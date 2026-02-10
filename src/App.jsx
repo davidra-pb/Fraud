@@ -5,11 +5,12 @@ import {
 import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
-  Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap, AlertCircle, Microscope, BrainCircuit
+  Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap, AlertCircle, Microscope, BrainCircuit,
+  FileBadge, Map, GraduationCap, Archive
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.10";
+const APP_VERSION = "v.1.11";
 
 // --- DATA ---
 const chartData = [
@@ -94,7 +95,7 @@ const TitleSlide = () => (
       <Shield className="w-16 h-16 text-white" />
     </div>
     <div>
-      <h1 className="text-6xl font-black text-slate-800 mb-4 tracking-tight">סקירת מניעת הונאות</h1>
+      <h1 className="text-6xl font-black text-slate-800 mb-4 tracking-tight">סקירה שנתית: מעילות והונאות</h1>
       <h2 className="text-3xl text-sky-600 font-normal">סיכום 2025 ותוכניות ל-2026</h2>
     </div>
     <div className="mt-12 px-10 py-3 bg-white rounded-full text-sky-700 text-xl font-bold shadow-xl border border-sky-100">
@@ -118,10 +119,10 @@ const ContextSlide = () => (
         </div>
         <div className="space-y-4 text-slate-600 text-xl leading-relaxed">
           <p>
-            עולם ההונאות משתנה כל הזמן. אנחנו פוגשים שיטות חדשות ומתוחכמות יותר.
+            עולם ההונאות והמעילות משתנה כל הזמן. אנחנו פוגשים שיטות חדשות ומתוחכמות יותר, הן מבחוץ והן בסיכונים פנימיים.
           </p>
           <p>
-            כדי להתמודד עם זה, אנחנו צריכים להיות גמישים ולעדכן את המערכות שלנו מהר.
+            כדי להתמודד עם זה, אנחנו צריכים להיות גמישים, לעדכן את המערכות שלנו ולחזק את הבקרות הפנימיות.
           </p>
         </div>
       </div>
@@ -143,7 +144,7 @@ const ContextSlide = () => (
           <li className="flex items-start gap-4">
             <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0"></span>
             <span>
-              <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה.
+              <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה והבקרות למניעת מעילות.
             </span>
           </li>
           <li className="flex items-start gap-4">
@@ -203,9 +204,9 @@ const ChartSlide = () => {
           <p className="text-xl text-slate-500">סיכום נתונים שנתי</p>
       </div>
 
-      <div className="flex gap-6 h-full pb-4">
+      <div className="flex gap-8 h-full pb-4">
 
-          <div className="w-1/4 flex flex-col gap-3">
+          <div className="w-1/4 flex flex-col gap-4">
               <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500"></div>
                   <div>
@@ -526,7 +527,65 @@ const LayersSlide = () => {
     );
 };
 
-// 7. Lists
+// 7. Embezzlement Slide (NEW)
+const EmbezzlementSlide = () => (
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
+       <div className="mb-10">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-indigo-500 pr-6">ניהול סיכוני מעילות</h2>
+            <p className="text-slate-500 text-2xl">פעילות שנת 2025 ותכנון ל-2026</p>
+       </div>
+
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-[65%]">
+          {/* Card 1 */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <FileBadge className="w-8 h-8 text-indigo-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">נוהל מהימנות עובדים</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                  בוצע עדכון לנוהל, כולל החמרת הקריטריונים לסיווג עובד ב"רמה א׳" (תפקידים רגישים).
+              </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Map className="w-8 h-8 text-indigo-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">מיפוי ובקרה</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                  מיפוי אזורי מעילות בחברה, יצירת תוכנית עבודה להפחתת סיכונים והטמעת בקרות מפצות.
+              </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <GraduationCap className="w-8 h-8 text-indigo-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">הדרכה והטמעה</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                  ביצוע הדרכות ייעודיות לצוותים האופרטיביים, הנמצאים בסיכון גבוה יותר מתוקף אופי עבודתם.
+              </p>
+          </div>
+       </div>
+
+       {/* 2026 Plan */}
+       <div className="mt-8 bg-indigo-50 border border-indigo-100 p-6 rounded-2xl flex items-center gap-6 shadow-sm">
+            <div className="bg-indigo-500 rounded-full p-3 text-white shadow-lg">
+                <Archive className="w-8 h-8" />
+            </div>
+            <div>
+                <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026</h4>
+                <p className="text-indigo-800 text-lg">
+                    צוות הציות יישם בקרות ייעודיות לניטור וטיפול בחשבונות רדומים (Dormant Accounts).
+                </p>
+            </div>
+        </div>
+    </div>
+);
+
+// 8. Lists
 const ListsSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
         <h2 className="text-4xl font-bold text-slate-800 mb-10 border-r-8 border-sky-400 pr-6">מבט ל-2026 - המשך ניהול שוטף ובקרה</h2>
@@ -586,7 +645,7 @@ const ListsSlide = () => (
     </div>
 );
 
-// 8. Thank You
+// 9. Thank You
 const ThankYouSlide = () => (
   <div className="flex flex-col items-center justify-center h-full text-center space-y-10 animate-fadeIn bg-gradient-to-tl from-sky-50 to-white">
     <div className="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center mb-4 shadow-sm">
@@ -611,6 +670,7 @@ const BoardPresentation = () => {
     { component: <TrendsSlide />, label: "מגמות 2025" },
     { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
     { component: <LayersSlide />, label: "שכבות הגנה" },
+    { component: <EmbezzlementSlide />, label: "ניהול מעילות" }, // New Slide
     { component: <ListsSlide />, label: "מבט ל-2026" },
     { component: <ThankYouSlide />, label: "סיום" },
   ];
