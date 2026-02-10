@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.01";
+const APP_VERSION = "v.1.02";
 
 // --- DATA ---
 const chartData = [
@@ -20,6 +20,8 @@ const chartData = [
 ];
 
 const formatCurrency = (val) => val >= 1000 ? `₪${(val/1000).toFixed(0)}k` : val;
+// New formatter for Millions on Axis
+const formatMillions = (val) => `₪${(val/1000000).toFixed(1)}M`;
 
 // PayBox Brand Colors
 const colors = {
@@ -207,10 +209,12 @@ const ChartSlide = () => {
                       <div className="text-slate-500 font-medium text-lg mb-1">איכות מניעה (%)</div>
                       <div className="text-6xl font-black text-slate-800">{savedPercentage}%</div>
                   </div>
-                  <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit mt-4">
-                      <TrendingUp className="w-5 h-5" />
-                      <span className="font-bold text-lg">+{improvement.toFixed(1)}%</span>
-                      <span className="text-sm text-emerald-700">שיפור</span>
+                  <div className="flex flex-col gap-2 mt-4 text-slate-500 text-sm">
+                      <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit">
+                        <TrendingUp className="w-5 h-5" />
+                        <span className="font-bold text-lg">+{improvement.toFixed(1)}%</span>
+                      </div>
+                      <p>שיפור משמעותי מול 2024. היעד לשנת 2026 עומד על 82%.</p>
                   </div>
               </div>
 
@@ -220,8 +224,9 @@ const ChartSlide = () => {
                       <div className="text-slate-500 font-medium text-lg mb-1">כסף שהוצל</div>
                       <div className="text-5xl font-black text-sky-600">{formatCurrency(totalSaved)}</div>
                   </div>
-                  <div className="mt-4 text-slate-400 text-base">
-                      מתוך חשיפה של <strong>{formatCurrency(totalExposure)}</strong>
+                  <div className="mt-4 text-slate-500 text-sm leading-snug">
+                      <p className="mb-1">מתוך חשיפה של <strong>{formatCurrency(totalExposure)}</strong></p>
+                      <p>יחס מניעה של <strong>1:4</strong> (על כל שקל נזק, נחסכו כ-4 שקלים).</p>
                   </div>
               </div>
 
@@ -231,9 +236,12 @@ const ChartSlide = () => {
                       <div className="text-slate-500 font-medium text-lg mb-1">נזק בפועל</div>
                       <div className="text-5xl font-black text-rose-500">{formatCurrency(latestData.damage)}</div>
                   </div>
-                  <div className="mt-4 text-slate-500 text-base flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-sky-500" />
-                      <span>ירידה של <strong>{formatCurrency(damageReduced)}</strong> בנזק</span>
+                  <div className="mt-4 text-slate-500 text-sm flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 text-sky-500" />
+                        <span>ירידה של <strong>{formatCurrency(damageReduced)}</strong></span>
+                      </div>
+                      <p>הנתון הנמוך ביותר ב-3 השנים האחרונות.</p>
                   </div>
               </div>
           </div>
@@ -251,7 +259,7 @@ const ChartSlide = () => {
                     <ComposedChart data={chartData} margin={{top: 60, right: 10, bottom: 10, left: 10}}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
                         <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 20, fontWeight: 600}} dy={15} />
-                        <YAxis yAxisId="left" tickFormatter={formatCurrency} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 16}} />
+                        <YAxis yAxisId="left" tickFormatter={formatMillions} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 16}} />
                         <YAxis yAxisId="right" orientation="right" tickFormatter={(v)=>`${v}%`} axisLine={false} tickLine={false} tick={{fill: '#0ea5e9', fontSize: 16, fontWeight: 700}} />
                         <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
                         <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
@@ -411,11 +419,11 @@ const ImprovementsSlide = () => (
               <ul className="space-y-6">
                   <li className="flex items-start gap-4 text-slate-600 text-xl leading-snug">
                       <div className="w-2.5 h-2.5 rounded-full bg-sky-400 mt-2.5 shrink-0"></div>
-                      <span><strong>הגבלת סכומים:</strong> הורדנו את תקרת האשראי הזר ל-1,000 ₪ כדי להקטין את המוטיבציה להונאה.</span>
+                      <span><strong>הגבלת סכומים:</strong> תהליך עסקי להורדת תקרות בכרטיסים זרים ל-1,000 ₪, שהוביל לירידה עקיפה בסיכון.</span>
                   </li>
                   <li className="flex items-start gap-4 text-slate-600 text-xl leading-snug">
                       <div className="w-2.5 h-2.5 rounded-full bg-sky-400 mt-2.5 shrink-0"></div>
-                      <span><strong>בקרת משיכות:</strong> אי אפשר למשוך כסף לחשבון בנק שלא אושר.</span>
+                      <span><strong>בקרת משיכות:</strong> לא ניתן למשוך כסף לחשבון בנק שטרם אושר.</span>
                   </li>
               </ul>
           </div>
@@ -619,8 +627,6 @@ const BoardPresentation = () => {
             <span>
               שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}
             </span>
-            <span className="text-slate-300">|</span>
-            <span>{APP_VERSION}</span>
           </div>
 
           <div className="flex gap-8">
