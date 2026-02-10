@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.04";
+const APP_VERSION = "v.1.05";
 
 // --- DATA ---
 const chartData = [
@@ -79,6 +79,10 @@ const LoginScreen = ({ onLogin }) => {
             כניסה למצגת
           </button>
         </form>
+
+        <div className="mt-8 text-slate-400 text-sm font-medium">
+            {APP_VERSION}
+        </div>
       </div>
     </div>
   );
