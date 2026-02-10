@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.09";
+const APP_VERSION = "v.1.10";
 
 // --- DATA ---
 const chartData = [
@@ -203,10 +203,10 @@ const ChartSlide = () => {
           <p className="text-xl text-slate-500">סיכום נתונים שנתי</p>
       </div>
 
-      <div className="flex gap-8 h-full pb-4">
+      <div className="flex gap-6 h-full pb-4">
 
-          <div className="w-1/4 flex flex-col gap-4">
-              <div className="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
+          <div className="w-1/4 flex flex-col gap-3">
+              <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500"></div>
                   <div>
                       <div className="text-slate-500 font-medium text-base mb-1">איכות מניעה (%)</div>
@@ -221,7 +221,7 @@ const ChartSlide = () => {
                   </div>
               </div>
 
-              <div className="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
+              <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-300"></div>
                   <div>
                       <div className="text-slate-500 font-medium text-base mb-1">כסף שהוצל</div>
@@ -233,7 +233,7 @@ const ChartSlide = () => {
                   </div>
               </div>
 
-              <div className="bg-white p-5 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
+              <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-1.5 h-full bg-rose-400"></div>
                   <div>
                       <div className="text-slate-500 font-medium text-base mb-1">נזק בפועל</div>
@@ -262,7 +262,7 @@ const ChartSlide = () => {
               </div>
           </div>
 
-          <div className="w-3/4 flex flex-col gap-4">
+          <div className="w-3/4 flex flex-col gap-3">
               <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative">
                   <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10">
                     <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
