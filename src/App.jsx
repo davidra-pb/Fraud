@@ -5,12 +5,12 @@ import {
 import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
-  Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap, AlertCircle, Microscope, BrainCircuit,
-  FileBadge, Map, GraduationCap, Archive
+  Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap,
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.12";
+const APP_VERSION = "v.1.13";
 
 // --- DATA ---
 const chartData = [
@@ -587,59 +587,76 @@ const ListsSlide = () => (
     </div>
 );
 
-// 8. Embezzlement Slide (NEW)
+// 8. Embezzlement Slide (NEW - FIX LAYOUT)
 const EmbezzlementSlide = () => (
-    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
-       <div className="mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-indigo-500 pr-6">ניהול סיכוני מעילות</h2>
+    <div className="h-full flex flex-col px-16 pt-8 pb-4 animate-fadeIn">
+        <div className="mb-8 text-center">
+            <h2 className="text-4xl font-bold text-slate-800 mb-2 border-b-4 border-indigo-500 inline-block pb-2">ניהול סיכוני מעילות</h2>
             <p className="text-slate-500 text-2xl">פעילות שנת 2025 ותכנון ל-2026</p>
-       </div>
+        </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-[65%]">
-          {/* Card 1 */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
-              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <FileBadge className="w-8 h-8 text-indigo-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">נוהל מהימנות עובדים</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                  בוצע עדכון לנוהל, כולל החמרת הקריטריונים לסיווג עובד ב"רמה א׳" (תפקידים רגישים).
-              </p>
-          </div>
+        {/* Main Content Area - Flex Column for Vertical Spacing */}
+        <div className="flex-grow flex flex-col justify-evenly gap-6 h-full">
 
-          {/* Card 2 */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
-              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Map className="w-8 h-8 text-indigo-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">מיפוי ובקרה</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                  מיפוי אזורי מעילות בחברה, יצירת תוכנית עבודה להפחתת סיכונים והטמעת בקרות מפצות.
-              </p>
-          </div>
+            {/* Top Row: 3 Cards */}
+            <div className="grid grid-cols-3 gap-8">
+                {/* Card 1 */}
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full">
+                    <div className="flex items-center gap-4 mb-3">
+                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                            <Scale className="w-6 h-6 text-indigo-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3>
+                    </div>
+                    <ul className="text-slate-600 text-base leading-relaxed space-y-2 flex-grow">
+                        <li>• עדכון מקיף לנוהל מהימנות עובדים.</li>
+                        <li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li>
+                        <li>• ביצוע בדיקות נאותות מוגברות וסיווג ביטחוני.</li>
+                    </ul>
+                </div>
 
-          {/* Card 3 */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
-              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <GraduationCap className="w-8 h-8 text-indigo-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">הדרכה והטמעה</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                  ביצוע הדרכות ייעודיות לצוותים האופרטיביים, הנמצאים בסיכון גבוה יותר מתוקף אופי עבודתם.
-              </p>
-          </div>
-       </div>
+                {/* Card 2 */}
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full">
+                    <div className="flex items-center gap-4 mb-3">
+                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                            <ShieldAlert className="w-6 h-6 text-indigo-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3>
+                    </div>
+                    <ul className="text-slate-600 text-base leading-relaxed space-y-2 flex-grow">
+                        <li>• מיפוי תהליכי ליבה ומוקדי סיכון למעילות.</li>
+                        <li>• יישום עקרון הפרדת סמכויות (SoD) במערכות.</li>
+                        <li>• בניית תוכנית להפחתת חשיפות והטמעת בקרות מפצות.</li>
+                    </ul>
+                </div>
 
-       {/* 2026 Plan */}
-       <div className="mt-8 bg-indigo-50 border border-indigo-100 p-6 rounded-2xl flex items-center gap-6 shadow-sm">
-            <div className="bg-indigo-500 rounded-full p-3 text-white shadow-lg">
-                <Archive className="w-8 h-8" />
+                {/* Card 3 */}
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full">
+                    <div className="flex items-center gap-4 mb-3">
+                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
+                            <GraduationCap className="w-6 h-6 text-indigo-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800">תרבות ומודעות</h3>
+                    </div>
+                    <ul className="text-slate-600 text-base leading-relaxed space-y-2 flex-grow">
+                        <li>• הדרכות ייעודיות לצוותים אופרטיביים בסיכון גבוה.</li>
+                        <li>• חיזוק האתיקה הארגונית ומנגנוני הדיווח.</li>
+                        <li>• הטמעת תרבות של "אפס סובלנות" למעילות.</li>
+                    </ul>
+                </div>
             </div>
-            <div>
-                <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026</h4>
-                <p className="text-indigo-800 text-lg">
-                    צוות הציות יישם בקרות ייעודיות לניטור וטיפול בחשבונות רדומים (Dormant Accounts).
-                </p>
+
+            {/* Bottom Row: 2026 Plan */}
+            <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem] flex items-center gap-6 shadow-sm">
+                <div className="bg-indigo-600 rounded-full p-3 text-white shadow-lg shrink-0">
+                    <Archive className="w-8 h-8" />
+                </div>
+                <div>
+                    <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026: מיקוד בחשבונות רדומים</h4>
+                    <p className="text-indigo-800 text-lg leading-snug">
+                        צוות הציות יטמיע בקרות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts), במטרה למנוע השתלטות פנימית ושימוש לרעה במאגרי המידע.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
@@ -647,92 +664,51 @@ const EmbezzlementSlide = () => (
 
 // 9. Thank You
 const ThankYouSlide = () => (
-  <div className="flex flex-col items-center justify-center h-full text-center space-y-10 animate-fadeIn bg-gradient-to-tl from-sky-50 to-white">
-    <div className="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center mb-4 shadow-sm">
-        <ShieldCheck className="w-16 h-16 text-sky-500" />
+    <div className="flex flex-col items-center justify-center h-full text-center space-y-10 animate-fadeIn bg-gradient-to-tl from-sky-50 to-white">
+        <div className="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center mb-4 shadow-sm"><ShieldCheck className="w-16 h-16 text-sky-500" /></div>
+        <div><h1 className="text-8xl font-extrabold text-slate-800 mb-4 tracking-tight">תודה רבה</h1></div>
     </div>
-    <div>
-        <h1 className="text-8xl font-extrabold text-slate-800 mb-4 tracking-tight">תודה רבה</h1>
-    </div>
-  </div>
 );
-
 
 // --- MAIN APP ---
 const BoardPresentation = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const slides = [
+        { component: <TitleSlide />, label: "פתיחה" },
+        { component: <ContextSlide />, label: "רקע ומטרות" },
+        { component: <ChartSlide />, label: "נתונים" },
+        { component: <TrendsSlide />, label: "מגמות 2025" },
+        { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
+        { component: <LayersSlide />, label: "שכבות הגנה" },
+        { component: <ListsSlide />, label: "מבט ל-2026" },
+        { component: <EmbezzlementSlide />, label: "ניהול מעילות" }, // Fixed Layout
+        { component: <ThankYouSlide />, label: "סיום" },
+    ];
 
-  const slides = [
-    { component: <TitleSlide />, label: "פתיחה" },
-    { component: <ContextSlide />, label: "רקע ומטרות" },
-    { component: <ChartSlide />, label: "נתונים" },
-    { component: <TrendsSlide />, label: "מגמות 2025" },
-    { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
-    { component: <LayersSlide />, label: "שכבות הגנה" },
-    { component: <ListsSlide />, label: "מבט ל-2026" },
-    { component: <EmbezzlementSlide />, label: "ניהול מעילות" }, // Updated Order
-    { component: <ThankYouSlide />, label: "סיום" },
-  ];
+    const nextSlide = () => setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
+    const prevSlide = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
 
-  const nextSlide = () => setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
-  const prevSlide = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
+    if (!isAuthenticated) { return <LoginScreen onLogin={() => setIsAuthenticated(true)} />; }
 
-  if (!isAuthenticated) {
-    return <LoginScreen onLogin={() => setIsAuthenticated(true)} />;
-  }
-
-  return (
-    <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-100 p-8 overflow-hidden font-sans">
-
-      {/* Slide Container (Full Width/Height) */}
-      <div className="bg-white w-[98vw] h-[92vh] rounded-[3.5rem] shadow-2xl border border-white/60 relative overflow-hidden flex flex-col">
-
-        {/* Progress Bar */}
-        <div className="w-full h-3 bg-sky-50">
-          <div
-            className="h-full bg-sky-500 transition-all duration-700 ease-in-out"
-            style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}
-          ></div>
+    return (
+        <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-100 p-8 overflow-hidden font-sans">
+            <div className="bg-white w-[98vw] h-[92vh] rounded-[3.5rem] shadow-2xl border border-white/60 relative overflow-hidden flex flex-col">
+                <div className="w-full h-3 bg-sky-50">
+                    <div className="h-full bg-sky-500 transition-all duration-700 ease-in-out" style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}></div>
+                </div>
+                <div className="flex-grow relative overflow-hidden">{slides[currentSlide].component}</div>
+                <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16">
+                    <div className="text-slate-400 text-xl font-medium flex gap-4"><span>שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}</span></div>
+                    <div className="flex gap-8">
+                        <button onClick={prevSlide} disabled={currentSlide === 0} className={`p-5 rounded-full ${currentSlide === 0 ? 'text-slate-300 bg-slate-50' : 'bg-white shadow-lg border border-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-600'} transition-all`}><ChevronRight className="w-8 h-8" /></button>
+                        <button onClick={nextSlide} disabled={currentSlide === slides.length - 1} className={`p-5 rounded-full ${currentSlide === slides.length - 1 ? 'text-slate-300 bg-slate-50' : 'bg-sky-500 shadow-xl shadow-sky-200 text-white hover:bg-sky-600 hover:shadow-sky-300'} transition-all`}><ChevronLeft className="w-8 h-8" /></button>
+                    </div>
+                </div>
+            </div>
+            <div className="text-center mt-6 text-slate-400 text-lg font-medium">Fraud Prevention Operations • Board Meeting Q1 2026 • {APP_VERSION}</div>
         </div>
-
-        {/* Slide Content */}
-        <div className="flex-grow relative overflow-hidden">
-          {slides[currentSlide].component}
-        </div>
-
-        {/* Navigation Footer */}
-        <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16">
-          <div className="text-slate-400 text-xl font-medium flex gap-4">
-            <span>
-              שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}
-            </span>
-          </div>
-
-          <div className="flex gap-8">
-            <button
-              onClick={prevSlide}
-              disabled={currentSlide === 0}
-              className={`p-5 rounded-full ${currentSlide === 0 ? 'text-slate-300 bg-slate-50' : 'bg-white shadow-lg border border-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-600'} transition-all`}
-            >
-              <ChevronRight className="w-8 h-8" />
-            </button>
-            <button
-              onClick={nextSlide}
-              disabled={currentSlide === slides.length - 1}
-              className={`p-5 rounded-full ${currentSlide === slides.length - 1 ? 'text-slate-300 bg-slate-50' : 'bg-sky-500 shadow-xl shadow-sky-200 text-white hover:bg-sky-600 hover:shadow-sky-300'} transition-all`}
-            >
-              <ChevronLeft className="w-8 h-8" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="text-center mt-6 text-slate-400 text-lg font-medium">
-        Fraud Prevention Operations • Board Meeting Q1 2026 • {APP_VERSION}
-      </div>
-    </div>
-  );
+    );
 };
 
 export default BoardPresentation;
