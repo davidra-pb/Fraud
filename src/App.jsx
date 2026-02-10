@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.02";
+const APP_VERSION = "v.1.03";
 
 // --- DATA ---
 const chartData = [
@@ -446,7 +446,7 @@ const LayersSlide = () => {
             title: "זיהוי לקוח (בכניסה)",
             icon: <Fingerprint className="w-10 h-10" />,
             desc: "בודקים שמי שנרשם הוא באמת מי שהוא טוען.",
-            items: ["בדיקות רגולטוריות", "אימות מסמכים", "פרופיל ראשוני"],
+            items: ["איסוף נב״ת 411: ת.ז, כתובת, טלפון, מגדר, אופי שימוש", "אימות מסמכים", "פרופיל ראשוני"],
             color: "bg-sky-600",
             widthClass: "w-[92%]"
         },
