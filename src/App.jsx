@@ -5,22 +5,21 @@ import {
 import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
-  Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap
+  Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap, AlertCircle, Microscope, BrainCircuit
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.06";
+const APP_VERSION = "v.1.08";
 
 // --- DATA ---
 const chartData = [
-  { year: '2022', savedNear: 741053, savedRetro: 338370, savedCollection: 265140, damage: 779212, quality: 63.3, totalSaved: 1344563, totalExposure: 2123775 },
-  { year: '2023', savedNear: 289707, savedRetro: 269037, savedCollection: 222605, damage: 658667, quality: 54.3, totalSaved: 781349, totalExposure: 1440016 },
-  { year: '2024', savedNear: 270150, savedRetro: 117560, savedCollection: 368444, damage: 394876, quality: 65.7, totalSaved: 756154, totalExposure: 1151030 },
-  { year: '2025', savedNear: 590387, savedRetro: 85356, savedCollection: 261321, damage: 244950, quality: 79.3, totalSaved: 937064, totalExposure: 1182014 },
+  { year: '2022', savedNear: 741053.20, savedRetro: 338370.34, savedCollection: 265140.60, damage: 779212.67, quality: 63.3, totalSaved: 1344564, totalExposure: 2123776 },
+  { year: '2023', savedNear: 289707, savedRetro: 269037.13, savedCollection: 221925.26, damage: 659347.02, quality: 54.2, totalSaved: 780669, totalExposure: 1440016 },
+  { year: '2024', savedNear: 270150, savedRetro: 119560, savedCollection: 368974.10, damage: 395792.65, quality: 65.7, totalSaved: 758684, totalExposure: 1154477 },
+  { year: '2025', savedNear: 590387.37, savedRetro: 85356, savedCollection: 263511.59, damage: 254250.00, quality: 78.7, totalSaved: 939255, totalExposure: 1193505 },
 ];
 
 const formatCurrency = (val) => val >= 1000 ? `₪${(val/1000).toFixed(0)}k` : val;
-// New formatter for Millions on Axis
 const formatMillions = (val) => `₪${(val/1000000).toFixed(1)}M`;
 
 // PayBox Brand Colors
@@ -199,7 +198,7 @@ const ChartSlide = () => {
 
     return (
     <div className="h-full flex flex-col px-12 animate-fadeIn">
-      <div className="mb-10">
+      <div className="mb-8">
           <h2 className="text-5xl font-bold text-slate-800 mb-3">נתוני מניעה ונזק - 2025</h2>
           <p className="text-2xl text-slate-500">סיכום נתונים שנתי</p>
       </div>
@@ -218,7 +217,7 @@ const ChartSlide = () => {
                         <TrendingUp className="w-5 h-5" />
                         <span className="font-bold text-lg">+{improvement.toFixed(1)}%</span>
                       </div>
-                      <p>שיפור משמעותי מול 2024. היעד לשנת 2026 עומד על 82%.</p>
+                      <p>שיפור משמעותי מול 2024.</p>
                   </div>
               </div>
 
@@ -234,18 +233,18 @@ const ChartSlide = () => {
                   </div>
               </div>
 
-              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-2 h-full bg-rose-400"></div>
+              <div className="bg-amber-50 p-6 rounded-[2rem] shadow-sm border border-amber-200 flex flex-col justify-between flex-1 relative overflow-hidden">
                   <div>
-                      <div className="text-slate-500 font-medium text-lg mb-1">נזק בפועל</div>
-                      <div className="text-5xl font-black text-rose-500">{formatCurrency(latestData.damage)}</div>
-                  </div>
-                  <div className="mt-4 text-slate-500 text-sm flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-5 h-5 text-sky-500" />
-                        <span>ירידה של <strong>{formatCurrency(damageReduced)}</strong></span>
+                      <div className="flex items-center gap-2 mb-2">
+                          <AlertCircle className="w-6 h-6 text-amber-600" />
+                          <div className="text-amber-800 font-bold text-lg">עדכון נתונים</div>
                       </div>
-                      <p>הנתון הנמוך ביותר ב-3 השנים האחרונות.</p>
+                      <p className="text-amber-900 text-base leading-snug font-medium">
+                          נכון למועד זה, התקבלו הכחשות נוספות (2025) בסך <strong>330k ₪</strong> הממתינות לסיווג (נזק/גבייה).
+                      </p>
+                  </div>
+                  <div className="mt-4 text-amber-700/70 text-sm border-t border-amber-200 pt-2">
+                      * הכחשות מתקבלות עד חצי שנה ממועד העסקה, לכן הסכומים אינם סופיים.
                   </div>
               </div>
           </div>
@@ -389,11 +388,11 @@ const ImprovementsSlide = () => (
               <ul className="space-y-6">
                   <li className="flex items-start gap-4 text-slate-600 text-xl leading-snug">
                       <div className="w-2.5 h-2.5 rounded-full bg-sky-400 mt-2.5 shrink-0"></div>
-                      <span><strong>אייפון:</strong> סידרנו זיהוי של דפוסים חשודים ספציפית במכשירי אפל.</span>
+                      <span><strong>מכשירי iPhone:</strong> הוספנו יכולת לאתר משתמשים ללא אנשי קשר ומאזור זמן שאיננו ישראל (בדומה לאנדרואיד) כמענה לצרכים מהשטח.</span>
                   </li>
                   <li className="flex items-start gap-4 text-slate-600 text-xl leading-snug">
                       <div className="w-2.5 h-2.5 rounded-full bg-sky-400 mt-2.5 shrink-0"></div>
-                      <span><strong>זיהוי מהיר:</strong> המערכת עולה מהר יותר על חשבונות שנפתחו רק כדי להעביר כסף.</span>
+                      <span><strong>ניתוח ותגובה:</strong> ניתוח מקרים ותגובה מהירה הם המפתח למניעת נזק כספי.</span>
                   </li>
               </ul>
           </div>
@@ -423,7 +422,7 @@ const ImprovementsSlide = () => (
               <ul className="space-y-6">
                   <li className="flex items-start gap-4 text-slate-600 text-xl leading-snug">
                       <div className="w-2.5 h-2.5 rounded-full bg-sky-400 mt-2.5 shrink-0"></div>
-                      <span><strong>הגבלת סכומים:</strong> תהליך עסקי להורדת תקרות בכרטיסים זרים ל-1,000 ₪, שהוביל לירידה עקיפה בסיכון.</span>
+                      <span><strong>הגבלת סכומים:</strong> תהליך עסקי שהוריד את הספים בכרטיסים ל-1,000 ₪, מה שהוביל לירידה בסיכון.</span>
                   </li>
                   <li className="flex items-start gap-4 text-slate-600 text-xl leading-snug">
                       <div className="w-2.5 h-2.5 rounded-full bg-sky-400 mt-2.5 shrink-0"></div>
@@ -450,7 +449,7 @@ const LayersSlide = () => {
             title: "זיהוי לקוח (בכניסה)",
             icon: <Fingerprint className="w-10 h-10" />,
             desc: "בודקים שמי שנרשם הוא באמת מי שהוא טוען.",
-            items: ["איסוף נב״ת 411: ת.ז, כתובת, טלפון, מגדר, אופי שימוש", "פרופיל ראשוני"],
+            items: ["איסוף נב״ת 411: ת.ז, כתובת, טלפון, מגדר, אופי שימוש", "אימות ח-ן מול אדי״ב", "פרופיל ראשוני"],
             color: "bg-sky-600",
             widthClass: "w-[92%]"
         },
@@ -513,7 +512,7 @@ const LayersSlide = () => {
 // 7. Lists
 const ListsSlide = () => (
     <div className="h-full flex flex-col justify-center px-20 animate-fadeIn">
-        <h2 className="text-5xl font-bold text-slate-800 mb-16 border-r-8 border-sky-400 pr-8">ניהול שוטף ובקרה</h2>
+        <h2 className="text-5xl font-bold text-slate-800 mb-16 border-r-8 border-sky-400 pr-8">מבט ל-2026 - המשך ניהול שוטף ובקרה</h2>
         <div className="grid grid-cols-3 gap-12">
 
             <div className="bg-slate-700 text-white p-12 rounded-[2.5rem] shadow-xl transform hover:scale-105 transition duration-300 flex flex-col">
@@ -522,7 +521,7 @@ const ListsSlide = () => (
                 </div>
                 <h3 className="text-3xl font-bold mb-4">רשימה שחורה (Black List)</h3>
                 <p className="text-slate-300 text-xl leading-relaxed mb-8 flex-grow">
-                    משתמשים שזוהו כהונאה בעבר ונחסמו לצמיתות.
+                    ניהול רשימה לפי מזהים ייחודיים: מזהה מכשיר וחשבונות בנק שזוהו כהונאה בעבר וחסימה לצמיתות.
                 </p>
                 <div className="pt-8 border-t border-slate-600 mt-auto">
                     <span className="text-base bg-rose-500/90 px-6 py-3 rounded-full text-white font-bold shadow-lg">חסימה אוטומטית</span>
@@ -531,14 +530,14 @@ const ListsSlide = () => (
 
             <div className="bg-white border border-slate-100 p-12 rounded-[2.5rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col">
                 <div className="bg-sky-50 w-20 h-20 rounded-3xl flex items-center justify-center mb-8">
-                    <Eye className="w-10 h-10 text-sky-500" />
+                    <Microscope className="w-10 h-10 text-sky-500" />
                 </div>
-                <h3 className="text-3xl font-bold mb-4 text-slate-800">רשימת מעקב (Watch List)</h3>
+                <h3 className="text-3xl font-bold mb-4 text-slate-800">ניטור מוגבר שוטף</h3>
                 <p className="text-slate-500 text-xl leading-relaxed mb-8 flex-grow">
-                    משתמשים עם פעילות חריגה שדורשים בדיקה ידנית לפני אישור.
+                    תהליך יומי המציף עסקאות חשודות על בסיס "התורה שבעל פה" (חוקים שנצברו). הצוות מנתח לעומק ומבצע עצירה מיידית.
                 </p>
                 <div className="pt-8 border-t border-slate-50 mt-auto">
-                    <span className="text-base bg-sky-100 text-sky-700 px-6 py-3 rounded-full font-bold">ניטור מוגבר</span>
+                    <span className="text-base bg-sky-100 text-sky-700 px-6 py-3 rounded-full font-bold">ניטור אנושי</span>
                 </div>
             </div>
 
@@ -546,25 +545,24 @@ const ListsSlide = () => (
                 <div className="bg-orange-50 w-20 h-20 rounded-3xl flex items-center justify-center mb-8">
                     <FileText className="w-10 h-10 text-orange-400" />
                 </div>
-                <h3 className="text-3xl font-bold mb-4 text-slate-800">מוקפאים (Banned)</h3>
+                <h3 className="text-3xl font-bold mb-4 text-slate-800">מוקפאים / חסומים (Banned)</h3>
                 <p className="text-slate-500 text-xl leading-relaxed mb-8 flex-grow">
-                    חשבונות שהוקפאו זמנית בגלל חשד, עד לבירור מול הלקוח.
+                    ניהול חסימה לפי ת.ז וטלפון. כולל חשבונות שהוקפאו זמנית בגלל חשד, עד לבירור מול הלקוח.
                 </p>
                 <div className="pt-8 border-t border-slate-50 mt-auto">
-                    <span className="text-base bg-orange-100 text-orange-700 px-6 py-3 rounded-full font-bold">הקפאה זמנית</span>
+                    <span className="text-base bg-orange-100 text-orange-700 px-6 py-3 rounded-full font-bold">הקפאה זמנית / חסימה</span>
                 </div>
             </div>
         </div>
 
         <div className="mt-16 bg-sky-50 border border-sky-100 p-8 rounded-3xl flex items-center gap-8 shadow-sm">
             <div className="bg-sky-500 rounded-full p-4 text-white shadow-lg">
-                <Activity className="w-8 h-8" />
+                <BrainCircuit className="w-8 h-8" />
             </div>
             <div>
-                <h4 className="font-bold text-sky-900 text-2xl mb-2">מה עושים ביומיום?</h4>
+                <h4 className="font-bold text-sky-900 text-2xl mb-2">מבט קדימה</h4>
                 <p className="text-sky-800 text-xl leading-relaxed">
-                    מדובר בתהליך יומי המציף עסקאות חשודות על בסיס "התורה שבעל פה" - אוסף כללים וחוקים שצברנו לאורך השנים.
-                    הצוות מנתח כל פעילות חריגה לעומק ומבצע עצירה מיידית במידת הצורך.
+                    שיפורים נוספים בחוקי ניטור ומניעה ב-Wallet Score, המשך במתווה הקיים. הכנסת כלים מתקדמים לבדיקות משתמשים בשילוב כלי AI ולוגיקות עסקיות.
                 </p>
             </div>
         </div>
@@ -596,7 +594,7 @@ const BoardPresentation = () => {
     { component: <TrendsSlide />, label: "מגמות 2025" },
     { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
     { component: <LayersSlide />, label: "שכבות הגנה" },
-    { component: <ListsSlide />, label: "ניטור ובקרה" },
+    { component: <ListsSlide />, label: "מבט ל-2026" },
     { component: <ThankYouSlide />, label: "סיום" },
   ];
 
