@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.03";
+const APP_VERSION = "v.1.04";
 
 // --- DATA ---
 const chartData = [
@@ -558,8 +558,9 @@ const ListsSlide = () => (
             </div>
             <div>
                 <h4 className="font-bold text-sky-900 text-2xl mb-2">מה עושים ביומיום?</h4>
-                <p className="text-sky-800 text-xl">
-                    כל יום הצוות עובר על פעילויות חריגה. אם יש משהו חשוד, עוצרים מיד את הפעילות.
+                <p className="text-sky-800 text-xl leading-relaxed">
+                    מדובר בתהליך יומי המציף עסקאות חשודות על בסיס "התורה שבעל פה" - אוסף כללים וחוקים שצברנו לאורך השנים.
+                    הצוות מנתח כל פעילות חריגה לעומק ומבצע עצירה מיידית במידת הצורך.
                 </p>
             </div>
         </div>
