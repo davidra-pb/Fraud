@@ -659,6 +659,9 @@ const EmbezzlementSlide = () => (
                     <p className="text-indigo-800 text-lg leading-snug">
                         בחינה מחודשת של נוהל מהיממות עובדים והגדלת תדירות חובת הפוליגרף
                     </p>
+                    <p className="text-indigo-800 text-lg leading-snug">
+                        הטמעה תוכנית להפחתת חשיפות ובקרות מפצות.
+                    </p>
                 </div>
             </div>
         </div>
