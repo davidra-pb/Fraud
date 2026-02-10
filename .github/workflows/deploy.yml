@@ -30,7 +30,7 @@
             run: |
               npm install -g staticrypt
               # מצפין את הקובץ שנוצר בתיקיית dist
-              staticrypt dist/index.html '111' -o dist/index.html --title "Secure Presentation" --instructions "Protected Content"
+              staticrypt dist/index.html '123' -o dist/index.html --title "Secure Presentation" --instructions "Protected Content"
 
           - name: Deploy to GitHub Pages
             uses: JamesIves/github-pages-deploy-action@v4
