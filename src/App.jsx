@@ -611,7 +611,7 @@ const EmbezzlementSlide = () => (
                     <ul className="text-slate-600 text-base leading-relaxed space-y-2 flex-grow">
                         <li>• עדכון מקיף לנוהל מהימנות עובדים.</li>
                         <li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li>
-                        <li>• ביצוע בדיקות נאותות מוגברות וסיווג ביטחוני.</li>
+                        <li>• ביצוע בדיקות נאותות מוגברות ומבחני מהימנות.</li>
                     </ul>
                 </div>
 
@@ -654,7 +654,10 @@ const EmbezzlementSlide = () => (
                 <div>
                     <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026: מיקוד בחשבונות רדומים</h4>
                     <p className="text-indigo-800 text-lg leading-snug">
-                        צוות הציות יטמיע בקרות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts), במטרה למנוע השתלטות פנימית ושימוש לרעה במאגרי המידע.
+                        צוות הציות יטמיע בקרות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts), במטרה למנוע השתלטות פנימית ושימוש לרעה בכספי לקוחות.
+                    </p>
+                    <p className="text-indigo-800 text-lg leading-snug">
+                        בחינה מחודשת של נוהל מהיממות עובדים והגדלת תדירות חובת הפוליגרף
                     </p>
                 </div>
             </div>
