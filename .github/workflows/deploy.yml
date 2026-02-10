@@ -1,5 +1,5 @@
 
-    name: Deploy React with Password
+    name: Deploy React App
 
     on:
       push:
@@ -25,12 +25,6 @@
 
           - name: Build Project
             run: npm run build
-
-          - name: Encrypt with Staticrypt
-            run: |
-              npm install -g staticrypt
-              # מצפין את הקובץ שנוצר בתיקיית dist
-              staticrypt dist/index.html '' -o dist/index.html --title "Secure Presentation" --instructions "Protected Content"
 
           - name: Deploy to GitHub Pages
             uses: JamesIves/github-pages-deploy-action@v4
