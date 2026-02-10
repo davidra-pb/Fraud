@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.11";
+const APP_VERSION = "v.1.12";
 
 // --- DATA ---
 const chartData = [
@@ -527,65 +527,7 @@ const LayersSlide = () => {
     );
 };
 
-// 7. Embezzlement Slide (NEW)
-const EmbezzlementSlide = () => (
-    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
-       <div className="mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-indigo-500 pr-6">ניהול סיכוני מעילות</h2>
-            <p className="text-slate-500 text-2xl">פעילות שנת 2025 ותכנון ל-2026</p>
-       </div>
-
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-[65%]">
-          {/* Card 1 */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
-              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <FileBadge className="w-8 h-8 text-indigo-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">נוהל מהימנות עובדים</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                  בוצע עדכון לנוהל, כולל החמרת הקריטריונים לסיווג עובד ב"רמה א׳" (תפקידים רגישים).
-              </p>
-          </div>
-
-          {/* Card 2 */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
-              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <Map className="w-8 h-8 text-indigo-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">מיפוי ובקרה</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                  מיפוי אזורי מעילות בחברה, יצירת תוכנית עבודה להפחתת סיכונים והטמעת בקרות מפצות.
-              </p>
-          </div>
-
-          {/* Card 3 */}
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
-              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                  <GraduationCap className="w-8 h-8 text-indigo-500" />
-              </div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">הדרכה והטמעה</h3>
-              <p className="text-slate-600 text-lg leading-relaxed">
-                  ביצוע הדרכות ייעודיות לצוותים האופרטיביים, הנמצאים בסיכון גבוה יותר מתוקף אופי עבודתם.
-              </p>
-          </div>
-       </div>
-
-       {/* 2026 Plan */}
-       <div className="mt-8 bg-indigo-50 border border-indigo-100 p-6 rounded-2xl flex items-center gap-6 shadow-sm">
-            <div className="bg-indigo-500 rounded-full p-3 text-white shadow-lg">
-                <Archive className="w-8 h-8" />
-            </div>
-            <div>
-                <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026</h4>
-                <p className="text-indigo-800 text-lg">
-                    צוות הציות יישם בקרות ייעודיות לניטור וטיפול בחשבונות רדומים (Dormant Accounts).
-                </p>
-            </div>
-        </div>
-    </div>
-);
-
-// 8. Lists
+// 7. Lists (View to 2026)
 const ListsSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
         <h2 className="text-4xl font-bold text-slate-800 mb-10 border-r-8 border-sky-400 pr-6">מבט ל-2026 - המשך ניהול שוטף ובקרה</h2>
@@ -645,6 +587,64 @@ const ListsSlide = () => (
     </div>
 );
 
+// 8. Embezzlement Slide (NEW)
+const EmbezzlementSlide = () => (
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
+       <div className="mb-10">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-indigo-500 pr-6">ניהול סיכוני מעילות</h2>
+            <p className="text-slate-500 text-2xl">פעילות שנת 2025 ותכנון ל-2026</p>
+       </div>
+
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-[65%]">
+          {/* Card 1 */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <FileBadge className="w-8 h-8 text-indigo-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">נוהל מהימנות עובדים</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                  בוצע עדכון לנוהל, כולל החמרת הקריטריונים לסיווג עובד ב"רמה א׳" (תפקידים רגישים).
+              </p>
+          </div>
+
+          {/* Card 2 */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Map className="w-8 h-8 text-indigo-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">מיפוי ובקרה</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                  מיפוי אזורי מעילות בחברה, יצירת תוכנית עבודה להפחתת סיכונים והטמעת בקרות מפצות.
+              </p>
+          </div>
+
+          {/* Card 3 */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+              <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <GraduationCap className="w-8 h-8 text-indigo-500" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">הדרכה והטמעה</h3>
+              <p className="text-slate-600 text-lg leading-relaxed">
+                  ביצוע הדרכות ייעודיות לצוותים האופרטיביים, הנמצאים בסיכון גבוה יותר מתוקף אופי עבודתם.
+              </p>
+          </div>
+       </div>
+
+       {/* 2026 Plan */}
+       <div className="mt-8 bg-indigo-50 border border-indigo-100 p-6 rounded-2xl flex items-center gap-6 shadow-sm">
+            <div className="bg-indigo-500 rounded-full p-3 text-white shadow-lg">
+                <Archive className="w-8 h-8" />
+            </div>
+            <div>
+                <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026</h4>
+                <p className="text-indigo-800 text-lg">
+                    צוות הציות יישם בקרות ייעודיות לניטור וטיפול בחשבונות רדומים (Dormant Accounts).
+                </p>
+            </div>
+        </div>
+    </div>
+);
+
 // 9. Thank You
 const ThankYouSlide = () => (
   <div className="flex flex-col items-center justify-center h-full text-center space-y-10 animate-fadeIn bg-gradient-to-tl from-sky-50 to-white">
@@ -670,8 +670,8 @@ const BoardPresentation = () => {
     { component: <TrendsSlide />, label: "מגמות 2025" },
     { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
     { component: <LayersSlide />, label: "שכבות הגנה" },
-    { component: <EmbezzlementSlide />, label: "ניהול מעילות" }, // New Slide
     { component: <ListsSlide />, label: "מבט ל-2026" },
+    { component: <EmbezzlementSlide />, label: "ניהול מעילות" }, // Updated Order
     { component: <ThankYouSlide />, label: "סיום" },
   ];
 
