@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
 } from 'recharts';
@@ -6,11 +6,11 @@ import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
   Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap,
-  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.14";
+const APP_VERSION = "v.1.15";
 
 // --- DATA ---
 const chartData = [
@@ -90,7 +90,7 @@ const LoginScreen = ({ onLogin }) => {
 
 // 1. Title Slide
 const TitleSlide = () => (
-  <div className="flex flex-col items-center justify-center h-full text-center space-y-8 animate-fadeIn bg-gradient-to-br from-sky-50 to-white">
+  <div className="flex flex-col items-center justify-center h-full text-center space-y-8 bg-gradient-to-br from-sky-50 to-white print:h-screen print:w-screen">
     <div className="w-32 h-32 bg-sky-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-sky-200">
       <Shield className="w-16 h-16 text-white" />
     </div>
@@ -106,7 +106,7 @@ const TitleSlide = () => (
 
 // 2. Context
 const ContextSlide = () => (
-  <div className="h-full flex flex-col justify-center px-12 animate-fadeIn overflow-hidden">
+  <div className="h-full flex flex-col justify-center px-12 overflow-hidden print:h-screen print:overflow-visible">
     <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-500 pr-6">רקע ומטרות</h2>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 flex-grow max-h-[70vh]">
@@ -198,7 +198,7 @@ const ChartSlide = () => {
     };
 
     return (
-    <div className="h-full flex flex-col px-8 animate-fadeIn overflow-hidden">
+    <div className="h-full flex flex-col px-8 overflow-hidden print:h-screen print:overflow-visible">
       <div className="mb-4">
           <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
           <p className="text-xl text-slate-500">סיכום נתונים שנתי</p>
@@ -680,6 +680,8 @@ const ThankYouSlide = () => (
 const BoardPresentation = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [currentSlide, setCurrentSlide] = useState(0);
+    const [isPrintMode, setIsPrintMode] = useState(false); // New state for Print Mode
+
     const slides = [
         { component: <TitleSlide />, label: "פתיחה" },
         { component: <ContextSlide />, label: "רקע ומטרות" },
@@ -688,7 +690,7 @@ const BoardPresentation = () => {
         { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
         { component: <LayersSlide />, label: "שכבות הגנה" },
         { component: <ListsSlide />, label: "מבט ל-2026" },
-        { component: <EmbezzlementSlide />, label: "ניהול מעילות" }, // Fixed Layout
+        { component: <EmbezzlementSlide />, label: "ניהול מעילות" },
         { component: <ThankYouSlide />, label: "סיום" },
     ];
 
@@ -697,6 +699,53 @@ const BoardPresentation = () => {
 
     if (!isAuthenticated) { return <LoginScreen onLogin={() => setIsAuthenticated(true)} />; }
 
+    // --- PRINT MODE RENDER ---
+    if (isPrintMode) {
+        return (
+            <div className="bg-white min-h-screen font-sans p-0 m-0" dir="rtl">
+                <style>{`
+                    @media print {
+                        @page { size: landscape; margin: 0; }
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; margin: 0; padding: 0; }
+                        .no-print { display: none !important; }
+                        .print-slide { break-after: always; page-break-after: always; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+                    }
+                `}</style>
+
+                <div className="fixed top-4 right-4 z-50 flex gap-4 no-print">
+                    <button
+                        onClick={() => window.print()}
+                        className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all"
+                    >
+                        <Printer className="w-5 h-5" />
+                        הדפס / שמור כ-PDF
+                    </button>
+                    <button
+                        onClick={() => setIsPrintMode(false)}
+                        className="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-full shadow-md transition-all"
+                    >
+                        <X className="w-5 h-5" />
+                        חזור למצגת
+                    </button>
+                </div>
+
+                <div className="flex flex-col">
+                    {slides.map((slide, index) => (
+                        <div key={index} className="print-slide relative w-screen h-screen overflow-hidden bg-white border-b-2 border-slate-100 print:border-none">
+                            <div className="absolute top-4 left-6 text-slate-300 text-sm font-bold z-10">
+                                {index + 1} / {slides.length} • {APP_VERSION}
+                            </div>
+                            <div className="w-full h-full">
+                                {slide.component}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    // --- PRESENTATION MODE RENDER ---
     return (
         <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-100 p-8 overflow-hidden font-sans">
             <div className="bg-white w-[98vw] h-[92vh] rounded-[3.5rem] shadow-2xl border border-white/60 relative overflow-hidden flex flex-col">
@@ -706,7 +755,18 @@ const BoardPresentation = () => {
                 <div className="flex-grow relative overflow-hidden">{slides[currentSlide].component}</div>
                 <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16">
                     <div className="text-slate-400 text-xl font-medium flex gap-4"><span>שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}</span></div>
-                    <div className="flex gap-8">
+                    <div className="flex gap-6 items-center">
+                        <button
+                            onClick={() => setIsPrintMode(true)}
+                            className="flex items-center gap-2 text-sky-600 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-4 py-2 rounded-xl transition-all font-semibold mr-4"
+                            title="הכן להדפסה"
+                        >
+                            <Printer className="w-5 h-5" />
+                            <span className="hidden md:inline">הכן להדפסה / PDF</span>
+                        </button>
+
+                        <div className="h-8 w-px bg-slate-200 mx-2"></div>
+
                         <button onClick={prevSlide} disabled={currentSlide === 0} className={`p-5 rounded-full ${currentSlide === 0 ? 'text-slate-300 bg-slate-50' : 'bg-white shadow-lg border border-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-600'} transition-all`}><ChevronRight className="w-8 h-8" /></button>
                         <button onClick={nextSlide} disabled={currentSlide === slides.length - 1} className={`p-5 rounded-full ${currentSlide === slides.length - 1 ? 'text-slate-300 bg-slate-50' : 'bg-sky-500 shadow-xl shadow-sky-200 text-white hover:bg-sky-600 hover:shadow-sky-300'} transition-all`}><ChevronLeft className="w-8 h-8" /></button>
                     </div>
