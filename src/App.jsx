@@ -15,15 +15,26 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.24";
+const APP_VERSION = "v.1.25";
 
 // --- FIREBASE SETUP ---
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+let app, auth, db;
+let isFirebaseInitialized = false;
+
+try {
+    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+    if (firebaseConfig) {
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        isFirebaseInitialized = true;
+    }
+} catch (e) {
+    console.error("Firebase initialization failed:", e);
+}
 
 // Critical Fix: Sanitize appId to ensure it is treated as a single path segment
+// Replaces slashes and dots to prevent creating unintended sub-collections
 const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
 const appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
 
@@ -109,14 +120,22 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     const [user, setUser] = useState(null);
     const [newCommentPos, setNewCommentPos] = useState(null);
     const [newCommentText, setNewCommentText] = useState("");
+    const [hasError, setHasError] = useState(false);
 
     // Auth & Data Fetching
     useEffect(() => {
+        if (!isFirebaseInitialized) return;
+
         const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.error("Auth error:", err);
+                setHasError(true);
             }
         };
         initAuth();
@@ -125,32 +144,38 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     }, []);
 
     useEffect(() => {
-        if (!user) return;
+        if (!user || !isFirebaseInitialized || hasError) return;
 
-        // Use a simple query and filter in memory to avoid index issues in this specific environment
-        const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
+        try {
+            // Using a simple collection reference to avoid complex query issues
+            const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
 
-        const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
-            const loadedComments = [];
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                // Client-side filtering for simplicity and robustness
-                if (data.slideIndex === slideIndex) {
-                    loadedComments.push({ id: doc.id, ...data });
-                }
+            const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
+                const loadedComments = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    // Client-side filtering
+                    if (data.slideIndex === slideIndex) {
+                        loadedComments.push({ id: doc.id, ...data });
+                    }
+                });
+                setComments(loadedComments);
+            }, (error) => {
+                console.warn("Comments unavailable (permissions/network):", error.message);
+                setHasError(true);
             });
-            setComments(loadedComments);
-        }, (error) => {
-            console.error("Error fetching comments:", error);
-        });
 
-        return () => unsubscribe();
-    }, [user, slideIndex]);
+            return () => unsubscribe();
+        } catch (err) {
+            console.error("Error setting up listener:", err);
+            setHasError(true);
+        }
+    }, [user, slideIndex, hasError]);
 
     // Right Click Handler
     useEffect(() => {
         const handleContextMenu = (e) => {
-            if (!isVisible || !containerRef.current) return;
+            if (!isVisible || !containerRef.current || hasError || !isFirebaseInitialized) return;
             if (!containerRef.current.contains(e.target)) return;
 
             e.preventDefault();
@@ -170,10 +195,10 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
         return () => {
             if(element) element.removeEventListener('contextmenu', handleContextMenu);
         };
-    }, [isVisible, containerRef]);
+    }, [isVisible, containerRef, hasError]);
 
     const handleSaveComment = async () => {
-        if (!newCommentText.trim() || !user) return;
+        if (!newCommentText.trim() || !user || !isFirebaseInitialized) return;
 
         try {
             await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), {
@@ -188,12 +213,12 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
             setNewCommentPos(null);
         } catch (err) {
             console.error("Error saving comment:", err);
-            alert("שגיאה בשמירת הערה. וודא חיבור לרשת.");
+            alert("שגיאה בשמירת הערה.");
         }
     };
 
     const handleDeleteComment = async (id) => {
-        if (!user) return;
+        if (!user || !isFirebaseInitialized) return;
         try {
             await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
         } catch (err) {
@@ -201,7 +226,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
         }
     };
 
-    if (!isVisible) return null;
+    if (!isVisible || hasError || !isFirebaseInitialized) return null;
 
     return (
         <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden no-print">
@@ -222,7 +247,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
                             <X className="w-3 h-3" />
                         </button>
                     </div>
-                    {/* Safe render of text to prevent Object Error */}
+                    {/* Ensure text is a string to prevent React children error */}
                     <p className="font-medium leading-snug break-words whitespace-pre-wrap">
                         {String(comment.text || '')}
                     </p>
