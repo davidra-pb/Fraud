@@ -12,18 +12,20 @@ import {
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.22";
+const APP_VERSION = "v.1.24";
 
 // --- FIREBASE SETUP ---
-// Robust handling for the provided config variables
 const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
+
+// Critical Fix: Sanitize appId to ensure it is treated as a single path segment
+const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
+const appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
 
 // --- DATA ---
 const chartData = [
@@ -125,17 +127,18 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     useEffect(() => {
         if (!user) return;
 
-        // Public comments query
-        const q = query(
-            collection(db, 'artifacts', appId, 'public', 'data', 'comments'),
-            where('slideIndex', '==', slideIndex)
-        );
+        // Use a simple query and filter in memory to avoid index issues in this specific environment
+        const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const loadedComments = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
+        const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
+            const loadedComments = [];
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Client-side filtering for simplicity and robustness
+                if (data.slideIndex === slideIndex) {
+                    loadedComments.push({ id: doc.id, ...data });
+                }
+            });
             setComments(loadedComments);
         }, (error) => {
             console.error("Error fetching comments:", error);
@@ -172,54 +175,74 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     const handleSaveComment = async () => {
         if (!newCommentText.trim() || !user) return;
 
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), {
-            slideIndex,
-            x: newCommentPos.x,
-            y: newCommentPos.y,
-            text: newCommentText,
-            createdAt: new Date().toISOString(),
-            authorId: user.uid
-        });
-
-        setNewCommentPos(null);
+        try {
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), {
+                slideIndex,
+                x: newCommentPos.x,
+                y: newCommentPos.y,
+                text: newCommentText,
+                createdAt: new Date().toISOString(),
+                authorId: user.uid,
+                authorName: "User"
+            });
+            setNewCommentPos(null);
+        } catch (err) {
+            console.error("Error saving comment:", err);
+            alert("שגיאה בשמירת הערה. וודא חיבור לרשת.");
+        }
     };
 
     const handleDeleteComment = async (id) => {
         if (!user) return;
-        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
+        try {
+            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
+        } catch (err) {
+            console.error("Error deleting comment:", err);
+        }
     };
 
     if (!isVisible) return null;
 
     return (
-        <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden no-print">
             {/* Existing Comments */}
             {comments.map(comment => (
                 <div
                     key={comment.id}
-                    className="absolute pointer-events-auto bg-yellow-100 border border-yellow-300 shadow-lg rounded-lg p-3 w-48 text-sm text-slate-800 animate-fadeIn z-50"
+                    className="absolute pointer-events-auto bg-yellow-100 border border-yellow-300 shadow-xl rounded-br-none rounded-lg p-3 w-48 text-sm text-slate-800 animate-fadeIn z-50 transform -translate-y-full"
                     style={{ left: `${comment.x}%`, top: `${comment.y}%` }}
                 >
-                    <button
-                        onClick={() => handleDeleteComment(comment.id)}
-                        className="absolute top-1 left-1 text-slate-400 hover:text-red-500"
-                    >
-                        <X className="w-3 h-3" />
-                    </button>
-                    <p className="mt-2 font-medium">{comment.text}</p>
+                    <div className="flex justify-between items-start mb-1 border-b border-yellow-200 pb-1">
+                        <span className="text-[10px] text-yellow-700 font-bold">הערה</span>
+                        <button
+                            onClick={() => handleDeleteComment(comment.id)}
+                            className="text-slate-400 hover:text-red-500 transition-colors"
+                            title="מחק הערה"
+                        >
+                            <X className="w-3 h-3" />
+                        </button>
+                    </div>
+                    {/* Safe render of text to prevent Object Error */}
+                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">
+                        {String(comment.text || '')}
+                    </p>
+                    <div className="absolute bottom-[-6px] right-0 w-3 h-3 bg-yellow-100 border-b border-r border-yellow-300 transform rotate-45"></div>
                 </div>
             ))}
 
             {/* New Comment Input */}
             {newCommentPos && (
                 <div
-                    className="absolute pointer-events-auto bg-white border border-sky-300 shadow-xl rounded-xl p-3 w-56 animate-fadeIn z-50"
+                    className="absolute pointer-events-auto bg-white border border-sky-300 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-50"
                     style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}
                 >
-                    <p className="text-xs font-bold text-sky-600 mb-2">הוסף הערה</p>
+                    <div className="flex justify-between items-center mb-2">
+                        <p className="text-xs font-bold text-sky-600">הוספת הערה חדשה</p>
+                        <button onClick={() => setNewCommentPos(null)} className="text-slate-400 hover:text-slate-600"><X className="w-3 h-3"/></button>
+                    </div>
                     <textarea
-                        className="w-full text-sm border border-slate-200 rounded p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-sky-500 min-h-[60px]"
-                        placeholder="כתוב כאן..."
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-sky-500 min-h-[80px] bg-slate-50 resize-none"
+                        placeholder="כתוב הערה כאן..."
                         value={newCommentText}
                         onChange={(e) => setNewCommentText(e.target.value)}
                         autoFocus
@@ -227,15 +250,9 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
                     <div className="flex gap-2">
                         <button
                             onClick={handleSaveComment}
-                            className="flex-1 bg-sky-500 text-white text-xs py-1.5 rounded hover:bg-sky-600 transition"
+                            className="flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg hover:bg-sky-700 transition font-medium"
                         >
                             שמור
-                        </button>
-                        <button
-                            onClick={() => setNewCommentPos(null)}
-                            className="flex-1 bg-slate-100 text-slate-600 text-xs py-1.5 rounded hover:bg-slate-200 transition"
-                        >
-                            ביטול
                         </button>
                     </div>
                 </div>
