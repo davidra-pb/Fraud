@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.15";
+const APP_VERSION = "v.1.16";
 
 // --- DATA ---
 const chartData = [
@@ -199,104 +199,107 @@ const ChartSlide = () => {
 
     return (
     <div className="h-full flex flex-col px-8 overflow-hidden print:h-screen print:overflow-visible">
-      <div className="mb-4">
-          <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
-          <p className="text-xl text-slate-500">סיכום נתונים שנתי</p>
-      </div>
-
-      <div className="flex gap-8 h-full pb-4">
-
-          <div className="w-1/4 flex flex-col gap-4">
-              <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500"></div>
-                  <div>
-                      <div className="text-slate-500 font-medium text-base mb-1">איכות מניעה (%)</div>
-                      <div className="text-5xl font-black text-slate-800">{savedPercentage}%</div>
-                  </div>
-                  <div className="flex flex-col gap-1 mt-2 text-slate-500 text-sm">
-                      <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit">
-                        <TrendingUp className="w-4 h-4" />
-                        <span className="font-bold text-base">+{improvement.toFixed(1)}%</span>
-                      </div>
-                      <p>שיפור משמעותי מול 2024.</p>
-                  </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-300"></div>
-                  <div>
-                      <div className="text-slate-500 font-medium text-base mb-1">כסף שהוצל</div>
-                      <div className="text-4xl font-black text-sky-600">{formatCurrency(totalSaved)}</div>
-                  </div>
-                  <div className="mt-2 text-slate-500 text-sm leading-snug">
-                      <p className="mb-1">מתוך חשיפה של <strong>{formatCurrency(totalExposure)}</strong></p>
-                      <p>יחס מניעה של <strong>1:4</strong> (נחסכו 4 שקלים על כל שקל נזק).</p>
-                  </div>
-              </div>
-
-              <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-1.5 h-full bg-rose-400"></div>
-                  <div>
-                      <div className="text-slate-500 font-medium text-base mb-1">נזק בפועל</div>
-                      <div className="text-4xl font-black text-rose-500">{formatCurrency(latestData.damage)}</div>
-                  </div>
-                  <div className="mt-2 text-slate-500 text-sm flex flex-col gap-1">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-sky-500" />
-                        <span>ירידה של <strong>{formatCurrency(damageReduced)}</strong></span>
-                      </div>
-                      <p>הנתון הנמוך ביותר ב-3 שנים.</p>
-                  </div>
-              </div>
-
-              <div className="bg-amber-50 p-4 rounded-[1.5rem] shadow-sm border border-amber-200 flex flex-col justify-center relative overflow-hidden">
-                  <div className="flex items-center gap-2 mb-1">
-                      <AlertCircle className="w-5 h-5 text-amber-600" />
-                      <div className="text-amber-800 font-bold text-base">עדכון נתונים</div>
-                  </div>
-                  <p className="text-amber-900 text-sm leading-tight font-medium">
-                      התקבלו הכחשות נוספות (2025) בסך <strong>330k ₪</strong> הממתינות לסיווג.
-                  </p>
-                  <div className="mt-2 text-amber-700/70 text-xs border-t border-amber-200 pt-1">
-                      * הכחשות מתקבלות עד חצי שנה ממועד העסקה.
-                  </div>
-              </div>
+      {/* Wrapper to scale down to 90% */}
+      <div className="w-full h-full flex flex-col origin-top transform scale-90" style={{ transformOrigin: 'top center' }}>
+          <div className="mb-4">
+              <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
+              <p className="text-xl text-slate-500">סיכום נתונים שנתי</p>
           </div>
 
-          <div className="w-3/4 flex flex-col gap-3">
-              <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative">
-                  <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10">
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
+          <div className="flex gap-8 h-full pb-4">
+
+              <div className="w-1/4 flex flex-col gap-4">
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500"></div>
+                      <div>
+                          <div className="text-slate-500 font-medium text-base mb-1">איכות מניעה (%)</div>
+                          <div className="text-5xl font-black text-slate-800">{savedPercentage}%</div>
+                      </div>
+                      <div className="flex flex-col gap-1 mt-2 text-slate-500 text-sm">
+                          <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit">
+                            <TrendingUp className="w-4 h-4" />
+                            <span className="font-bold text-base">+{improvement.toFixed(1)}%</span>
+                          </div>
+                          <p>שיפור משמעותי מול 2024.</p>
+                      </div>
                   </div>
 
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={chartData} margin={{top: 50, right: 10, bottom: 5, left: 0}}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
-                        <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 16, fontWeight: 600}} dy={10} />
-                        <YAxis yAxisId="left" tickFormatter={formatMillions} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 14}} />
-                        <YAxis yAxisId="right" orientation="right" tickFormatter={(v)=>`${v}%`} axisLine={false} tickLine={false} tick={{fill: '#0ea5e9', fontSize: 14, fontWeight: 700}} />
-                        <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-                        <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
-                        <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
-                        <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[0,0,6,6]} />
-                        <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[6,6,0,0]} />
-                        <Line yAxisId="right" type="monotone" dataKey="quality" name="איכות מניעה" stroke={colors.chart.line} strokeWidth={5} dot={{r:6, fill: colors.chart.line, strokeWidth: 0}} />
-                    </ComposedChart>
-                  </ResponsiveContainer>
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-300"></div>
+                      <div>
+                          <div className="text-slate-500 font-medium text-base mb-1">כסף שהוצל</div>
+                          <div className="text-4xl font-black text-sky-600">{formatCurrency(totalSaved)}</div>
+                      </div>
+                      <div className="mt-2 text-slate-500 text-sm leading-snug">
+                          <p className="mb-1">מתוך חשיפה של <strong>{formatCurrency(totalExposure)}</strong></p>
+                          <p>יחס מניעה של <strong>1:4</strong> (נחסכו 4 שקלים על כל שקל נזק).</p>
+                      </div>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-1.5 h-full bg-rose-400"></div>
+                      <div>
+                          <div className="text-slate-500 font-medium text-base mb-1">נזק בפועל</div>
+                          <div className="text-4xl font-black text-rose-500">{formatCurrency(latestData.damage)}</div>
+                      </div>
+                      <div className="mt-2 text-slate-500 text-sm flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-sky-500" />
+                            <span>ירידה של <strong>{formatCurrency(damageReduced)}</strong></span>
+                          </div>
+                          <p>הנתון הנמוך ביותר ב-3 שנים.</p>
+                      </div>
+                  </div>
+
+                  <div className="bg-amber-50 p-4 rounded-[1.5rem] shadow-sm border border-amber-200 flex flex-col justify-center relative overflow-hidden">
+                      <div className="flex items-center gap-2 mb-1">
+                          <AlertCircle className="w-5 h-5 text-amber-600" />
+                          <div className="text-amber-800 font-bold text-base">עדכון נתונים</div>
+                      </div>
+                      <p className="text-amber-900 text-sm leading-tight font-medium">
+                          התקבלו הכחשות נוספות (2025) בסך <strong>330k ₪</strong> הממתינות לסיווג.
+                      </p>
+                      <div className="mt-2 text-amber-700/70 text-xs border-t border-amber-200 pt-1">
+                          * הכחשות מתקבלות עד חצי שנה ממועד העסקה.
+                      </div>
+                  </div>
               </div>
 
-              <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-center gap-4">
-                  <div className="bg-sky-500 text-white p-2 rounded-lg">
-                      <Zap className="w-5 h-5" />
+              <div className="w-3/4 flex flex-col gap-3">
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative">
+                      <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
+                      </div>
+
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={chartData} margin={{top: 50, right: 10, bottom: 5, left: 0}}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
+                            <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 16, fontWeight: 600}} dy={10} />
+                            <YAxis yAxisId="left" tickFormatter={formatMillions} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 14}} />
+                            <YAxis yAxisId="right" orientation="right" tickFormatter={(v)=>`${v}%`} axisLine={false} tickLine={false} tick={{fill: '#0ea5e9', fontSize: 14, fontWeight: 700}} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+                            <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
+                            <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
+                            <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[0,0,6,6]} />
+                            <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[6,6,0,0]} />
+                            <Line yAxisId="right" type="monotone" dataKey="quality" name="איכות מניעה" stroke={colors.chart.line} strokeWidth={5} dot={{r:6, fill: colors.chart.line, strokeWidth: 0}} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
                   </div>
-                  <div>
-                      <h4 className="font-bold text-sky-900 text-lg mb-0.5">בשורה התחתונה</h4>
-                      <p className="text-sky-800 text-base leading-snug">
-                          השנה הצלחנו לעצור הרבה יותר כסף בזמן אמת. על כל שקל ש"ברח" לנו, עצרנו 4 שקלים לפני שיצאו.
-                      </p>
+
+                  <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-center gap-4">
+                      <div className="bg-sky-500 text-white p-2 rounded-lg">
+                          <Zap className="w-5 h-5" />
+                      </div>
+                      <div>
+                          <h4 className="font-bold text-sky-900 text-lg mb-0.5">בשורה התחתונה</h4>
+                          <p className="text-sky-800 text-base leading-snug">
+                              השנה הצלחנו לעצור הרבה יותר כסף בזמן אמת. על כל שקל ש"ברח" לנו, עצרנו 4 שקלים לפני שיצאו.
+                          </p>
+                      </div>
                   </div>
               </div>
           </div>
@@ -709,6 +712,7 @@ const BoardPresentation = () => {
                         body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; margin: 0; padding: 0; }
                         .no-print { display: none !important; }
                         .print-slide { break-after: always; page-break-after: always; width: 100vw; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+                        .print-scale-90 { transform: scale(0.9); transform-origin: center; width: 100%; height: 100%; }
                     }
                 `}</style>
 
@@ -735,7 +739,7 @@ const BoardPresentation = () => {
                             <div className="absolute top-4 left-6 text-slate-300 text-sm font-bold z-10">
                                 {index + 1} / {slides.length} • {APP_VERSION}
                             </div>
-                            <div className="w-full h-full">
+                            <div className="w-full h-full print-scale-90">
                                 {slide.component}
                             </div>
                         </div>
