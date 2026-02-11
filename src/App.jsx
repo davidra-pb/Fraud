@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.17";
+const APP_VERSION = "v.1.18";
 
 // --- DATA ---
 const chartData = [
@@ -91,14 +91,14 @@ const LoginScreen = ({ onLogin }) => {
 // 1. Title Slide
 const TitleSlide = () => (
   <div className="flex flex-col items-center justify-center h-full text-center space-y-8 bg-gradient-to-br from-sky-50 to-white print:h-full print:w-full">
-    <div className="w-32 h-32 bg-sky-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-sky-200 print-no-shadow">
+    <div className="w-32 h-32 bg-sky-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-sky-200 print:shadow-none print:border print:border-slate-200">
       <Shield className="w-16 h-16 text-white" />
     </div>
     <div>
       <h1 className="text-6xl font-black text-slate-800 mb-4 tracking-tight">סקירה שנתית: מעילות והונאות</h1>
       <h2 className="text-3xl text-sky-600 font-normal">סיכום 2025 ותוכניות ל-2026</h2>
     </div>
-    <div className="mt-12 px-10 py-3 bg-white rounded-full text-sky-700 text-xl font-bold shadow-xl border border-sky-100 print-border">
+    <div className="mt-12 px-10 py-3 bg-white rounded-full text-sky-700 text-xl font-bold shadow-xl border border-sky-100 print:shadow-none print:border-slate-300">
       דירקטוריון פברואר 2026
     </div>
   </div>
@@ -110,9 +110,9 @@ const ContextSlide = () => (
     <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-500 pr-6">רקע ומטרות</h2>
 
     <div className="grid grid-cols-1 md:grid-cols-2 gap-10 flex-grow max-h-[70vh] print:max-h-none">
-      <div className="bg-sky-50/60 p-8 rounded-[2rem] border border-sky-100 relative overflow-hidden flex flex-col justify-center print-border">
+      <div className="bg-sky-50/60 p-8 rounded-[2rem] border border-sky-100 relative overflow-hidden flex flex-col justify-center print:border-slate-200">
         <div className="flex items-center gap-4 mb-6">
-          <div className="bg-white p-4 rounded-2xl shadow-sm print-border">
+          <div className="bg-white p-4 rounded-2xl shadow-sm print:border print:border-slate-200">
              <Activity className="w-8 h-8 text-sky-600" />
           </div>
           <h3 className="text-2xl font-bold text-slate-800">האתגרים שלנו</h3>
@@ -127,28 +127,28 @@ const ContextSlide = () => (
         </div>
       </div>
 
-      <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-slate-100 border border-slate-100 relative flex flex-col justify-center print-border">
+      <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-slate-100 border border-slate-100 relative flex flex-col justify-center print:border-slate-200">
         <div className="flex items-center gap-4 mb-6">
-           <div className="bg-sky-100 p-4 rounded-2xl shadow-sm print-border">
+           <div className="bg-sky-100 p-4 rounded-2xl shadow-sm print:border print:border-sky-200">
               <Target className="w-8 h-8 text-sky-600" />
            </div>
           <h3 className="text-2xl font-bold text-slate-800">מה נציג היום?</h3>
         </div>
         <ul className="space-y-6 text-slate-600 text-xl">
           <li className="flex items-start gap-4">
-            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
+            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0"></span>
             <span>
               <strong>מספרים:</strong> כמה מנענו וכמה זה חסך לחברה.
             </span>
           </li>
           <li className="flex items-start gap-4">
-            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
+            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0"></span>
             <span>
               <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה והבקרות למניעת מעילות.
             </span>
           </li>
           <li className="flex items-start gap-4">
-            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
+            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0"></span>
             <span>
               <strong>אישור תוכנית:</strong> המשך עבודה באותה מתכונת ב-2026.
             </span>
@@ -209,14 +209,14 @@ const ChartSlide = () => {
           <div className="flex gap-8 h-full pb-4">
 
               <div className="w-1/4 flex flex-col gap-4">
-                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print-border">
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
                       <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500"></div>
                       <div>
                           <div className="text-slate-500 font-medium text-base mb-1">איכות מניעה (%)</div>
                           <div className="text-5xl font-black text-slate-800">{savedPercentage}%</div>
                       </div>
                       <div className="flex flex-col gap-1 mt-2 text-slate-500 text-sm">
-                          <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit print-border">
+                          <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit print:border print:border-emerald-200">
                             <TrendingUp className="w-4 h-4" />
                             <span className="font-bold text-base">+{improvement.toFixed(1)}%</span>
                           </div>
@@ -224,7 +224,7 @@ const ChartSlide = () => {
                       </div>
                   </div>
 
-                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print-border">
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
                       <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-300"></div>
                       <div>
                           <div className="text-slate-500 font-medium text-base mb-1">כסף שהוצל</div>
@@ -236,7 +236,7 @@ const ChartSlide = () => {
                       </div>
                   </div>
 
-                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print-border">
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
                       <div className="absolute top-0 right-0 w-1.5 h-full bg-rose-400"></div>
                       <div>
                           <div className="text-slate-500 font-medium text-base mb-1">נזק בפועל</div>
@@ -251,7 +251,7 @@ const ChartSlide = () => {
                       </div>
                   </div>
 
-                  <div className="bg-amber-50 p-4 rounded-[1.5rem] shadow-sm border border-amber-200 flex flex-col justify-center relative overflow-hidden print-border">
+                  <div className="bg-amber-50 p-4 rounded-[1.5rem] shadow-sm border border-amber-200 flex flex-col justify-center relative overflow-hidden print:border-amber-300">
                       <div className="flex items-center gap-2 mb-1">
                           <AlertCircle className="w-5 h-5 text-amber-600" />
                           <div className="text-amber-800 font-bold text-base">עדכון נתונים</div>
@@ -266,12 +266,12 @@ const ChartSlide = () => {
               </div>
 
               <div className="w-3/4 flex flex-col gap-3">
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative print-border">
-                      <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10 print:bg-white print-border">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative print:border-slate-300">
+                      <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10 print:border print:border-slate-200">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
                       </div>
 
                       <ResponsiveContainer width="100%" height="100%">
@@ -290,7 +290,7 @@ const ChartSlide = () => {
                       </ResponsiveContainer>
                   </div>
 
-                  <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-center gap-4 print-border">
+                  <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-center gap-4 print:border-sky-200">
                       <div className="bg-sky-500 text-white p-2 rounded-lg">
                           <Zap className="w-5 h-5" />
                       </div>
@@ -315,13 +315,13 @@ const TrendsSlide = () => (
 
      <div className="grid grid-cols-2 gap-12 flex-grow max-h-[65vh] print:max-h-none">
         {/* Bezeq Fraud */}
-        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print-border">
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
             <div>
                 <div className="flex items-start justify-between mb-6">
-                    <div className="bg-rose-50 p-5 rounded-2xl print-border">
+                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100">
                         <Phone className="w-10 h-10 text-rose-400" />
                     </div>
-                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print-border">
+                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print:border-slate-300">
                         הנדסה חברתית
                     </div>
                 </div>
@@ -333,7 +333,7 @@ const TrendsSlide = () => (
                     <p>
                         <strong>התוצאה:</strong> פותחים חשבון PayBox חדש על שם הלקוח ומתחילים לחייב.
                     </p>
-                    <div className="mt-4 inline-block font-semibold text-rose-600 bg-rose-50 px-4 py-2 rounded-xl text-lg print-border">
+                    <div className="mt-4 inline-block font-semibold text-rose-600 bg-rose-50 px-4 py-2 rounded-xl text-lg print:border print:border-rose-200">
                         בעיקר מול אוכלוסייה מבוגרת
                     </div>
                 </div>
@@ -352,13 +352,13 @@ const TrendsSlide = () => (
         </div>
 
         {/* Restaurant Fraud */}
-        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print-border">
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
              <div>
                 <div className="flex items-start justify-between mb-6">
-                    <div className="bg-rose-50 p-5 rounded-2xl print-border">
+                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100">
                         <Utensils className="w-10 h-10 text-rose-400" />
                     </div>
-                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print-border">
+                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print:border-slate-300">
                         פישינג
                     </div>
                 </div>
@@ -370,7 +370,7 @@ const TrendsSlide = () => (
                     <p>
                         <strong>התוצאה:</strong> משתלטים על החשבון הקיים של הלקוח ומבצעים עסקאות.
                     </p>
-                    <div className="mt-4 inline-block font-semibold text-rose-600 bg-rose-50 px-4 py-2 rounded-xl text-lg print-border">
+                    <div className="mt-4 inline-block font-semibold text-rose-600 bg-rose-50 px-4 py-2 rounded-xl text-lg print:border print:border-rose-200">
                         מנצלים את הלחץ של הלקוח
                     </div>
                 </div>
@@ -401,52 +401,52 @@ const ImprovementsSlide = () => (
 
        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print-border">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print-border">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200">
                   <Sliders className="w-8 h-8 text-sky-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">שיפור מנוע הסיכונים</h3>
               <ul className="space-y-4 flex-grow">
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
-                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print-no-shadow print-border"></div>
+                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div>
                       <span><strong>מכשירי iPhone:</strong> הוספנו יכולת לאתר משתמשים ללא אנשי קשר ומאזור זמן שאיננו ישראל (בדומה לאנדרואיד) כמענה לצרכים מהשטח.</span>
                   </li>
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
-                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print-no-shadow print-border"></div>
+                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div>
                       <span><strong>ניתוח ותגובה:</strong> ניתוח מקרים ותגובה מהירה הם המפתח למניעת נזק כספי.</span>
                   </li>
               </ul>
           </div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print-border">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print-border">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200">
                   <MessageSquare className="w-8 h-8 text-sky-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">התראות ללקוח</h3>
               <ul className="space-y-4 flex-grow">
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
-                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print-no-shadow print-border"></div>
+                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div>
                       <span><strong>SMS ברור יותר:</strong> שינינו את הנוסח בהודעת הכניסה כדי שלקוחות יבינו שאסור למסור את הקוד.</span>
                   </li>
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
-                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print-no-shadow print-border"></div>
+                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div>
                       <span><strong>מכשיר חדש:</strong> שולחים התראה ללקוח אם מישהו נכנס לחשבון שלו ממכשיר לא מוכר.</span>
                   </li>
               </ul>
           </div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print-border">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print-border">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200">
                   <CreditCard className="w-8 h-8 text-sky-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">צמצום סיכונים</h3>
               <ul className="space-y-4 flex-grow">
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
-                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print-no-shadow print-border"></div>
+                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div>
                       <span><strong>הגבלת סכומים:</strong> תהליך עסקי שהוריד את הספים בכרטיסים ל-1,000 ₪, שהוביל לירידה בסיכון.</span>
                   </li>
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
-                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print-no-shadow print-border"></div>
+                      <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div>
                       <span><strong>בקרת משיכות:</strong> לא ניתן למשוך כסף לחשבון בנק שטרם אושר.</span>
                   </li>
               </ul>
@@ -505,7 +505,7 @@ const LayersSlide = () => {
                 {layers.map((layer, idx) => (
                     <div
                         key={idx}
-                        className={`${layer.widthClass} ${layer.color} text-white rounded-2xl shadow-xl flex items-center p-5 transition-all hover:scale-[1.01] print-no-shadow print-border`}
+                        className={`${layer.widthClass} ${layer.color} text-white rounded-2xl shadow-xl flex items-center p-5 transition-all hover:scale-[1.01] print:shadow-none print:border print:border-slate-400`}
                     >
                         <div className="p-3 bg-white/20 rounded-xl mr-4 ml-6 backdrop-blur-md shadow-inner">
                             {layer.icon}
@@ -517,7 +517,7 @@ const LayersSlide = () => {
                             </div>
                             <div className="flex gap-3 mt-3 flex-wrap">
                                 {layer.items.map((item, i) => (
-                                    <span key={i} className="text-base bg-black/20 px-4 py-1.5 rounded-xl border border-white/10 shadow-sm">
+                                    <span key={i} className="text-base bg-black/20 px-4 py-1.5 rounded-xl border border-white/10 shadow-sm print:border print:border-white/30">
                                         {item}
                                     </span>
                                 ))}
@@ -536,7 +536,7 @@ const ListsSlide = () => (
         <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-400 pr-6">מבט ל-2026 - המשך ניהול שוטף ובקרה</h2>
         <div className="grid grid-cols-3 gap-8 flex-grow">
 
-            <div className="bg-slate-700 text-white p-8 rounded-[2rem] shadow-xl transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between print-no-shadow">
+            <div className="bg-slate-700 text-white p-8 rounded-[2rem] shadow-xl transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between print:shadow-none print:border print:border-slate-600">
                 <div>
                     <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md shadow-inner">
                         <Lock className="w-8 h-8 text-white" />
@@ -547,11 +547,11 @@ const ListsSlide = () => (
                     </p>
                 </div>
                 <div className="pt-6 border-t border-slate-600">
-                    <span className="text-sm bg-rose-500/90 px-4 py-2 rounded-full text-white font-bold shadow-lg">חסימה אוטומטית</span>
+                    <span className="text-sm bg-rose-500/90 px-4 py-2 rounded-full text-white font-bold shadow-lg print:border print:border-white">חסימה אוטומטית</span>
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between print-border print-no-shadow">
+            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between print:border-slate-300 print:shadow-none">
                 <div>
                     <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
                         <Microscope className="w-8 h-8 text-sky-500" />
@@ -566,7 +566,7 @@ const ListsSlide = () => (
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between print-border print-no-shadow">
+            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between print:border-slate-300 print:shadow-none">
                 <div>
                     <div className="bg-orange-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
                         <FileText className="w-8 h-8 text-orange-400" />
@@ -582,7 +582,7 @@ const ListsSlide = () => (
             </div>
         </div>
 
-        <div className="mt-8 bg-sky-50 border border-sky-100 p-6 rounded-3xl flex items-center gap-6 shadow-sm print-border print-no-shadow">
+        <div className="mt-8 bg-sky-50 border border-sky-100 p-6 rounded-3xl flex items-center gap-6 shadow-sm print:border-sky-200 print:shadow-none">
             <div className="bg-sky-500 rounded-full p-3 text-white shadow-lg">
                 <BrainCircuit className="w-8 h-8" />
             </div>
@@ -610,9 +610,9 @@ const EmbezzlementSlide = () => (
             {/* Top Row: 3 Cards */}
             <div className="grid grid-cols-3 gap-8 flex-grow min-h-0">
                 {/* Card 1 */}
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print-border print-no-shadow">
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print-border">
+                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200">
                             <Scale className="w-6 h-6 text-indigo-600" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3>
@@ -625,9 +625,9 @@ const EmbezzlementSlide = () => (
                 </div>
 
                 {/* Card 2 */}
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print-border print-no-shadow">
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print-border">
+                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200">
                             <ShieldAlert className="w-6 h-6 text-indigo-600" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3>
@@ -640,9 +640,9 @@ const EmbezzlementSlide = () => (
                 </div>
 
                 {/* Card 3 */}
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print-border print-no-shadow">
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0">
-                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print-border">
+                        <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200">
                             <GraduationCap className="w-6 h-6 text-indigo-600" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-800">תרבות ומודעות</h3>
@@ -656,7 +656,7 @@ const EmbezzlementSlide = () => (
             </div>
 
             {/* Bottom Row: 2026 Plan */}
-            <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem] flex items-center gap-6 shadow-sm shrink-0 print-border print-no-shadow">
+            <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem] flex items-center gap-6 shadow-sm shrink-0 print:border-indigo-200 print:shadow-none">
                 <div className="bg-indigo-600 rounded-full p-3 text-white shadow-lg shrink-0">
                     <Archive className="w-8 h-8" />
                 </div>
@@ -674,7 +674,7 @@ const EmbezzlementSlide = () => (
 // 9. Thank You
 const ThankYouSlide = () => (
     <div className="flex flex-col items-center justify-center h-full text-center space-y-10 animate-fadeIn bg-gradient-to-tl from-sky-50 to-white print:h-full print:w-full">
-        <div className="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center mb-4 shadow-sm print-no-shadow"><ShieldCheck className="w-16 h-16 text-sky-500" /></div>
+        <div className="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center mb-4 shadow-sm print:shadow-none print:border print:border-slate-300"><ShieldCheck className="w-16 h-16 text-sky-500" /></div>
         <div><h1 className="text-8xl font-extrabold text-slate-800 mb-4 tracking-tight">תודה רבה</h1></div>
     </div>
 );
@@ -711,10 +711,16 @@ const BoardPresentation = () => {
                         @page { size: landscape; margin: 0; }
                         body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; margin: 0; padding: 0; }
                         .no-print { display: none !important; }
+                        /* Universal Reset for Print - NO SHADOWS */
+                        * { box-shadow: none !important; text-shadow: none !important; filter: none !important; }
+
+                        /* Layout */
                         .print-slide { break-after: always; page-break-after: always; width: 297mm; height: 210mm; overflow: hidden; display: flex; flex-direction: column; }
                         .print-scale-90 { transform: scale(0.9); transform-origin: center; width: 100%; height: 100%; }
-                        .print-no-shadow { box-shadow: none !important; text-shadow: none !important; }
-                        .print-border { border: 1px solid #e2e8f0 !important; }
+
+                        /* Borders to replace shadows */
+                        .print-border { border: 1px solid #cbd5e1 !important; }
+                        .print-no-shadow { box-shadow: none !important; }
                     }
                 `}</style>
 
