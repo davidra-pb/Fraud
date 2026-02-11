@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.21";
+const APP_VERSION = "v.1.22";
 
 // --- FIREBASE SETUP ---
 // Robust handling for the provided config variables
@@ -631,7 +631,7 @@ const EmbezzlementSlide = () => (
             <div className="grid grid-cols-3 gap-8 flex-grow min-h-0">
                 <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0"><div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><Scale className="w-6 h-6 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3></div>
-                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto"><li>• עדכון מקיף לנוהל מהימנות עובדים.</li><li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li><li>• ביצוע בדיקות נאותות מוגברות וסיווג ביטחוני.</li></ul>
+                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto"><li>• עדכון מקיף לנוהל מהימנות עובדים.</li><li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li><li>• ביצוע בדיקות נאותות מוגברות ומבחני מהימנות.</li></ul>
                 </div>
                 <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0"><div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><ShieldAlert className="w-6 h-6 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3></div>
@@ -644,7 +644,11 @@ const EmbezzlementSlide = () => (
             </div>
             <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem] flex items-center gap-6 shadow-sm shrink-0 print:border-indigo-200 print:shadow-none">
                 <div className="bg-indigo-600 rounded-full p-3 text-white shadow-lg shrink-0"><Archive className="w-8 h-8" /></div>
-                <div><h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026: מיקוד בחשבונות רדומים</h4><p className="text-indigo-800 text-lg leading-snug">צוות הציות יטמיע בקרות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts), במטרה למנוע השתלטות פנימית ושימוש לרעה במאגרי המידע.</p></div>
+                <div>
+                    <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026: מיקוד בחשבונות רדומים</h4>
+                    <p className="text-indigo-800 text-lg leading-snug">צוות הציות יטמיע בקרות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות, במטרה למנוע השתלטות פנימית ושימוש לרעה.</p>
+                    <p className="text-indigo-800 text-lg leading-snug mt-1">בחינה מחודשת של נוהל מהימנות והגדלת תדירות הפוליגרף, לצד הטמעת בקרות מפצות.</p>
+                </div>
             </div>
         </div>
     </div>
