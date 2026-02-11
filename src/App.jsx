@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.18";
+const APP_VERSION = "v.1.19";
 
 // --- DATA ---
 const chartData = [
@@ -136,19 +136,19 @@ const ContextSlide = () => (
         </div>
         <ul className="space-y-6 text-slate-600 text-xl">
           <li className="flex items-start gap-4">
-            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0"></span>
+            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
             <span>
               <strong>מספרים:</strong> כמה מנענו וכמה זה חסך לחברה.
             </span>
           </li>
           <li className="flex items-start gap-4">
-            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0"></span>
+            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
             <span>
               <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה והבקרות למניעת מעילות.
             </span>
           </li>
           <li className="flex items-start gap-4">
-            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0"></span>
+            <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
             <span>
               <strong>אישור תוכנית:</strong> המשך עבודה באותה מתכונת ב-2026.
             </span>
@@ -696,6 +696,22 @@ const BoardPresentation = () => {
         { component: <EmbezzlementSlide />, label: "ניהול מעילות" },
         { component: <ThankYouSlide />, label: "סיום" },
     ];
+
+    // Keyboard Navigation Effect
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!isAuthenticated || isPrintMode) return;
+
+            if (e.key === 'ArrowLeft') {
+                setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
+            } else if (e.key === 'ArrowRight') {
+                setCurrentSlide(prev => Math.max(prev - 1, 0));
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isAuthenticated, isPrintMode, slides.length]);
 
     const nextSlide = () => setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
     const prevSlide = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
