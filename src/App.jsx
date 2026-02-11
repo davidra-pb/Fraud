@@ -11,14 +11,15 @@ import {
 
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.20";
+const APP_VERSION = "v.1.21";
 
 // --- FIREBASE SETUP ---
-const firebaseConfig = JSON.parse(__firebase_config);
+// Robust handling for the provided config variables
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -110,7 +111,11 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     // Auth & Data Fetching
     useEffect(() => {
         const initAuth = async () => {
-            await signInAnonymously(auth);
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
+            }
         };
         initAuth();
         const unsubscribeAuth = onAuthStateChanged(auth, setUser);
@@ -120,8 +125,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     useEffect(() => {
         if (!user) return;
 
-        // Query: Public comments for this app, filtered by slideIndex
-        // Note: Using a simple query to avoid index requirements for now. Filtering in memory if needed or simple where clause.
+        // Public comments query
         const q = query(
             collection(db, 'artifacts', appId, 'public', 'data', 'comments'),
             where('slideIndex', '==', slideIndex)
@@ -144,7 +148,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     useEffect(() => {
         const handleContextMenu = (e) => {
             if (!isVisible || !containerRef.current) return;
-            // Only trigger if clicking directly on the slide container or its children (but handled at container level)
             if (!containerRef.current.contains(e.target)) return;
 
             e.preventDefault();
@@ -157,7 +160,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
             setNewCommentText("");
         };
 
-        // Attach to the container element via ref in parent, or add event listener to container
         const element = containerRef.current;
         if(element) {
             element.addEventListener('contextmenu', handleContextMenu);
@@ -195,7 +197,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
             {comments.map(comment => (
                 <div
                     key={comment.id}
-                    className="absolute pointer-events-auto bg-yellow-100 border border-yellow-300 shadow-lg rounded-lg p-3 w-48 text-sm text-slate-800 animate-fadeIn"
+                    className="absolute pointer-events-auto bg-yellow-100 border border-yellow-300 shadow-lg rounded-lg p-3 w-48 text-sm text-slate-800 animate-fadeIn z-50"
                     style={{ left: `${comment.x}%`, top: `${comment.y}%` }}
                 >
                     <button
@@ -211,7 +213,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
             {/* New Comment Input */}
             {newCommentPos && (
                 <div
-                    className="absolute pointer-events-auto bg-white border border-sky-300 shadow-xl rounded-xl p-3 w-56 animate-fadeIn"
+                    className="absolute pointer-events-auto bg-white border border-sky-300 shadow-xl rounded-xl p-3 w-56 animate-fadeIn z-50"
                     style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}
                 >
                     <p className="text-xs font-bold text-sky-600 mb-2">הוסף הערה</p>
@@ -243,7 +245,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
 };
 
 // --- SLIDE COMPONENTS ---
-// (Keeping existing slide components unchanged for brevity, reusing the exact same structure)
 
 // 1. Title Slide
 const TitleSlide = () => (
@@ -356,6 +357,7 @@ const ChartSlide = () => {
 
     return (
     <div className="h-full flex flex-col px-8 overflow-hidden print:h-full print:px-6">
+      {/* Wrapper to scale down to 90% */}
       <div className="w-full h-full flex flex-col origin-top transform scale-90 print:scale-100" style={{ transformOrigin: 'top center' }}>
           <div className="mb-4">
               <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
