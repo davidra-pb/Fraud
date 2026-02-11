@@ -22,6 +22,7 @@ let app, auth, db;
 let isFirebaseInitialized = false;
 
 try {
+    // Robust check for config presence
     const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
     if (firebaseConfig) {
         app = initializeApp(firebaseConfig);
@@ -34,7 +35,6 @@ try {
 }
 
 // Critical Fix: Sanitize appId to ensure it is treated as a single path segment
-// Replaces slashes and dots to prevent creating unintended sub-collections
 const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
 const appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
 
@@ -147,7 +147,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
         if (!user || !isFirebaseInitialized || hasError) return;
 
         try {
-            // Using a simple collection reference to avoid complex query issues
             const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
 
             const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
@@ -161,7 +160,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
                 });
                 setComments(loadedComments);
             }, (error) => {
-                console.warn("Comments unavailable (permissions/network):", error.message);
+                console.warn("Comments unavailable:", error.message);
                 setHasError(true);
             });
 
@@ -247,7 +246,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
                             <X className="w-3 h-3" />
                         </button>
                     </div>
-                    {/* Ensure text is a string to prevent React children error */}
                     <p className="font-medium leading-snug break-words whitespace-pre-wrap">
                         {String(comment.text || '')}
                     </p>
