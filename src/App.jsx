@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.13";
+const APP_VERSION = "v.1.14";
 
 // --- DATA ---
 const chartData = [
@@ -106,10 +106,10 @@ const TitleSlide = () => (
 
 // 2. Context
 const ContextSlide = () => (
-  <div className="h-full flex flex-col justify-center px-12 animate-fadeIn">
-    <h2 className="text-4xl font-bold text-slate-800 mb-10 border-r-8 border-sky-500 pr-6">רקע ומטרות</h2>
+  <div className="h-full flex flex-col justify-center px-12 animate-fadeIn overflow-hidden">
+    <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-500 pr-6">רקע ומטרות</h2>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 h-[65%]">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 flex-grow max-h-[70vh]">
       <div className="bg-sky-50/60 p-8 rounded-[2rem] border border-sky-100 relative overflow-hidden flex flex-col justify-center">
         <div className="flex items-center gap-4 mb-6">
           <div className="bg-white p-4 rounded-2xl shadow-sm">
@@ -161,8 +161,8 @@ const ContextSlide = () => (
 
 // 3. Chart Slide
 const ChartSlide = () => {
-    const latestData = chartData[3]; // 2025
-    const prevData = chartData[2];   // 2024
+    const latestData = chartData[3];
+    const prevData = chartData[2];
 
     const totalExposure = latestData.totalExposure;
     const totalSaved = latestData.totalSaved;
@@ -198,7 +198,7 @@ const ChartSlide = () => {
     };
 
     return (
-    <div className="h-full flex flex-col px-8 animate-fadeIn">
+    <div className="h-full flex flex-col px-8 animate-fadeIn overflow-hidden">
       <div className="mb-4">
           <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
           <p className="text-xl text-slate-500">סיכום נתונים שנתי</p>
@@ -307,10 +307,10 @@ const ChartSlide = () => {
 
 // 4. Trends 2025
 const TrendsSlide = () => (
-  <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
+  <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden">
      <h2 className="text-4xl font-bold text-slate-800 mb-10 border-r-8 border-rose-300 pr-6">סוגי הונאות בולטים ב-2025</h2>
 
-     <div className="grid grid-cols-2 gap-12 h-[70%]">
+     <div className="grid grid-cols-2 gap-12 flex-grow max-h-[65vh]">
         {/* Bezeq Fraud */}
         <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full">
             <div>
@@ -390,20 +390,20 @@ const TrendsSlide = () => (
 
 // 5. Improvements
 const ImprovementsSlide = () => (
-    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden">
        <div className="mb-10">
             <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">מה עשינו השנה?</h2>
             <p className="text-slate-500 text-2xl">שיפורים במערכת ובמוצר</p>
        </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 h-[65%]">
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh]">
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col">
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <Sliders className="w-8 h-8 text-sky-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">שיפור מנוע הסיכונים</h3>
-              <ul className="space-y-4">
+              <ul className="space-y-4 flex-grow">
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
                       <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0"></div>
                       <span><strong>מכשירי iPhone:</strong> הוספנו יכולת לאתר משתמשים ללא אנשי קשר ומאזור זמן שאיננו ישראל (בדומה לאנדרואיד) כמענה לצרכים מהשטח.</span>
@@ -415,12 +415,12 @@ const ImprovementsSlide = () => (
               </ul>
           </div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col">
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <MessageSquare className="w-8 h-8 text-sky-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">התראות ללקוח</h3>
-              <ul className="space-y-4">
+              <ul className="space-y-4 flex-grow">
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
                       <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0"></div>
                       <span><strong>SMS ברור יותר:</strong> שינינו את הנוסח בהודעת הכניסה כדי שלקוחות יבינו שאסור למסור את הקוד.</span>
@@ -432,12 +432,12 @@ const ImprovementsSlide = () => (
               </ul>
           </div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col">
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                   <CreditCard className="w-8 h-8 text-sky-500" />
               </div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">צמצום סיכונים</h3>
-              <ul className="space-y-4">
+              <ul className="space-y-4 flex-grow">
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
                       <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0"></div>
                       <span><strong>הגבלת סכומים:</strong> תהליך עסקי שהוריד את הספים בכרטיסים ל-1,000 ₪, שהוביל לירידה בסיכון.</span>
@@ -490,19 +490,19 @@ const LayersSlide = () => {
     ];
 
     return (
-        <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-y-auto">
-            <div className="mb-10 text-center">
+        <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden">
+            <div className="mb-8 text-center">
                 <h2 className="text-4xl font-bold text-slate-800 mb-4">איך אנחנו מגינים?</h2>
                 <p className="text-slate-500 text-xl max-w-4xl mx-auto">
                     מערכת של כמה שכבות סינון, מהגנה כללית ועד בדיקה פרטנית
                 </p>
             </div>
 
-            <div className="flex flex-col items-center gap-6 w-full">
+            <div className="flex flex-col items-center gap-4 w-full flex-grow justify-center">
                 {layers.map((layer, idx) => (
                     <div
                         key={idx}
-                        className={`${layer.widthClass} ${layer.color} text-white rounded-2xl shadow-xl flex items-center p-6 transition-all hover:scale-[1.01]`}
+                        className={`${layer.widthClass} ${layer.color} text-white rounded-2xl shadow-xl flex items-center p-5 transition-all hover:scale-[1.01]`}
                     >
                         <div className="p-3 bg-white/20 rounded-xl mr-4 ml-6 backdrop-blur-md shadow-inner">
                             {layer.icon}
@@ -529,51 +529,57 @@ const LayersSlide = () => {
 
 // 7. Lists (View to 2026)
 const ListsSlide = () => (
-    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn">
-        <h2 className="text-4xl font-bold text-slate-800 mb-10 border-r-8 border-sky-400 pr-6">מבט ל-2026 - המשך ניהול שוטף ובקרה</h2>
-        <div className="grid grid-cols-3 gap-10">
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden">
+        <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-400 pr-6">מבט ל-2026 - המשך ניהול שוטף ובקרה</h2>
+        <div className="grid grid-cols-3 gap-8 flex-grow">
 
-            <div className="bg-slate-700 text-white p-8 rounded-[2rem] shadow-xl transform hover:scale-105 transition duration-300 flex flex-col">
-                <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md shadow-inner">
-                    <Lock className="w-8 h-8 text-white" />
+            <div className="bg-slate-700 text-white p-8 rounded-[2rem] shadow-xl transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between">
+                <div>
+                    <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md shadow-inner">
+                        <Lock className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3">רשימה שחורה (Black List)</h3>
+                    <p className="text-slate-300 text-lg leading-relaxed mb-6">
+                        ניהול רשימה לפי מזהים ייחודיים: מזהה מכשיר וחשבונות בנק שזוהו כהונאה בעבר וחסימה לצמיתות.
+                    </p>
                 </div>
-                <h3 className="text-2xl font-bold mb-3">רשימה שחורה (Black List)</h3>
-                <p className="text-slate-300 text-lg leading-relaxed mb-6 flex-grow">
-                    ניהול רשימה לפי מזהים ייחודיים: מזהה מכשיר וחשבונות בנק שזוהו כהונאה בעבר וחסימה לצמיתות.
-                </p>
-                <div className="pt-6 border-t border-slate-600 mt-auto">
+                <div className="pt-6 border-t border-slate-600">
                     <span className="text-sm bg-rose-500/90 px-4 py-2 rounded-full text-white font-bold shadow-lg">חסימה אוטומטית</span>
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col">
-                <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
-                    <Microscope className="w-8 h-8 text-sky-500" />
+            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between">
+                <div>
+                    <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
+                        <Microscope className="w-8 h-8 text-sky-500" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 text-slate-800">ניטור מוגבר שוטף</h3>
+                    <p className="text-slate-500 text-lg leading-relaxed mb-6">
+                        תהליך יומי המציף עסקאות חשודות על בסיס "התורה שבעל פה" (חוקים שנצברו). הצוות מנתח לעומק ומבצע עצירה מיידית.
+                    </p>
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-slate-800">ניטור מוגבר שוטף</h3>
-                <p className="text-slate-500 text-lg leading-relaxed mb-6 flex-grow">
-                    תהליך יומי המציף עסקאות חשודות על בסיס "התורה שבעל פה" (חוקים שנצברו). הצוות מנתח לעומק ומבצע עצירה מיידית.
-                </p>
-                <div className="pt-6 border-t border-slate-50 mt-auto">
+                <div className="pt-6 border-t border-slate-50">
                     <span className="text-sm bg-sky-100 text-sky-700 px-4 py-2 rounded-full font-bold">ניטור אנושי</span>
                 </div>
             </div>
 
-            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col">
-                <div className="bg-orange-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
-                    <FileText className="w-8 h-8 text-orange-400" />
+            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col h-full justify-between">
+                <div>
+                    <div className="bg-orange-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6">
+                        <FileText className="w-8 h-8 text-orange-400" />
+                    </div>
+                    <h3 className="text-2xl font-bold mb-3 text-slate-800">מוקפאים / חסומים (Banned)</h3>
+                    <p className="text-slate-500 text-lg leading-relaxed mb-6">
+                        ניהול חסימה לפי ת.ז וטלפון. כולל חשבונות שהוקפאו זמנית בגלל חשד, עד לבירור מול הלקוח.
+                    </p>
                 </div>
-                <h3 className="text-2xl font-bold mb-3 text-slate-800">מוקפאים / חסומים (Banned)</h3>
-                <p className="text-slate-500 text-lg leading-relaxed mb-6 flex-grow">
-                    ניהול חסימה לפי ת.ז וטלפון. כולל חשבונות שהוקפאו זמנית בגלל חשד, עד לבירור מול הלקוח.
-                </p>
-                <div className="pt-6 border-t border-slate-50 mt-auto">
+                <div className="pt-6 border-t border-slate-50">
                     <span className="text-sm bg-orange-100 text-orange-700 px-4 py-2 rounded-full font-bold">הקפאה זמנית / חסימה</span>
                 </div>
             </div>
         </div>
 
-        <div className="mt-10 bg-sky-50 border border-sky-100 p-6 rounded-3xl flex items-center gap-6 shadow-sm">
+        <div className="mt-8 bg-sky-50 border border-sky-100 p-6 rounded-3xl flex items-center gap-6 shadow-sm">
             <div className="bg-sky-500 rounded-full p-3 text-white shadow-lg">
                 <BrainCircuit className="w-8 h-8" />
             </div>
@@ -587,43 +593,43 @@ const ListsSlide = () => (
     </div>
 );
 
-// 8. Embezzlement Slide (NEW - FIX LAYOUT)
+// 8. Embezzlement Slide (NO SCROLL FIX)
 const EmbezzlementSlide = () => (
-    <div className="h-full flex flex-col px-16 pt-8 pb-4 animate-fadeIn">
-        <div className="mb-8 text-center">
+    <div className="h-full flex flex-col px-16 pt-8 pb-6 animate-fadeIn overflow-hidden">
+        <div className="mb-6 text-center shrink-0">
             <h2 className="text-4xl font-bold text-slate-800 mb-2 border-b-4 border-indigo-500 inline-block pb-2">ניהול סיכוני מעילות</h2>
             <p className="text-slate-500 text-2xl">פעילות שנת 2025 ותכנון ל-2026</p>
         </div>
 
         {/* Main Content Area - Flex Column for Vertical Spacing */}
-        <div className="flex-grow flex flex-col justify-evenly gap-6 h-full">
+        <div className="flex-grow flex flex-col justify-between gap-6 h-full min-h-0">
 
             {/* Top Row: 3 Cards */}
-            <div className="grid grid-cols-3 gap-8">
+            <div className="grid grid-cols-3 gap-8 flex-grow min-h-0">
                 {/* Card 1 */}
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full">
-                    <div className="flex items-center gap-4 mb-3">
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden">
+                    <div className="flex items-center gap-4 mb-3 shrink-0">
                         <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
                             <Scale className="w-6 h-6 text-indigo-600" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3>
                     </div>
-                    <ul className="text-slate-600 text-base leading-relaxed space-y-2 flex-grow">
+                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto">
                         <li>• עדכון מקיף לנוהל מהימנות עובדים.</li>
                         <li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li>
-                        <li>• ביצוע בדיקות נאותות מוגברות ומבחני מהימנות.</li>
+                        <li>• ביצוע בדיקות נאותות מוגברות וסיווג ביטחוני.</li>
                     </ul>
                 </div>
 
                 {/* Card 2 */}
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full">
-                    <div className="flex items-center gap-4 mb-3">
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden">
+                    <div className="flex items-center gap-4 mb-3 shrink-0">
                         <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
                             <ShieldAlert className="w-6 h-6 text-indigo-600" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3>
                     </div>
-                    <ul className="text-slate-600 text-base leading-relaxed space-y-2 flex-grow">
+                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto">
                         <li>• מיפוי תהליכי ליבה ומוקדי סיכון למעילות.</li>
                         <li>• יישום עקרון הפרדת סמכויות (SoD) במערכות.</li>
                         <li>• בניית תוכנית להפחתת חשיפות והטמעת בקרות מפצות.</li>
@@ -631,14 +637,14 @@ const EmbezzlementSlide = () => (
                 </div>
 
                 {/* Card 3 */}
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full">
-                    <div className="flex items-center gap-4 mb-3">
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden">
+                    <div className="flex items-center gap-4 mb-3 shrink-0">
                         <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors">
                             <GraduationCap className="w-6 h-6 text-indigo-600" />
                         </div>
                         <h3 className="text-xl font-bold text-slate-800">תרבות ומודעות</h3>
                     </div>
-                    <ul className="text-slate-600 text-base leading-relaxed space-y-2 flex-grow">
+                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto">
                         <li>• הדרכות ייעודיות לצוותים אופרטיביים בסיכון גבוה.</li>
                         <li>• חיזוק האתיקה הארגונית ומנגנוני הדיווח.</li>
                         <li>• הטמעת תרבות של "אפס סובלנות" למעילות.</li>
@@ -647,20 +653,14 @@ const EmbezzlementSlide = () => (
             </div>
 
             {/* Bottom Row: 2026 Plan */}
-            <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem] flex items-center gap-6 shadow-sm">
+            <div className="bg-indigo-50 border border-indigo-100 p-6 rounded-[2rem] flex items-center gap-6 shadow-sm shrink-0">
                 <div className="bg-indigo-600 rounded-full p-3 text-white shadow-lg shrink-0">
                     <Archive className="w-8 h-8" />
                 </div>
                 <div>
                     <h4 className="font-bold text-indigo-900 text-xl mb-1">תוכנית עבודה 2026: מיקוד בחשבונות רדומים</h4>
                     <p className="text-indigo-800 text-lg leading-snug">
-                        צוות הציות יטמיע בקרות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts), במטרה למנוע השתלטות פנימית ושימוש לרעה בכספי לקוחות.
-                    </p>
-                    <p className="text-indigo-800 text-lg leading-snug">
-                        בחינה מחודשת של נוהל מהימנות עובדים והגדלת תדירות חובת הפוליגרף
-                    </p>
-                    <p className="text-indigo-800 text-lg leading-snug">
-                        הטמעה תוכנית להפחתת חשיפות ובקרות מפצות.
+                        צוות הציות יטמיע בקרות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts), במטרה למנוע השתלטות פנימית ושימוש לרעה במאגרי המידע.
                     </p>
                 </div>
             </div>
