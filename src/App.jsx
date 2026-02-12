@@ -6,7 +6,7 @@ import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
   Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap,
-  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, Cloud, CloudOff
 } from 'lucide-react';
 
 // Firebase Imports
@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.30";
+const APP_VERSION = "v.1.32";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -116,13 +116,20 @@ const LoginScreen = ({ onLogin }) => {
 };
 
 // --- COMMENTS SYSTEM (HYBRID: Cloud + Local) ---
-const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, setNewCommentPos }) => {
+const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, setNewCommentPos, onStatusChange }) => {
     const [comments, setComments] = useState([]);
     const [user, setUser] = useState(null);
     const [newCommentText, setNewCommentText] = useState("");
     const [useLocalMode, setUseLocalMode] = useState(!isFirebaseAvailable);
 
     const LOCAL_STORAGE_KEY = `fraud-deck-comments-${appId}`;
+
+    // Report status back to parent
+    useEffect(() => {
+        if (onStatusChange) {
+            onStatusChange(useLocalMode ? 'local' : 'cloud');
+        }
+    }, [useLocalMode, onStatusChange]);
 
     // 1. Try to connect to Firebase
     useEffect(() => {
@@ -147,7 +154,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
             if (u) {
                 setUser(u);
-                setUseLocalMode(false); // Force cloud mode if connected
+                setUseLocalMode(false); // Valid user = try cloud
             } else {
                 setUseLocalMode(true);
             }
@@ -155,10 +162,10 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         return () => unsubscribeAuth();
     }, []);
 
-    // 2. Listen to Comments (Firebase or nothing if local)
+    // 2. Listen to Comments
     useEffect(() => {
+        // Local Mode Logic
         if (useLocalMode) {
-            // Load from localStorage if in local mode
             try {
                 const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
                 if (saved) {
@@ -172,16 +179,16 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 
         if (!user) return;
 
+        // Cloud Mode Logic
         try {
-            // CRITICAL FIX: Fetch all comments directly (without 'where' clause)
-            // This bypasses Firebase index/permission restrictions on filtered queries.
+            // FIX: Fetch ALL comments directly (no 'where' clause) to avoid index issues
             const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
 
             const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
-                const loadedComments = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
+                const loadedComments = [];
+                snapshot.forEach(doc => {
+                    loadedComments.push({ id: doc.id, ...doc.data() });
+                });
                 setComments(loadedComments);
             }, (error) => {
                 console.warn("Snapshot failed, switching to local:", error);
@@ -193,7 +200,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
             console.error("Error setting up snapshot:", err);
             setUseLocalMode(true);
         }
-    }, [user, useLocalMode]); // Removed slideIndex from deps to fetch globally
+    }, [user, useLocalMode]);
 
     const handleSaveComment = async () => {
         if (!newCommentText.trim()) return;
@@ -208,14 +215,12 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         };
 
         if (useLocalMode) {
-            // Local Save with Persistence
+            // Local Save
             const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
             setComments(updatedComments);
             try {
                 localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
-            } catch (e) {
-                console.error("Failed to save to localStorage", e);
-            }
+            } catch (e) {}
             setNewCommentPos(null);
             setNewCommentText("");
         } else {
@@ -226,7 +231,8 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                 setNewCommentText("");
             } catch (err) {
                 console.error("Save failed, saving locally:", err);
-                setUseLocalMode(true); // Switch to local mode for future actions
+                setUseLocalMode(true);
+                // Fallback save locally
                 const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
                 setComments(updatedComments);
                 try {
@@ -250,18 +256,16 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
             } catch (err) {
                  console.error("Delete failed, deleting locally:", err);
+                 // Fallback delete
                  const updatedComments = comments.filter(c => c.id !== id);
-                 setComments(updatedComments); // Optimistic delete
-                 try {
-                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
-                 } catch (e) {}
+                 setComments(updatedComments);
             }
         }
     };
 
     if (!isVisible) return null;
 
-    // Filter comments for current slide only (Crucial for Local Mode correctness)
+    // Filter comments for current slide only (Client Side Filtering)
     const currentSlideComments = comments.filter(c => c.slideIndex === slideIndex);
 
     return (
@@ -270,7 +274,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
             {!newCommentPos && currentSlideComments.length === 0 && (
                 <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-800/90 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm animate-fadeIn pointer-events-none z-50">
                     <MousePointer2 className="w-4 h-4" />
-                    <span>קליק ימני להוספת הערה {useLocalMode ? '(מצב מקומי)' : ''}</span>
+                    <span>קליק ימני להוספת הערה {useLocalMode ? '(שמירה מקומית)' : ''}</span>
                 </div>
             )}
 
@@ -330,6 +334,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 };
 
 // --- SLIDE COMPONENTS ---
+// (Same slide components as before, keeping brevity)
 
 // 1. Title Slide
 const TitleSlide = () => (
@@ -406,7 +411,6 @@ const ContextSlide = () => (
 const ChartSlide = () => {
     const latestData = chartData[3];
     const prevData = chartData[2];
-
     const totalExposure = latestData.totalExposure;
     const totalSaved = latestData.totalSaved;
     const savedPercentage = latestData.quality;
@@ -416,7 +420,6 @@ const ChartSlide = () => {
     const CustomTooltip = ({ active, payload, label }) => {
       if (active && payload && payload.length) {
         const getVal = (key) => payload.find(p => p.dataKey === key)?.value || 0;
-
         return (
           <div className="bg-white p-4 border border-slate-100 shadow-2xl rounded-xl font-sans text-right min-w-[240px]" dir="rtl">
             <p className="font-bold text-slate-800 text-lg mb-2 border-b pb-2">{label}</p>
@@ -442,81 +445,42 @@ const ChartSlide = () => {
 
     return (
     <div className="h-full flex flex-col px-8 overflow-hidden print:h-full print:px-6">
-      {/* Wrapper to scale down to 90% */}
       <div className="w-full h-full flex flex-col origin-top transform scale-90 print:scale-100" style={{ transformOrigin: 'top center' }}>
           <div className="mb-4">
               <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
               <p className="text-xl text-slate-500">סיכום נתונים שנתי</p>
           </div>
-
           <div className="flex gap-8 h-full pb-4">
-
               <div className="w-1/4 flex flex-col gap-4">
                   <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
                       <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500"></div>
-                      <div>
-                          <div className="text-slate-500 font-medium text-base mb-1">איכות מניעה (%)</div>
-                          <div className="text-5xl font-black text-slate-800">{savedPercentage}%</div>
-                      </div>
-                      <div className="flex flex-col gap-1 mt-2 text-slate-500 text-sm">
-                          <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit print:border print:border-emerald-200">
-                            <TrendingUp className="w-4 h-4" />
-                            <span className="font-bold text-base">+{improvement.toFixed(1)}%</span>
-                          </div>
-                          <p>שיפור משמעותי מול 2024.</p>
-                      </div>
+                      <div><div className="text-slate-500 font-medium text-base mb-1">איכות מניעה (%)</div><div className="text-5xl font-black text-slate-800">{savedPercentage}%</div></div>
+                      <div className="flex flex-col gap-1 mt-2 text-slate-500 text-sm"><div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit print:border print:border-emerald-200"><TrendingUp className="w-4 h-4" /><span className="font-bold text-base">+{improvement.toFixed(1)}%</span></div><p>שיפור משמעותי מול 2024.</p></div>
                   </div>
-
                   <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
                       <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-300"></div>
-                      <div>
-                          <div className="text-slate-500 font-medium text-base mb-1">כסף שהוצל</div>
-                          <div className="text-4xl font-black text-sky-600">{formatCurrency(totalSaved)}</div>
-                      </div>
-                      <div className="mt-2 text-slate-500 text-sm leading-snug">
-                          <p className="mb-1">מתוך חשיפה של <strong>{formatCurrency(totalExposure)}</strong></p>
-                          <p>יחס מניעה של <strong>1:4</strong> (נחסכו 4 שקלים על כל שקל נזק).</p>
-                      </div>
+                      <div><div className="text-slate-500 font-medium text-base mb-1">כסף שהוצל</div><div className="text-4xl font-black text-sky-600">{formatCurrency(totalSaved)}</div></div>
+                      <div className="mt-2 text-slate-500 text-sm leading-snug"><p className="mb-1">מתוך חשיפה של <strong>{formatCurrency(totalExposure)}</strong></p><p>יחס מניעה של <strong>1:4</strong> (נחסכו 4 שקלים על כל שקל נזק).</p></div>
                   </div>
-
                   <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
                       <div className="absolute top-0 right-0 w-1.5 h-full bg-rose-400"></div>
-                      <div>
-                          <div className="text-slate-500 font-medium text-base mb-1">נזק בפועל</div>
-                          <div className="text-4xl font-black text-rose-500">{formatCurrency(latestData.damage)}</div>
-                      </div>
-                      <div className="mt-2 text-slate-500 text-sm flex flex-col gap-1">
-                          <div className="flex items-center gap-2">
-                            <CheckCircle className="w-4 h-4 text-sky-500" />
-                            <span>ירידה של <strong>{formatCurrency(damageReduced)}</strong></span>
-                          </div>
-                          <p>הנתון הנמוך ביותר ב-3 שנים.</p>
-                      </div>
+                      <div><div className="text-slate-500 font-medium text-base mb-1">נזק בפועל</div><div className="text-4xl font-black text-rose-500">{formatCurrency(latestData.damage)}</div></div>
+                      <div className="mt-2 text-slate-500 text-sm flex flex-col gap-1"><div className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-sky-500" /><span>ירידה של <strong>{formatCurrency(damageReduced)}</strong></span></div><p>הנתון הנמוך ביותר ב-3 שנים.</p></div>
                   </div>
-
                   <div className="bg-amber-50 p-4 rounded-[1.5rem] shadow-sm border border-amber-200 flex flex-col justify-center relative overflow-hidden print:border-amber-300">
-                      <div className="flex items-center gap-2 mb-1">
-                          <AlertCircle className="w-5 h-5 text-amber-600" />
-                          <div className="text-amber-800 font-bold text-base">עדכון נתונים</div>
-                      </div>
-                      <p className="text-amber-900 text-sm leading-tight font-medium">
-                          התקבלו הכחשות נוספות (2025) בסך <strong>330k ₪</strong> הממתינות לסיווג.
-                      </p>
-                      <div className="mt-2 text-amber-700/70 text-xs border-t border-amber-200 pt-1">
-                          * הכחשות מתקבלות עד חצי שנה ממועד העסקה.
-                      </div>
+                      <div className="flex items-center gap-2 mb-1"><AlertCircle className="w-5 h-5 text-amber-600" /><div className="text-amber-800 font-bold text-base">עדכון נתונים</div></div>
+                      <p className="text-amber-900 text-sm leading-tight font-medium">התקבלו הכחשות נוספות (2025) בסך <strong>330k ₪</strong> הממתינות לסיווג.</p>
+                      <div className="mt-2 text-amber-700/70 text-xs border-t border-amber-200 pt-1">* הכחשות מתקבלות עד חצי שנה ממועד העסקה.</div>
                   </div>
               </div>
-
               <div className="w-3/4 flex flex-col gap-3">
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative print:border-slate-300">
                       <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10 print:border print:border-slate-200">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
                       </div>
-
                       <ResponsiveContainer width="100%" height="100%">
                         <ComposedChart data={chartData} margin={{top: 50, right: 10, bottom: 5, left: 0}}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
@@ -524,25 +488,17 @@ const ChartSlide = () => {
                             <YAxis yAxisId="left" tickFormatter={formatMillions} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 14}} />
                             <YAxis yAxisId="right" orientation="right" tickFormatter={(v)=>`${v}%`} axisLine={false} tickLine={false} tick={{fill: '#0ea5e9', fontSize: 14, fontWeight: 700}} />
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+                            <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
                             <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
                             <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
-                            <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[0,0,6,6]} />
-                            <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[6,6,0,0]} />
+                            <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} />
                             <Line yAxisId="right" type="monotone" dataKey="quality" name="איכות מניעה" stroke={colors.chart.line} strokeWidth={5} dot={{r:6, fill: colors.chart.line, strokeWidth: 0}} />
                         </ComposedChart>
                       </ResponsiveContainer>
                   </div>
-
                   <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-center gap-4 print:border-sky-200">
-                      <div className="bg-sky-500 text-white p-2 rounded-lg">
-                          <Zap className="w-5 h-5" />
-                      </div>
-                      <div>
-                          <h4 className="font-bold text-sky-900 text-lg mb-0.5">בשורה התחתונה</h4>
-                          <p className="text-sky-800 text-base leading-snug">
-                              השנה הצלחנו לעצור הרבה יותר כסף בזמן אמת. על כל שקל ש"ברח" לנו, עצרנו 4 שקלים לפני שיצאו.
-                          </p>
-                      </div>
+                      <div className="bg-sky-500 text-white p-2 rounded-lg"><Zap className="w-5 h-5" /></div>
+                      <div><h4 className="font-bold text-sky-900 text-lg mb-0.5">בשורה התחתונה</h4><p className="text-sky-800 text-base leading-snug">השנה הצלחנו לעצור הרבה יותר כסף בזמן אמת. על כל שקל ש"ברח" לנו, עצרנו 4 שקלים לפני שיצאו.</p></div>
                   </div>
               </div>
           </div>
@@ -555,17 +511,12 @@ const ChartSlide = () => {
 const TrendsSlide = () => (
   <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
      <h2 className="text-4xl font-bold text-slate-800 mb-10 border-r-8 border-rose-300 pr-6">סוגי הונאות בולטים ב-2025</h2>
-
      <div className="grid grid-cols-2 gap-12 flex-grow max-h-[65vh] print:max-h-none">
         <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
             <div>
                 <div className="flex items-start justify-between mb-6">
-                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100">
-                        <Phone className="w-10 h-10 text-rose-400" />
-                    </div>
-                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print:border-slate-300">
-                        הנדסה חברתית
-                    </div>
+                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100"><Phone className="w-10 h-10 text-rose-400" /></div>
+                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print:border-slate-300">הנדסה חברתית</div>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-4">הונאת "בזק" / שירות לקוחות</h3>
                 <div className="text-slate-600 text-xl leading-relaxed space-y-4">
@@ -580,13 +531,10 @@ const TrendsSlide = () => (
                 <div><span className="block text-sm text-slate-400 uppercase font-bold tracking-wider">נזק כספי</span><span className="text-3xl font-black text-rose-500">₪64k</span></div>
             </div>
         </div>
-
         <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
              <div>
                 <div className="flex items-start justify-between mb-6">
-                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100">
-                        <Utensils className="w-10 h-10 text-rose-400" />
-                    </div>
+                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100"><Utensils className="w-10 h-10 text-rose-400" /></div>
                     <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print:border-slate-300">פישינג</div>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-4">הונאת "מסעדות"</h3>
@@ -613,7 +561,6 @@ const ImprovementsSlide = () => (
             <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">מה עשינו השנה?</h2>
             <p className="text-slate-500 text-2xl">שיפורים במערכת ובמוצר</p>
        </div>
-
        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><Sliders className="w-8 h-8 text-sky-500" /></div>
@@ -623,7 +570,6 @@ const ImprovementsSlide = () => (
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>ניתוח ותגובה:</strong> ניתוח מקרים ותגובה מהירה הם המפתח למניעת נזק כספי.</span></li>
               </ul>
           </div>
-
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><MessageSquare className="w-8 h-8 text-sky-500" /></div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">התראות ללקוח</h3>
@@ -632,7 +578,6 @@ const ImprovementsSlide = () => (
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מכשיר חדש:</strong> שולחים התראה ללקוח אם מישהו נכנס לחשבון שלו ממכשיר לא מוכר.</span></li>
               </ul>
           </div>
-
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><CreditCard className="w-8 h-8 text-sky-500" /></div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">צמצום סיכונים</h3>
@@ -660,7 +605,6 @@ const LayersSlide = () => {
                 <h2 className="text-4xl font-bold text-slate-800 mb-4">איך אנחנו מגינים?</h2>
                 <p className="text-slate-500 text-xl max-w-4xl mx-auto">מערכת של כמה שכבות סינון, מהגנה כללית ועד בדיקה פרטנית</p>
             </div>
-
             <div className="flex flex-col items-center gap-4 w-full flex-grow justify-center">
                 {layers.map((layer, idx) => (
                     <div key={idx} className={`${layer.widthClass} ${layer.color} text-white rounded-2xl shadow-xl flex items-center p-5 transition-all hover:scale-[1.01] print:shadow-none print:border print:border-slate-400`}>
@@ -753,8 +697,9 @@ const BoardPresentation = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isPrintMode, setIsPrintMode] = useState(false);
     const [commentsVisible, setCommentsVisible] = useState(true);
-    const [newCommentPos, setNewCommentPos] = useState(null); // Lifted state
-    const containerRef = React.useRef(null);
+    const [newCommentPos, setNewCommentPos] = useState(null);
+    const [connectionStatus, setConnectionStatus] = useState('checking'); // 'cloud', 'local', 'checking'
+    const containerRef = useRef(null);
 
     const slides = [
         { component: <TitleSlide />, label: "פתיחה" },
@@ -831,7 +776,6 @@ const BoardPresentation = () => {
             <div className="bg-white w-[98vw] h-[92vh] rounded-[3.5rem] shadow-2xl border border-white/60 relative overflow-hidden flex flex-col">
                 <div className="w-full h-3 bg-sky-50"><div className="h-full bg-sky-500 transition-all duration-700 ease-in-out" style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}></div></div>
 
-                {/* Main Content Area with Context Menu Listener */}
                 <div
                     className="flex-grow relative overflow-hidden"
                     ref={containerRef}
@@ -843,6 +787,7 @@ const BoardPresentation = () => {
                         containerRef={containerRef}
                         newCommentPos={newCommentPos}
                         setNewCommentPos={setNewCommentPos}
+                        onStatusChange={setConnectionStatus}
                     />
                     {slides[currentSlide].component}
                 </div>
@@ -850,6 +795,14 @@ const BoardPresentation = () => {
                 <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16">
                     <div className="text-slate-400 text-xl font-medium flex gap-4"><span>שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}</span></div>
                     <div className="flex gap-6 items-center">
+                        {/* Status Indicator */}
+                        <div className="flex items-center gap-2 ml-4" title={connectionStatus === 'cloud' ? 'מחובר לענן' : 'מצב מקומי (לא מסונכרן)'}>
+                            {connectionStatus === 'cloud' ?
+                                <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg text-xs font-bold border border-emerald-100"><Cloud className="w-3 h-3" /> Online</div> :
+                                <div className="flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded-lg text-xs font-bold border border-orange-100"><CloudOff className="w-3 h-3" /> Local</div>
+                            }
+                        </div>
+
                         <button onClick={() => setCommentsVisible(!commentsVisible)} className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-semibold mr-2 ${commentsVisible ? 'text-sky-600 bg-sky-50' : 'text-slate-400 bg-slate-50'}`} title="הערות"><MessageCircle className="w-5 h-5" /></button>
                         <button onClick={() => setIsPrintMode(true)} className="flex items-center gap-2 text-sky-600 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-4 py-2 rounded-xl transition-all font-semibold mr-4" title="הכן להדפסה"><Printer className="w-5 h-5" /><span className="hidden md:inline">הכן להדפסה / PDF</span></button>
                         <div className="h-8 w-px bg-slate-200 mx-2"></div>
