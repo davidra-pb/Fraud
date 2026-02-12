@@ -12,17 +12,32 @@ import {
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.26";
+const APP_VERSION = "v.1.28";
 
-// --- FIREBASE SETUP ---
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
+// --- FIREBASE SETUP (Safe Initialization) ---
+let app, auth, db;
+let isFirebaseAvailable = false;
+let appId = 'fraud-prevention-deck';
+
+try {
+    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+
+        // Sanitize App ID
+        const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
+        appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        isFirebaseAvailable = true;
+    }
+} catch (e) {
+    console.warn("Firebase init failed, falling back to local state:", e);
+}
 
 // --- DATA ---
 const chartData = [
@@ -100,140 +115,161 @@ const LoginScreen = ({ onLogin }) => {
   );
 };
 
-// --- COMMENTS SYSTEM ---
-const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
-    const [comments, setComments] = useState([]);
+// --- COMMENTS SYSTEM (HYBRID: Cloud + Local) ---
+const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, setNewCommentPos }) => {
+    const [comments, setComments] = useState([]); // Local state for comments (backup or main)
     const [user, setUser] = useState(null);
-    const [newCommentPos, setNewCommentPos] = useState(null);
     const [newCommentText, setNewCommentText] = useState("");
+    const [useLocalMode, setUseLocalMode] = useState(!isFirebaseAvailable);
 
-    // Auth & Data Fetching
+    // 1. Try to connect to Firebase
     useEffect(() => {
+        if (!isFirebaseAvailable) {
+            setUseLocalMode(true);
+            return;
+        }
+
         const initAuth = async () => {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await signInWithCustomToken(auth, __initial_auth_token);
-            } else {
-                await signInAnonymously(auth);
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Auth failed, switching to local mode:", err);
+                setUseLocalMode(true);
             }
         };
         initAuth();
-        const unsubscribeAuth = onAuthStateChanged(auth, setUser);
+        const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+            if (u) setUser(u);
+            else setUseLocalMode(true); // No user = local mode
+        });
         return () => unsubscribeAuth();
     }, []);
 
+    // 2. Listen to Comments (Firebase or nothing if local)
     useEffect(() => {
-        if (!user) return;
+        if (useLocalMode || !user) return;
 
-        const q = query(
-            collection(db, 'artifacts', appId, 'public', 'data', 'comments'),
-            where('slideIndex', '==', slideIndex)
-        );
+        try {
+            const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
+            // We query by slideIndex to fetch relevant ones
+            const q = query(commentsRef, where('slideIndex', '==', slideIndex));
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const loadedComments = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setComments(loadedComments);
-        }, (error) => {
-            console.error("Error fetching comments:", error);
-        });
+            const unsubscribe = onSnapshot(q, (snapshot) => {
+                const loadedComments = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                setComments(loadedComments);
+            }, (error) => {
+                console.warn("Snapshot failed, switching to local:", error);
+                setUseLocalMode(true);
+            });
 
-        return () => unsubscribe();
-    }, [user, slideIndex]);
-
-    // Right Click Handler
-    useEffect(() => {
-        const handleContextMenu = (e) => {
-            if (!isVisible || !containerRef.current) return;
-            if (!containerRef.current.contains(e.target)) return;
-
-            e.preventDefault();
-
-            const rect = containerRef.current.getBoundingClientRect();
-            const x = ((e.clientX - rect.left) / rect.width) * 100;
-            const y = ((e.clientY - rect.top) / rect.height) * 100;
-
-            setNewCommentPos({ x, y });
-            setNewCommentText("");
-        };
-
-        const element = containerRef.current;
-        if(element) {
-            element.addEventListener('contextmenu', handleContextMenu);
+            return () => unsubscribe();
+        } catch (err) {
+            setUseLocalMode(true);
         }
-        return () => {
-            if(element) element.removeEventListener('contextmenu', handleContextMenu);
-        };
-    }, [isVisible, containerRef]);
+    }, [user, slideIndex, useLocalMode]);
 
     const handleSaveComment = async () => {
-        if (!newCommentText.trim() || !user) return;
+        if (!newCommentText.trim()) return;
 
-        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), {
+        const newComment = {
             slideIndex,
             x: newCommentPos.x,
             y: newCommentPos.y,
             text: newCommentText,
             createdAt: new Date().toISOString(),
-            authorId: user.uid,
-            authorName: "User"
-        });
+            authorId: user ? user.uid : 'local-user',
+        };
 
-        setNewCommentPos(null);
+        if (useLocalMode) {
+            // Local Save
+            setComments([...comments, { ...newComment, id: Date.now().toString() }]);
+            setNewCommentPos(null);
+            setNewCommentText("");
+        } else {
+            // Cloud Save
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), newComment);
+                setNewCommentPos(null);
+                setNewCommentText("");
+            } catch (err) {
+                console.error("Save failed, saving locally:", err);
+                setComments([...comments, { ...newComment, id: Date.now().toString() }]);
+                setNewCommentPos(null);
+                setNewCommentText("");
+            }
+        }
     };
 
     const handleDeleteComment = async (id) => {
-        if (!user) return;
-        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
+        if (useLocalMode) {
+            setComments(comments.filter(c => c.id !== id));
+        } else {
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
+            } catch (err) {
+                 setComments(comments.filter(c => c.id !== id)); // Optimistic delete
+            }
+        }
     };
 
     if (!isVisible) return null;
 
+    // Filter comments for current slide only (Crucial for Local Mode correctness)
+    const currentSlideComments = comments.filter(c => c.slideIndex === slideIndex);
+
     return (
-        <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden no-print">
-            {/* Visual Instruction when no new comment is active */}
-            {!newCommentPos && (
-                <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-900/80 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm animate-fadeIn pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none z-[100] overflow-hidden no-print">
+            {/* Visual Instruction */}
+            {!newCommentPos && currentSlideComments.length === 0 && (
+                <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-800/90 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm animate-fadeIn pointer-events-none z-50">
                     <MousePointer2 className="w-4 h-4" />
-                    <span>לחץ מקש ימני בכל מקום להוספת הערה</span>
+                    <span>קליק ימני להוספת הערה {useLocalMode ? '(מצב מקומי)' : ''}</span>
                 </div>
             )}
 
             {/* Existing Comments */}
-            {comments.map(comment => (
+            {currentSlideComments.map(comment => (
                 <div
                     key={comment.id}
-                    className="absolute pointer-events-auto bg-yellow-100 border border-yellow-300 shadow-xl rounded-br-none rounded-lg p-3 w-48 text-sm text-slate-800 animate-fadeIn z-50 transform -translate-y-full"
+                    className="absolute pointer-events-auto bg-amber-100 border border-amber-300 shadow-xl rounded-lg rounded-br-none p-3 w-48 text-sm text-slate-900 animate-fadeIn z-[101] transform -translate-y-full origin-bottom-left"
                     style={{ left: `${comment.x}%`, top: `${comment.y}%` }}
                 >
-                    <div className="flex justify-between items-start mb-1 border-b border-yellow-200 pb-1">
-                        <span className="text-[10px] text-yellow-700 font-bold">הערה</span>
+                    <div className="flex justify-between items-start mb-1 border-b border-amber-200 pb-1">
+                        <span className="text-[10px] text-amber-700 font-bold">הערה</span>
                         <button
                             onClick={() => handleDeleteComment(comment.id)}
-                            className="text-slate-400 hover:text-red-500 transition-colors"
+                            className="text-slate-400 hover:text-red-600 transition-colors p-1"
                             title="מחק הערה"
                         >
                             <X className="w-3 h-3" />
                         </button>
                     </div>
-                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">{String(comment.text)}</p>
-                    <div className="absolute bottom-[-6px] right-0 w-3 h-3 bg-yellow-100 border-b border-r border-yellow-300 transform rotate-45"></div>
+                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">
+                        {String(comment.text || '')}
+                    </p>
+                    <div className="absolute bottom-[-5px] right-0 w-3 h-3 bg-amber-100 border-b border-r border-amber-300 transform rotate-45"></div>
                 </div>
             ))}
 
             {/* New Comment Input */}
             {newCommentPos && (
                 <div
-                    className="absolute pointer-events-auto bg-white border border-sky-300 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-50"
+                    className="absolute pointer-events-auto bg-white border border-sky-500 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-[102]"
                     style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}
                 >
                     <div className="flex justify-between items-center mb-2">
-                        <p className="text-xs font-bold text-sky-600">הוספת הערה חדשה</p>
-                        <button onClick={() => setNewCommentPos(null)} className="text-slate-400 hover:text-slate-600"><X className="w-3 h-3"/></button>
+                        <p className="text-xs font-bold text-sky-600">הוספת הערה</p>
+                        <button onClick={() => setNewCommentPos(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4"/></button>
                     </div>
                     <textarea
-                        className="w-full text-sm border border-slate-200 rounded-lg p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-sky-500 min-h-[80px] bg-slate-50 resize-none"
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-sky-500 min-h-[80px] bg-slate-50 resize-none text-right"
                         placeholder="כתוב הערה כאן..."
                         value={newCommentText}
                         onChange={(e) => setNewCommentText(e.target.value)}
@@ -242,7 +278,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
                     <div className="flex gap-2">
                         <button
                             onClick={handleSaveComment}
-                            className="flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg hover:bg-sky-700 transition font-medium"
+                            className="flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg hover:bg-sky-700 transition font-medium shadow-sm"
                         >
                             שמור
                         </button>
@@ -677,6 +713,7 @@ const BoardPresentation = () => {
     const [currentSlide, setCurrentSlide] = useState(0);
     const [isPrintMode, setIsPrintMode] = useState(false);
     const [commentsVisible, setCommentsVisible] = useState(true);
+    const [newCommentPos, setNewCommentPos] = useState(null); // Lifted state
     const containerRef = React.useRef(null);
 
     const slides = [
@@ -703,6 +740,18 @@ const BoardPresentation = () => {
 
     const nextSlide = () => setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
     const prevSlide = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
+
+    // Handler to capture right click on the container
+    const handleContainerContextMenu = (e) => {
+        if (!commentsVisible || isPrintMode) return;
+
+        e.preventDefault();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+        setNewCommentPos({ x, y });
+    };
 
     if (!isAuthenticated) return <LoginScreen onLogin={() => setIsAuthenticated(true)} />;
 
@@ -741,10 +790,23 @@ const BoardPresentation = () => {
         <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-100 p-8 overflow-hidden font-sans">
             <div className="bg-white w-[98vw] h-[92vh] rounded-[3.5rem] shadow-2xl border border-white/60 relative overflow-hidden flex flex-col">
                 <div className="w-full h-3 bg-sky-50"><div className="h-full bg-sky-500 transition-all duration-700 ease-in-out" style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}></div></div>
-                <div className="flex-grow relative overflow-hidden" ref={containerRef}>
-                    <CommentsLayer slideIndex={currentSlide} isVisible={commentsVisible} containerRef={containerRef} />
+
+                {/* Main Content Area with Context Menu Listener */}
+                <div
+                    className="flex-grow relative overflow-hidden"
+                    ref={containerRef}
+                    onContextMenu={handleContainerContextMenu}
+                >
+                    <CommentsLayer
+                        slideIndex={currentSlide}
+                        isVisible={commentsVisible}
+                        containerRef={containerRef}
+                        newCommentPos={newCommentPos}
+                        setNewCommentPos={setNewCommentPos}
+                    />
                     {slides[currentSlide].component}
                 </div>
+
                 <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16">
                     <div className="text-slate-400 text-xl font-medium flex gap-4"><span>שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}</span></div>
                     <div className="flex gap-6 items-center">
