@@ -6,37 +6,23 @@ import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
   Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap,
-  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2
 } from 'lucide-react';
 
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where, orderBy } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.25";
+const APP_VERSION = "v.1.26";
 
 // --- FIREBASE SETUP ---
-let app, auth, db;
-let isFirebaseInitialized = false;
-
-try {
-    // Robust check for config presence
-    const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
-    if (firebaseConfig) {
-        app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-        isFirebaseInitialized = true;
-    }
-} catch (e) {
-    console.error("Firebase initialization failed:", e);
-}
-
-// Critical Fix: Sanitize appId to ensure it is treated as a single path segment
-const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
-const appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
+const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
 
 // --- DATA ---
 const chartData = [
@@ -120,22 +106,14 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     const [user, setUser] = useState(null);
     const [newCommentPos, setNewCommentPos] = useState(null);
     const [newCommentText, setNewCommentText] = useState("");
-    const [hasError, setHasError] = useState(false);
 
     // Auth & Data Fetching
     useEffect(() => {
-        if (!isFirebaseInitialized) return;
-
         const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth error:", err);
-                setHasError(true);
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+                await signInAnonymously(auth);
             }
         };
         initAuth();
@@ -144,37 +122,30 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
     }, []);
 
     useEffect(() => {
-        if (!user || !isFirebaseInitialized || hasError) return;
+        if (!user) return;
 
-        try {
-            const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
+        const q = query(
+            collection(db, 'artifacts', appId, 'public', 'data', 'comments'),
+            where('slideIndex', '==', slideIndex)
+        );
 
-            const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
-                const loadedComments = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    // Client-side filtering
-                    if (data.slideIndex === slideIndex) {
-                        loadedComments.push({ id: doc.id, ...data });
-                    }
-                });
-                setComments(loadedComments);
-            }, (error) => {
-                console.warn("Comments unavailable:", error.message);
-                setHasError(true);
-            });
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const loadedComments = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            setComments(loadedComments);
+        }, (error) => {
+            console.error("Error fetching comments:", error);
+        });
 
-            return () => unsubscribe();
-        } catch (err) {
-            console.error("Error setting up listener:", err);
-            setHasError(true);
-        }
-    }, [user, slideIndex, hasError]);
+        return () => unsubscribe();
+    }, [user, slideIndex]);
 
     // Right Click Handler
     useEffect(() => {
         const handleContextMenu = (e) => {
-            if (!isVisible || !containerRef.current || hasError || !isFirebaseInitialized) return;
+            if (!isVisible || !containerRef.current) return;
             if (!containerRef.current.contains(e.target)) return;
 
             e.preventDefault();
@@ -194,41 +165,41 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
         return () => {
             if(element) element.removeEventListener('contextmenu', handleContextMenu);
         };
-    }, [isVisible, containerRef, hasError]);
+    }, [isVisible, containerRef]);
 
     const handleSaveComment = async () => {
-        if (!newCommentText.trim() || !user || !isFirebaseInitialized) return;
+        if (!newCommentText.trim() || !user) return;
 
-        try {
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), {
-                slideIndex,
-                x: newCommentPos.x,
-                y: newCommentPos.y,
-                text: newCommentText,
-                createdAt: new Date().toISOString(),
-                authorId: user.uid,
-                authorName: "User"
-            });
-            setNewCommentPos(null);
-        } catch (err) {
-            console.error("Error saving comment:", err);
-            alert("שגיאה בשמירת הערה.");
-        }
+        await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), {
+            slideIndex,
+            x: newCommentPos.x,
+            y: newCommentPos.y,
+            text: newCommentText,
+            createdAt: new Date().toISOString(),
+            authorId: user.uid,
+            authorName: "User"
+        });
+
+        setNewCommentPos(null);
     };
 
     const handleDeleteComment = async (id) => {
-        if (!user || !isFirebaseInitialized) return;
-        try {
-            await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
-        } catch (err) {
-            console.error("Error deleting comment:", err);
-        }
+        if (!user) return;
+        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
     };
 
-    if (!isVisible || hasError || !isFirebaseInitialized) return null;
+    if (!isVisible) return null;
 
     return (
         <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden no-print">
+            {/* Visual Instruction when no new comment is active */}
+            {!newCommentPos && (
+                <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-900/80 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm animate-fadeIn pointer-events-none">
+                    <MousePointer2 className="w-4 h-4" />
+                    <span>לחץ מקש ימני בכל מקום להוספת הערה</span>
+                </div>
+            )}
+
             {/* Existing Comments */}
             {comments.map(comment => (
                 <div
@@ -246,9 +217,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef }) => {
                             <X className="w-3 h-3" />
                         </button>
                     </div>
-                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">
-                        {String(comment.text || '')}
-                    </p>
+                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">{String(comment.text)}</p>
                     <div className="absolute bottom-[-6px] right-0 w-3 h-3 bg-yellow-100 border-b border-r border-yellow-300 transform rotate-45"></div>
                 </div>
             ))}
