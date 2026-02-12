@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.28";
+const APP_VERSION = "v.1.29";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -117,10 +117,12 @@ const LoginScreen = ({ onLogin }) => {
 
 // --- COMMENTS SYSTEM (HYBRID: Cloud + Local) ---
 const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, setNewCommentPos }) => {
-    const [comments, setComments] = useState([]); // Local state for comments (backup or main)
+    const [comments, setComments] = useState([]);
     const [user, setUser] = useState(null);
     const [newCommentText, setNewCommentText] = useState("");
     const [useLocalMode, setUseLocalMode] = useState(!isFirebaseAvailable);
+
+    const LOCAL_STORAGE_KEY = `fraud-deck-comments-${appId}`;
 
     // 1. Try to connect to Firebase
     useEffect(() => {
@@ -151,7 +153,20 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 
     // 2. Listen to Comments (Firebase or nothing if local)
     useEffect(() => {
-        if (useLocalMode || !user) return;
+        if (useLocalMode) {
+            // Load from localStorage if in local mode
+            try {
+                const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (saved) {
+                    setComments(JSON.parse(saved));
+                }
+            } catch(e) {
+                console.error("Failed to load local comments", e);
+            }
+            return;
+        }
+
+        if (!user) return;
 
         try {
             const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
@@ -188,8 +203,14 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         };
 
         if (useLocalMode) {
-            // Local Save
-            setComments([...comments, { ...newComment, id: Date.now().toString() }]);
+            // Local Save with Persistence
+            const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
+            setComments(updatedComments);
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
+            } catch (e) {
+                console.error("Failed to save to localStorage", e);
+            }
             setNewCommentPos(null);
             setNewCommentText("");
         } else {
@@ -200,7 +221,12 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                 setNewCommentText("");
             } catch (err) {
                 console.error("Save failed, saving locally:", err);
-                setComments([...comments, { ...newComment, id: Date.now().toString() }]);
+                setUseLocalMode(true); // Switch to local mode for future actions
+                const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
+                setComments(updatedComments);
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
+                } catch (e) {}
                 setNewCommentPos(null);
                 setNewCommentText("");
             }
@@ -209,12 +235,21 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 
     const handleDeleteComment = async (id) => {
         if (useLocalMode) {
-            setComments(comments.filter(c => c.id !== id));
+            const updatedComments = comments.filter(c => c.id !== id);
+            setComments(updatedComments);
+            try {
+                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
+            } catch (e) {}
         } else {
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
             } catch (err) {
-                 setComments(comments.filter(c => c.id !== id)); // Optimistic delete
+                 console.error("Delete failed, deleting locally:", err);
+                 const updatedComments = comments.filter(c => c.id !== id);
+                 setComments(updatedComments); // Optimistic delete
+                 try {
+                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
+                 } catch (e) {}
             }
         }
     };
