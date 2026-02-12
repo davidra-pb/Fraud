@@ -12,10 +12,10 @@ import {
 // Firebase Imports
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc, query, where } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.29";
+const APP_VERSION = "v.1.30";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -145,8 +145,12 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         };
         initAuth();
         const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
-            if (u) setUser(u);
-            else setUseLocalMode(true); // No user = local mode
+            if (u) {
+                setUser(u);
+                setUseLocalMode(false); // Force cloud mode if connected
+            } else {
+                setUseLocalMode(true);
+            }
         });
         return () => unsubscribeAuth();
     }, []);
@@ -169,11 +173,11 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         if (!user) return;
 
         try {
+            // CRITICAL FIX: Fetch all comments directly (without 'where' clause)
+            // This bypasses Firebase index/permission restrictions on filtered queries.
             const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
-            // We query by slideIndex to fetch relevant ones
-            const q = query(commentsRef, where('slideIndex', '==', slideIndex));
 
-            const unsubscribe = onSnapshot(q, (snapshot) => {
+            const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
                 const loadedComments = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
@@ -186,9 +190,10 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 
             return () => unsubscribe();
         } catch (err) {
+            console.error("Error setting up snapshot:", err);
             setUseLocalMode(true);
         }
-    }, [user, slideIndex, useLocalMode]);
+    }, [user, useLocalMode]); // Removed slideIndex from deps to fetch globally
 
     const handleSaveComment = async () => {
         if (!newCommentText.trim()) return;
