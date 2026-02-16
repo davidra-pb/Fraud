@@ -6,7 +6,7 @@ import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
   Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap,
-  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, FileCheck, Landmark
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, FileCheck, Landmark, Cloud, CloudOff, RefreshCw
 } from 'lucide-react';
 
 // Firebase Imports
@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.34";
+const APP_VERSION = "v.1.35";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -23,20 +23,23 @@ let isFirebaseAvailable = false;
 let appId = 'fraud-prevention-deck';
 
 try {
+    // Check if config exists and has at least one key
     if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-        const firebaseConfig = JSON.parse(__firebase_config);
-        app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
+        const configObj = JSON.parse(__firebase_config);
+        if (Object.keys(configObj).length > 0) {
+            app = initializeApp(configObj);
+            auth = getAuth(app);
+            db = getFirestore(app);
 
-        // Sanitize App ID
-        const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
-        appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
+            // Sanitize App ID
+            const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
+            appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
 
-        isFirebaseAvailable = true;
+            isFirebaseAvailable = true;
+        }
     }
 } catch (e) {
-    console.warn("Firebase init failed, falling back to local state:", e);
+    console.warn("Firebase init failed (running in offline mode):", e);
 }
 
 // --- DATA ---
@@ -121,6 +124,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
     const [user, setUser] = useState(null);
     const [newCommentText, setNewCommentText] = useState("");
     const [useLocalMode, setUseLocalMode] = useState(!isFirebaseAvailable);
+    const [isSaving, setIsSaving] = useState(false);
 
     const LOCAL_STORAGE_KEY = `fraud-deck-comments-${appId}`;
 
@@ -130,6 +134,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         }
     }, [useLocalMode, onStatusChange]);
 
+    // 1. Initialize Auth
     useEffect(() => {
         if (!isFirebaseAvailable) {
             setUseLocalMode(true);
@@ -160,6 +165,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         return () => unsubscribeAuth();
     }, []);
 
+    // 2. Listen to Comments
     useEffect(() => {
         if (useLocalMode) {
             try {
@@ -197,6 +203,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 
     const handleSaveComment = async () => {
         if (!newCommentText.trim()) return;
+        setIsSaving(true);
 
         const newComment = {
             slideIndex,
@@ -208,6 +215,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         };
 
         if (useLocalMode) {
+            // Local Save
             const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
             setComments(updatedComments);
             try {
@@ -215,7 +223,9 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
             } catch (e) {}
             setNewCommentPos(null);
             setNewCommentText("");
+            setIsSaving(false);
         } else {
+            // Cloud Save
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), newComment);
                 setNewCommentPos(null);
@@ -230,6 +240,8 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                 } catch (e) {}
                 setNewCommentPos(null);
                 setNewCommentText("");
+            } finally {
+                setIsSaving(false);
             }
         }
     };
@@ -248,6 +260,9 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                  console.error("Delete failed, deleting locally:", err);
                  const updatedComments = comments.filter(c => c.id !== id);
                  setComments(updatedComments);
+                 try {
+                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
+                 } catch (e) {}
             }
         }
     };
@@ -264,7 +279,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                     <span>קליק ימני להוספת הערה {useLocalMode ? '(מצב מקומי)' : ''}</span>
                 </div>
             )}
-
             {currentSlideComments.map(comment => (
                 <div
                     key={comment.id}
@@ -279,7 +293,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                     <div className="absolute bottom-[-5px] right-0 w-3 h-3 bg-amber-100 border-b border-r border-amber-300 transform rotate-45"></div>
                 </div>
             ))}
-
             {newCommentPos && (
                 <div className="absolute pointer-events-auto bg-white border border-sky-500 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-[102]" style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}>
                     <div className="flex justify-between items-center mb-2">
@@ -294,7 +307,13 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                         autoFocus
                     />
                     <div className="flex gap-2">
-                        <button onClick={handleSaveComment} className="flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg hover:bg-sky-700 transition font-medium shadow-sm">שמור</button>
+                        <button
+                            onClick={handleSaveComment}
+                            disabled={isSaving}
+                            className={`flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg transition font-medium shadow-sm flex items-center justify-center ${isSaving ? 'opacity-70 cursor-wait' : 'hover:bg-sky-700'}`}
+                        >
+                            {isSaving ? <RefreshCw className="w-3 h-3 animate-spin" /> : 'שמור'}
+                        </button>
                     </div>
                 </div>
             )}
@@ -379,7 +398,6 @@ const ContextSlide = () => (
 const ChartSlide = () => {
     const latestData = chartData[3];
     const prevData = chartData[2];
-
     const totalExposure = latestData.totalExposure;
     const totalSaved = latestData.totalSaved;
     const savedPercentage = latestData.quality;
@@ -389,7 +407,6 @@ const ChartSlide = () => {
     const CustomTooltip = ({ active, payload, label }) => {
       if (active && payload && payload.length) {
         const getVal = (key) => payload.find(p => p.dataKey === key)?.value || 0;
-
         return (
           <div className="bg-white p-4 border border-slate-100 shadow-2xl rounded-xl font-sans text-right min-w-[240px]" dir="rtl">
             <p className="font-bold text-slate-800 text-lg mb-2 border-b pb-2">{label}</p>
@@ -484,6 +501,7 @@ const ChartSlide = () => {
               <div className="w-3/4 flex flex-col gap-3">
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative print:border-slate-300">
                       <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10 print:border print:border-slate-200">
+                        {/* Legend in correct order: Near (Top), Retro, Collection, Damage (Bottom) */}
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
@@ -497,10 +515,17 @@ const ChartSlide = () => {
                             <YAxis yAxisId="left" tickFormatter={formatMillions} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 14}} />
                             <YAxis yAxisId="right" orientation="right" tickFormatter={(v)=>`${v}%`} axisLine={false} tickLine={false} tick={{fill: '#0ea5e9', fontSize: 14, fontWeight: 700}} />
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+
+                            {/* Stacked Bars: Bottom to Top */}
+                            {/* 1. Damage (Bottom, Red) */}
                             <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
+                            {/* 2. Collection (Blue Lightest) */}
                             <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
+                            {/* 3. Retro (Blue Light) */}
                             <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
+                            {/* 4. Near (Top, Blue Dark, Rounded Top) */}
                             <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} />
+
                             <Line yAxisId="right" type="monotone" dataKey="quality" name="איכות מניעה" stroke={colors.chart.line} strokeWidth={5} dot={{r:6, fill: colors.chart.line, strokeWidth: 0}} />
                         </ComposedChart>
                       </ResponsiveContainer>
@@ -579,7 +604,7 @@ const TrendsSlide = () => (
   </div>
 );
 
-// 5. Automation (NEW SLIDE)
+// 5. Automation
 const AutomationSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
        <div className="mb-10">
@@ -739,7 +764,7 @@ const EmbezzlementSlide = () => (
             <div className="grid grid-cols-3 gap-8 flex-grow min-h-0">
                 <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0"><div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><Scale className="w-6 h-6 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3></div>
-                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto"><li>• עדכון מקיף לנוהל מהימנות עובדים.</li><li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li><li>• ביצוע בדיקות נאותות מוגברות וסיווג ביטחוני.</li></ul>
+                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto"><li>• עדכון מקיף לנוהל מהימנות עובדים.</li><li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li><li>• ביצוע בדיקות נאותות מוגברות ומבחני מהימנות.</li></ul>
                 </div>
                 <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0"><div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><ShieldAlert className="w-6 h-6 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3></div>
@@ -777,6 +802,7 @@ const BoardPresentation = () => {
     const [isPrintMode, setIsPrintMode] = useState(false);
     const [commentsVisible, setCommentsVisible] = useState(true);
     const [newCommentPos, setNewCommentPos] = useState(null); // Lifted state
+    const [connectionStatus, setConnectionStatus] = useState('checking'); // 'cloud', 'local', 'checking'
     const containerRef = useRef(null);
 
     const slides = [
@@ -784,7 +810,7 @@ const BoardPresentation = () => {
         { component: <ContextSlide />, label: "רקע ומטרות" },
         { component: <ChartSlide />, label: "נתונים" },
         { component: <TrendsSlide />, label: "מגמות 2025" },
-        { component: <AutomationSlide />, label: "אוטומציה" }, // Updated
+        { component: <AutomationSlide />, label: "אוטומציה" },
         { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
         { component: <LayersSlide />, label: "שכבות הגנה" },
         { component: <ListsSlide />, label: "מבט ל-2026" },
