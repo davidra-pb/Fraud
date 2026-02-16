@@ -6,7 +6,7 @@ import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
   Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap,
-  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, Cloud, CloudOff, RefreshCw
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, Cloud, CloudOff, RefreshCw, Workflow, RefreshCcw, FileCheck
 } from 'lucide-react';
 
 // Firebase Imports
@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.32";
+const APP_VERSION = "v.1.33";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -115,24 +115,21 @@ const LoginScreen = ({ onLogin }) => {
   );
 };
 
-// --- COMMENTS SYSTEM (ROBUST SYNC) ---
-const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, setNewCommentPos, onStatusChange, forceReconnect }) => {
+// --- COMMENTS SYSTEM (HYBRID: Cloud + Local) ---
+const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, setNewCommentPos, onStatusChange }) => {
     const [comments, setComments] = useState([]);
     const [user, setUser] = useState(null);
     const [newCommentText, setNewCommentText] = useState("");
     const [useLocalMode, setUseLocalMode] = useState(!isFirebaseAvailable);
-    const [isSaving, setIsSaving] = useState(false);
 
     const LOCAL_STORAGE_KEY = `fraud-deck-comments-${appId}`;
 
-    // Report status back to parent
     useEffect(() => {
         if (onStatusChange) {
             onStatusChange(useLocalMode ? 'local' : 'cloud');
         }
     }, [useLocalMode, onStatusChange]);
 
-    // 1. Initialize Auth
     useEffect(() => {
         if (!isFirebaseAvailable) {
             setUseLocalMode(true);
@@ -155,17 +152,15 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
             if (u) {
                 setUser(u);
-                setUseLocalMode(false); // Force cloud mode if connected
+                setUseLocalMode(false);
             } else {
-                // Keep local mode if auth failed or not ready
+                setUseLocalMode(true);
             }
         });
         return () => unsubscribeAuth();
-    }, [forceReconnect]); // Allow manual reconnection trigger
+    }, []);
 
-    // 2. Data Sync
     useEffect(() => {
-        // Fallback to local storage if needed
         if (useLocalMode) {
             try {
                 const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -181,9 +176,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         if (!user) return;
 
         try {
-            // FIX: Fetch ALL comments for this app ID (no filtering by slideIndex on server to avoid index issues)
             const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
-
             const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
                 const loadedComments = [];
                 snapshot.forEach(doc => {
@@ -200,11 +193,10 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
             console.error("Error setting up snapshot:", err);
             setUseLocalMode(true);
         }
-    }, [user, useLocalMode, forceReconnect]);
+    }, [user, useLocalMode]);
 
     const handleSaveComment = async () => {
         if (!newCommentText.trim()) return;
-        setIsSaving(true);
 
         const newComment = {
             slideIndex,
@@ -216,7 +208,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
         };
 
         if (useLocalMode) {
-            // Local Save
             const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
             setComments(updatedComments);
             try {
@@ -224,9 +215,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
             } catch (e) {}
             setNewCommentPos(null);
             setNewCommentText("");
-            setIsSaving(false);
         } else {
-            // Cloud Save
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), newComment);
                 setNewCommentPos(null);
@@ -234,7 +223,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
             } catch (err) {
                 console.error("Save failed, saving locally:", err);
                 setUseLocalMode(true);
-                // Fallback save locally
                 const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
                 setComments(updatedComments);
                 try {
@@ -242,8 +230,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                 } catch (e) {}
                 setNewCommentPos(null);
                 setNewCommentText("");
-            } finally {
-                setIsSaving(false);
             }
         }
     };
@@ -271,20 +257,16 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 
     if (!isVisible) return null;
 
-    // Filter comments for current slide only (Client Side Filtering)
     const currentSlideComments = comments.filter(c => c.slideIndex === slideIndex);
 
     return (
         <div className="absolute inset-0 pointer-events-none z-[100] overflow-hidden no-print">
-            {/* Visual Instruction */}
             {!newCommentPos && currentSlideComments.length === 0 && (
                 <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-800/90 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm animate-fadeIn pointer-events-none z-50">
                     <MousePointer2 className="w-4 h-4" />
                     <span>קליק ימני להוספת הערה {useLocalMode ? '(מצב מקומי)' : ''}</span>
                 </div>
             )}
-
-            {/* Existing Comments */}
             {currentSlideComments.map(comment => (
                 <div
                     key={comment.id}
@@ -293,27 +275,14 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                 >
                     <div className="flex justify-between items-start mb-1 border-b border-amber-200 pb-1">
                         <span className="text-[10px] text-amber-700 font-bold">הערה</span>
-                        <button
-                            onClick={() => handleDeleteComment(comment.id)}
-                            className="text-slate-400 hover:text-red-600 transition-colors p-1"
-                            title="מחק הערה"
-                        >
-                            <X className="w-3 h-3" />
-                        </button>
+                        <button onClick={() => handleDeleteComment(comment.id)} className="text-slate-400 hover:text-red-600 transition-colors p-1"><X className="w-3 h-3" /></button>
                     </div>
-                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">
-                        {String(comment.text || '')}
-                    </p>
+                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">{String(comment.text || '')}</p>
                     <div className="absolute bottom-[-5px] right-0 w-3 h-3 bg-amber-100 border-b border-r border-amber-300 transform rotate-45"></div>
                 </div>
             ))}
-
-            {/* New Comment Input */}
             {newCommentPos && (
-                <div
-                    className="absolute pointer-events-auto bg-white border border-sky-500 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-[102]"
-                    style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}
-                >
+                <div className="absolute pointer-events-auto bg-white border border-sky-500 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-[102]" style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}>
                     <div className="flex justify-between items-center mb-2">
                         <p className="text-xs font-bold text-sky-600">הוספת הערה</p>
                         <button onClick={() => setNewCommentPos(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4"/></button>
@@ -326,13 +295,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                         autoFocus
                     />
                     <div className="flex gap-2">
-                        <button
-                            onClick={handleSaveComment}
-                            disabled={isSaving}
-                            className={`flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg transition font-medium shadow-sm flex items-center justify-center ${isSaving ? 'opacity-70 cursor-wait' : 'hover:bg-sky-700'}`}
-                        >
-                            {isSaving ? <RefreshCw className="w-3 h-3 animate-spin" /> : 'שמור'}
-                        </button>
+                        <button onClick={handleSaveComment} className="flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg hover:bg-sky-700 transition font-medium shadow-sm">שמור</button>
                     </div>
                 </div>
             )}
@@ -341,7 +304,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
 };
 
 // --- SLIDE COMPONENTS ---
-// All Slides components remain exactly the same as v1.19/1.31, kept for brevity in this response but included in the full file
 
 // 1. Title Slide
 const TitleSlide = () => (
@@ -374,10 +336,10 @@ const ContextSlide = () => (
           </div>
           <div className="space-y-4 text-slate-600 text-xl leading-relaxed">
             <p>
-              עולם ההונאות והמעילות משתנה כל הזמן. אנחנו פוגשים שיטות חדשות ומתוחכמות יותר, הן מבחוץ והן בסיכונים פנימיים.
+              עולם ההונאות והמעילות משתנה כל הזמן. האתגר הוא לא רק לחסום, אלא לנהל תהליכים אוטומטיים המונעים טעויות אנוש וחשיפות.
             </p>
             <p>
-              כדי להתמודד עם זה, אנחנו צריכים להיות גמישים, לעדכן את המערכות שלנו ולחזק את הבקרות הפנימיות.
+              אנו נדרשים לגמישות תפעולית ולשילוב בקרות פיננסיות חכמות כחלק ממערך ההגנה הכולל.
             </p>
           </div>
         </div>
@@ -399,7 +361,7 @@ const ContextSlide = () => (
             <li className="flex items-start gap-4">
               <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
               <span>
-                <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה והבקרות למניעת מעילות.
+                <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה, האוטומציה והבקרות.
               </span>
             </li>
             <li className="flex items-start gap-4">
@@ -454,7 +416,6 @@ const ChartSlide = () => {
 
     return (
     <div className="h-full flex flex-col px-8 overflow-hidden print:h-full print:px-6">
-      {/* Wrapper to scale down to 90% */}
       <div className="w-full h-full flex flex-col origin-top transform scale-90 print:scale-100" style={{ transformOrigin: 'top center' }}>
           <div className="mb-4">
               <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
@@ -536,12 +497,10 @@ const ChartSlide = () => {
                             <YAxis yAxisId="left" tickFormatter={formatMillions} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 14}} />
                             <YAxis yAxisId="right" orientation="right" tickFormatter={(v)=>`${v}%`} axisLine={false} tickLine={false} tick={{fill: '#0ea5e9', fontSize: 14, fontWeight: 700}} />
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-                            {/* Visual Order: Bottom to Top in stack */}
                             <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
                             <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
                             <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
                             <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} />
-
                             <Line yAxisId="right" type="monotone" dataKey="quality" name="איכות מניעה" stroke={colors.chart.line} strokeWidth={5} dot={{r:6, fill: colors.chart.line, strokeWidth: 0}} />
                         </ComposedChart>
                       </ResponsiveContainer>
@@ -620,46 +579,85 @@ const TrendsSlide = () => (
   </div>
 );
 
-// 5. Improvements
-const ImprovementsSlide = () => (
+// 5. Automation & Controls (NEW SLIDE)
+const AutomationSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
        <div className="mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">מה עשינו השנה?</h2>
-            <p className="text-slate-500 text-2xl">שיפורים במערכת ובמוצר</p>
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">אוטומציה ובקרות פיננסיות</h2>
+            <p className="text-slate-500 text-2xl">צמצום תלות בגורם אנושי ומזעור סיכונים</p>
        </div>
 
        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><Sliders className="w-8 h-8 text-sky-500" /></div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">שיפור מנוע הסיכונים</h3>
-              <ul className="space-y-4 flex-grow">
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מכשירי iPhone:</strong> הוספנו יכולת לאתר משתמשים ללא אנשי קשר ומאזור זמן שאיננו ישראל.</span></li>
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>ניתוח ותגובה:</strong> ניתוח מקרים ותגובה מהירה הם המפתח למניעת נזק כספי.</span></li>
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><FileCheck className="w-8 h-8 text-sky-500" /></div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">בקרות כספיות (Reconciliation)</h3>
+              <ul className="space-y-4 flex-grow text-slate-600 text-lg leading-snug">
+                  <li>• זיהוי וסיווג אוטומטי של אי-התאמות כספיות (הכחשות עסקה).</li>
+                  <li>• מניעת זליגת כספים וטיפול בנפחים גדולים (Scale) ללא מגע יד אדם.</li>
               </ul>
           </div>
 
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><MessageSquare className="w-8 h-8 text-sky-500" /></div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">התראות ללקוח</h3>
-              <ul className="space-y-4 flex-grow">
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>SMS ברור יותר:</strong> שינינו את הנוסח בהודעת הכניסה כדי שלקוחות יבינו שאסור למסור את הקוד.</span></li>
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מכשיר חדש:</strong> שולחים התראה ללקוח אם מישהו נכנס לחשבון שלו ממכשיר לא מוכר.</span></li>
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><Scale className="w-8 h-8 text-sky-500" /></div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">ציות ורגולציה</h3>
+              <ul className="space-y-4 flex-grow text-slate-600 text-lg leading-snug">
+                  <li>• אוטומציה מלאה לניהול עיקולים: קליטה, זיהוי, חסימה ודיווח לרשות.</li>
+                  <li>• מנגנון אוטומטי לטיפול בהחזרי מס"ב וביטול העברות שגויות.</li>
               </ul>
           </div>
 
           <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><CreditCard className="w-8 h-8 text-sky-500" /></div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">צמצום סיכונים</h3>
-              <ul className="space-y-4 flex-grow">
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>הגבלת סכומים:</strong> תהליך עסקי שהוריד את הספים בכרטיסים ל-1,000 ₪, שהוביל לירידה בסיכון.</span></li>
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>בקרת משיכות:</strong> לא ניתן למשוך כסף לחשבון בנק שטרם אושר.</span></li>
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><RefreshCcw className="w-8 h-8 text-sky-500" /></div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">שרידות וגמישות</h3>
+              <ul className="space-y-4 flex-grow text-slate-600 text-lg leading-snug">
+                  <li>• יכולת הסטה מהירה של נתיבי סליקה (בין שב"א למסלולים בינלאומיים) להבטחת המשכיות עסקית.</li>
+                  <li>• כלי הצפנה ואיתור משתמשים המוני (Bulk) לצרכים אופרטיביים דחופים.</li>
               </ul>
           </div>
        </div>
     </div>
   );
 
-// 6. Layers
+// 6. Improvements (Updated)
+const ImprovementsSlide = () => (
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
+       <div className="mb-10">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">שיפורים במערכת ובמוצר</h2>
+            <p className="text-slate-500 text-2xl">מענה טכנולוגי לאיומים מתפתחים</p>
+       </div>
+
+       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><Sliders className="w-8 h-8 text-sky-500" /></div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">שדרוג Wallet Score</h3>
+              <ul className="space-y-4 flex-grow">
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>איזון עדין:</strong> פיתוח חוקי P2P חדשים שחוסמים הונאות תוך שמירה על מינימום פגיעה במשתמשים לגיטימיים (False Positives).</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מכשירי iPhone:</strong> יכולת זיהוי מתקדמת לאיתור משתמשים ללא אנשי קשר/אזור זמן זר.</span></li>
+              </ul>
+          </div>
+
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><MessageSquare className="w-8 h-8 text-sky-500" /></div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">התראות ומודעות</h3>
+              <ul className="space-y-4 flex-grow">
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מניעת פישינג:</strong> חידוד הודעות ה-SMS והוספת התראות יזומות בכניסה ממכשיר לא מזוהה.</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>הגנה על דאטה:</strong> מנגנון סיסמאות לייצוא דוחות רגישים.</span></li>
+              </ul>
+          </div>
+
+          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><CreditCard className="w-8 h-8 text-sky-500" /></div>
+              <h3 className="text-2xl font-bold text-slate-800 mb-4">צמצום משטח התקיפה</h3>
+              <ul className="space-y-4 flex-grow">
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>הגבלת סכומים:</strong> הורדת תקרות בכרטיסים זרים ל-1,000 ₪ להפחתת הסיכון.</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>בקרת משיכות:</strong> חסימת משיכות לחשבונות בנק שטרם אושרו (אדי״ב).</span></li>
+              </ul>
+          </div>
+       </div>
+    </div>
+  );
+
+// 7. Layers
 const LayersSlide = () => {
     const layers = [
         { title: "תשתית וסייבר (בסיס)", icon: <Server className="w-8 h-8" />, desc: "חוסמים גישה לא מורשית עוד לפני שנכנסים לאפליקציה.", items: ["חומת אש (Firewall)", "חסימת מדינות (Geo-Block)", "הגנה ממתקפות"], color: "bg-slate-700", widthClass: "w-full" },
@@ -694,7 +692,7 @@ const LayersSlide = () => {
     );
 };
 
-// 7. Lists
+// 8. Lists
 const ListsSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
         <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-400 pr-6">מבט ל-2026 - המשך ניהול שוטף ובקרה</h2>
@@ -719,7 +717,7 @@ const ListsSlide = () => (
     </div>
 );
 
-// 8. Embezzlement Slide
+// 9. Embezzlement Slide
 const EmbezzlementSlide = () => (
     <div className="h-full flex flex-col px-16 pt-8 pb-6 animate-fadeIn overflow-hidden print:h-full print:px-8">
         <div className="mb-6 text-center shrink-0">
@@ -753,7 +751,7 @@ const EmbezzlementSlide = () => (
     </div>
 );
 
-// 9. Thank You
+// 10. Thank You
 const ThankYouSlide = () => (
     <div className="flex flex-col items-center justify-center h-full text-center space-y-10 animate-fadeIn bg-gradient-to-tl from-sky-50 to-white print:h-full print:w-full">
         <div className="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center mb-4 shadow-sm print:shadow-none print:border print:border-slate-300"><ShieldCheck className="w-16 h-16 text-sky-500" /></div>
@@ -776,6 +774,7 @@ const BoardPresentation = () => {
         { component: <ContextSlide />, label: "רקע ומטרות" },
         { component: <ChartSlide />, label: "נתונים" },
         { component: <TrendsSlide />, label: "מגמות 2025" },
+        { component: <AutomationSlide />, label: "אוטומציה" }, // New Slide Added Here
         { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
         { component: <LayersSlide />, label: "שכבות הגנה" },
         { component: <ListsSlide />, label: "מבט ל-2026" },
@@ -845,39 +844,20 @@ const BoardPresentation = () => {
         <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-100 p-8 overflow-hidden font-sans">
             <div className="bg-white w-[98vw] h-[92vh] rounded-[3.5rem] shadow-2xl border border-white/60 relative overflow-hidden flex flex-col">
                 <div className="w-full h-3 bg-sky-50"><div className="h-full bg-sky-500 transition-all duration-700 ease-in-out" style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}></div></div>
-
-                <div
-                    className="flex-grow relative overflow-hidden"
-                    ref={containerRef}
-                    onContextMenu={handleContainerContextMenu}
-                >
-                    <CommentsLayer
-                        slideIndex={currentSlide}
-                        isVisible={commentsVisible}
-                        containerRef={containerRef}
-                        newCommentPos={newCommentPos}
-                        setNewCommentPos={setNewCommentPos}
-                        onStatusChange={setConnectionStatus}
-                        forceReconnect={currentSlide} // Retry connection on slide change
-                    />
+                <div className="flex-grow relative overflow-hidden" ref={containerRef} onContextMenu={handleContainerContextMenu}>
+                    <CommentsLayer slideIndex={currentSlide} isVisible={commentsVisible} containerRef={containerRef} newCommentPos={newCommentPos} setNewCommentPos={setNewCommentPos} onStatusChange={setConnectionStatus} />
                     {slides[currentSlide].component}
                 </div>
-
                 <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16">
                     <div className="text-slate-400 text-xl font-medium flex gap-4"><span>שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}</span></div>
                     <div className="flex gap-6 items-center">
-                        {/* Status Indicator (Clickable to reconnect) */}
-                        <div
-                            className="flex items-center gap-2 ml-4 cursor-pointer hover:opacity-80 transition"
-                            title={connectionStatus === 'cloud' ? 'מחובר לענן' : 'מצב מקומי (לחץ לניסיון חיבור)'}
-                            onClick={() => window.location.reload()}
-                        >
+                         {/* Status Indicator */}
+                         <div className="flex items-center gap-2 ml-4 cursor-pointer hover:opacity-80 transition" title={connectionStatus === 'cloud' ? 'מחובר לענן' : 'מצב מקומי (לחץ לניסיון חיבור)'} onClick={() => window.location.reload()}>
                             {connectionStatus === 'cloud' ?
                                 <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg text-xs font-bold border border-emerald-100"><Cloud className="w-3 h-3" /> Online</div> :
                                 <div className="flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded-lg text-xs font-bold border border-orange-100"><CloudOff className="w-3 h-3" /> Local</div>
                             }
                         </div>
-
                         <button onClick={() => setCommentsVisible(!commentsVisible)} className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-semibold mr-2 ${commentsVisible ? 'text-sky-600 bg-sky-50' : 'text-slate-400 bg-slate-50'}`} title="הערות"><MessageCircle className="w-5 h-5" /></button>
                         <button onClick={() => setIsPrintMode(true)} className="flex items-center gap-2 text-sky-600 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-4 py-2 rounded-xl transition-all font-semibold mr-4" title="הכן להדפסה"><Printer className="w-5 h-5" /><span className="hidden md:inline">הכן להדפסה / PDF</span></button>
                         <div className="h-8 w-px bg-slate-200 mx-2"></div>
