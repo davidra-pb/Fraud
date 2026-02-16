@@ -6,7 +6,7 @@ import {
   Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText,
   ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils,
   Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap,
-  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, Cloud, CloudOff, RefreshCw, Workflow, RefreshCcw, FileCheck
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, FileCheck, Landmark
 } from 'lucide-react';
 
 // Firebase Imports
@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.33";
+const APP_VERSION = "v.1.34";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -248,9 +248,6 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                  console.error("Delete failed, deleting locally:", err);
                  const updatedComments = comments.filter(c => c.id !== id);
                  setComments(updatedComments);
-                 try {
-                     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments));
-                 } catch (e) {}
             }
         }
     };
@@ -267,6 +264,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                     <span>קליק ימני להוספת הערה {useLocalMode ? '(מצב מקומי)' : ''}</span>
                 </div>
             )}
+
             {currentSlideComments.map(comment => (
                 <div
                     key={comment.id}
@@ -281,6 +279,7 @@ const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, set
                     <div className="absolute bottom-[-5px] right-0 w-3 h-3 bg-amber-100 border-b border-r border-amber-300 transform rotate-45"></div>
                 </div>
             ))}
+
             {newCommentPos && (
                 <div className="absolute pointer-events-auto bg-white border border-sky-500 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-[102]" style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}>
                     <div className="flex justify-between items-center mb-2">
@@ -336,10 +335,10 @@ const ContextSlide = () => (
           </div>
           <div className="space-y-4 text-slate-600 text-xl leading-relaxed">
             <p>
-              עולם ההונאות והמעילות משתנה כל הזמן. האתגר הוא לא רק לחסום, אלא לנהל תהליכים אוטומטיים המונעים טעויות אנוש וחשיפות.
+              עולם ההונאות והמעילות משתנה כל הזמן. אנחנו פוגשים שיטות חדשות ומתוחכמות יותר, הן מבחוץ והן בסיכונים פנימיים.
             </p>
             <p>
-              אנו נדרשים לגמישות תפעולית ולשילוב בקרות פיננסיות חכמות כחלק ממערך ההגנה הכולל.
+              כדי להתמודד עם זה, אנחנו צריכים להיות גמישים, לעדכן את המערכות שלנו ולחזק את הבקרות הפנימיות.
             </p>
           </div>
         </div>
@@ -361,7 +360,7 @@ const ContextSlide = () => (
             <li className="flex items-start gap-4">
               <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
               <span>
-                <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה, האוטומציה והבקרות.
+                <strong>איך אנחנו עובדים:</strong> סקירה של כלי ההגנה והבקרות למניעת מעילות.
               </span>
             </li>
             <li className="flex items-start gap-4">
@@ -416,6 +415,7 @@ const ChartSlide = () => {
 
     return (
     <div className="h-full flex flex-col px-8 overflow-hidden print:h-full print:px-6">
+      {/* Wrapper to scale down to 90% */}
       <div className="w-full h-full flex flex-col origin-top transform scale-90 print:scale-100" style={{ transformOrigin: 'top center' }}>
           <div className="mb-4">
               <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
@@ -484,10 +484,10 @@ const ChartSlide = () => {
               <div className="w-3/4 flex flex-col gap-3">
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative print:border-slate-300">
                       <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10 print:border print:border-slate-200">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
                       </div>
 
                       <ResponsiveContainer width="100%" height="100%">
@@ -579,46 +579,57 @@ const TrendsSlide = () => (
   </div>
 );
 
-// 5. Automation & Controls (NEW SLIDE)
+// 5. Automation (NEW SLIDE)
 const AutomationSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
        <div className="mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">אוטומציה ובקרות פיננסיות</h2>
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">אוטומציה ככלי למניעת זליגת כספים</h2>
             <p className="text-slate-500 text-2xl">צמצום תלות בגורם אנושי ומזעור סיכונים</p>
        </div>
 
-       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><FileCheck className="w-8 h-8 text-sky-500" /></div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">בקרות כספיות (Reconciliation)</h3>
-              <ul className="space-y-4 flex-grow text-slate-600 text-lg leading-snug">
-                  <li>• זיהוי וסיווג אוטומטי של אי-התאמות כספיות (הכחשות עסקה).</li>
-                  <li>• מניעת זליגת כספים וטיפול בנפחים גדולים (Scale) ללא מגע יד אדם.</li>
-              </ul>
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-12 flex-grow max-h-[65vh] print:max-h-none">
+          <div className="bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-20 h-20 bg-sky-50 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform print:border print:border-sky-200"><FileCheck className="w-10 h-10 text-sky-500" /></div>
+              <h3 className="text-3xl font-bold text-slate-800 mb-6">בקרות כספיות (Reconciliation)</h3>
+              <div className="space-y-6 flex-grow">
+                  <div className="flex items-start gap-4">
+                      <div className="w-2.5 h-2.5 rounded-full bg-sky-500 mt-2.5 shrink-0 print:border print:border-sky-300"></div>
+                      <p className="text-slate-600 text-xl leading-relaxed">
+                          <strong>מניעת מניפולציות:</strong> מעבר מבקרה ידנית (החשופה לטעויות או הסתרה מכוונת) למערכת השוואה אוטומטית שרצה מדי יום ומזהה כל שקל שלא תואם.
+                      </p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <div className="w-2.5 h-2.5 rounded-full bg-sky-500 mt-2.5 shrink-0 print:border print:border-sky-300"></div>
+                      <p className="text-slate-600 text-xl leading-relaxed">
+                          <strong>זיהוי הכחשות בזמן אמת:</strong> המערכת מזהה ומסווגת אוטומטית פערים הנובעים מהכחשות עסקה, מה שמאפשר טיפול מיידי ומניעת גלגול הפסדים.
+                      </p>
+                  </div>
+              </div>
           </div>
 
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><Scale className="w-8 h-8 text-sky-500" /></div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">ציות ורגולציה</h3>
-              <ul className="space-y-4 flex-grow text-slate-600 text-lg leading-snug">
-                  <li>• אוטומציה מלאה לניהול עיקולים: קליטה, זיהוי, חסימה ודיווח לרשות.</li>
-                  <li>• מנגנון אוטומטי לטיפול בהחזרי מס"ב וביטול העברות שגויות.</li>
-              </ul>
-          </div>
-
-          <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
-              <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><RefreshCcw className="w-8 h-8 text-sky-500" /></div>
-              <h3 className="text-2xl font-bold text-slate-800 mb-4">שרידות וגמישות</h3>
-              <ul className="space-y-4 flex-grow text-slate-600 text-lg leading-snug">
-                  <li>• יכולת הסטה מהירה של נתיבי סליקה (בין שב"א למסלולים בינלאומיים) להבטחת המשכיות עסקית.</li>
-                  <li>• כלי הצפנה ואיתור משתמשים המוני (Bulk) לצרכים אופרטיביים דחופים.</li>
-              </ul>
+          <div className="bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group h-full flex flex-col print:border-slate-300">
+              <div className="w-20 h-20 bg-sky-50 rounded-3xl flex items-center justify-center mb-8 group-hover:scale-110 transition-transform print:border print:border-sky-200"><Landmark className="w-10 h-10 text-sky-500" /></div>
+              <h3 className="text-3xl font-bold text-slate-800 mb-6">ציות וניהול עיקולים</h3>
+              <div className="space-y-6 flex-grow">
+                  <div className="flex items-start gap-4">
+                      <div className="w-2.5 h-2.5 rounded-full bg-sky-500 mt-2.5 shrink-0 print:border print:border-sky-300"></div>
+                      <p className="text-slate-600 text-xl leading-relaxed">
+                          <strong>מניעת הברחת נכסים:</strong> אוטומציה מלאה של תהליך העיקולים מבטיחה שחשבונות החייבים לרשויות נחסמים באופן מיידי וללא שיקול דעת אנושי או עיכובים.
+                      </p>
+                  </div>
+                  <div className="flex items-start gap-4">
+                      <div className="w-2.5 h-2.5 rounded-full bg-sky-500 mt-2.5 shrink-0 print:border print:border-sky-300"></div>
+                      <p className="text-slate-600 text-xl leading-relaxed">
+                          <strong>צמצום חשיפה משפטית:</strong> המערכת מטפלת בדיווחים לרשויות ובחסימות בצורה מתועדת ומדויקת, מה שמגן על החברה מתביעות וקנסות.
+                      </p>
+                  </div>
+              </div>
           </div>
        </div>
     </div>
-  );
+);
 
-// 6. Improvements (Updated)
+// 6. Improvements
 const ImprovementsSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
        <div className="mb-10">
@@ -632,7 +643,7 @@ const ImprovementsSlide = () => (
               <h3 className="text-2xl font-bold text-slate-800 mb-4">שדרוג Wallet Score</h3>
               <ul className="space-y-4 flex-grow">
                   <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>איזון עדין:</strong> פיתוח חוקי P2P חדשים שחוסמים הונאות תוך שמירה על מינימום פגיעה במשתמשים לגיטימיים (False Positives).</span></li>
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מכשירי iPhone:</strong> יכולת זיהוי מתקדמת לאיתור משתמשים ללא אנשי קשר/אזור זמן זר.</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מכשירי iPhone:</strong> יכולת זיהוי מתקדמת לאיתור משתמשים ללא אנשי קשר/אזור זמן זר (ששימשו לתקיפה).</span></li>
               </ul>
           </div>
 
@@ -640,8 +651,8 @@ const ImprovementsSlide = () => (
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><MessageSquare className="w-8 h-8 text-sky-500" /></div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">התראות ומודעות</h3>
               <ul className="space-y-4 flex-grow">
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מניעת פישינג:</strong> חידוד הודעות ה-SMS והוספת התראות יזומות בכניסה ממכשיר לא מזוהה.</span></li>
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>הגנה על דאטה:</strong> מנגנון סיסמאות לייצוא דוחות רגישים.</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>מניעת פישינג (ATO):</strong> חידוד הודעות ה-SMS והוספת התראות יזומות בכניסה ממכשיר לא מזוהה, כדי למנוע השתלטות עוינת.</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>הגנה על דאטה:</strong> מנגנון סיסמאות לייצוא דוחות רגישים למניעת זליגת מידע.</span></li>
               </ul>
           </div>
 
@@ -649,8 +660,8 @@ const ImprovementsSlide = () => (
               <div className="w-16 h-16 bg-sky-50 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform print:border print:border-sky-200"><CreditCard className="w-8 h-8 text-sky-500" /></div>
               <h3 className="text-2xl font-bold text-slate-800 mb-4">צמצום משטח התקיפה</h3>
               <ul className="space-y-4 flex-grow">
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>הגבלת סכומים:</strong> הורדת תקרות בכרטיסים זרים ל-1,000 ₪ להפחתת הסיכון.</span></li>
-                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>בקרת משיכות:</strong> חסימת משיכות לחשבונות בנק שטרם אושרו (אדי״ב).</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>הגבלת סכומים:</strong> הורדת תקרות בכרטיסים זרים ל-1,000 ₪, מה שמפחית את האטרקטיביות של האפליקציה להונאה.</span></li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug"><div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0 print:border print:border-sky-300"></div><span><strong>בקרת משיכות:</strong> חסימת משיכות לחשבונות בנק שטרם אושרו (אדי״ב) למניעת הלבנת הון.</span></li>
               </ul>
           </div>
        </div>
@@ -728,7 +739,7 @@ const EmbezzlementSlide = () => (
             <div className="grid grid-cols-3 gap-8 flex-grow min-h-0">
                 <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0"><div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><Scale className="w-6 h-6 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3></div>
-                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto"><li>• עדכון מקיף לנוהל מהימנות עובדים.</li><li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li><li>• ביצוע בדיקות נאותות מוגברות ומבחני מהימנות.</li></ul>
+                    <ul className="text-slate-600 text-lg leading-relaxed space-y-3 flex-grow overflow-y-auto"><li>• עדכון מקיף לנוהל מהימנות עובדים.</li><li>• החמרת קריטריונים לסיווג עובדי "רמה א׳" (רגישים).</li><li>• ביצוע בדיקות נאותות מוגברות וסיווג ביטחוני.</li></ul>
                 </div>
                 <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
                     <div className="flex items-center gap-4 mb-3 shrink-0"><div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><ShieldAlert className="w-6 h-6 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3></div>
@@ -766,7 +777,6 @@ const BoardPresentation = () => {
     const [isPrintMode, setIsPrintMode] = useState(false);
     const [commentsVisible, setCommentsVisible] = useState(true);
     const [newCommentPos, setNewCommentPos] = useState(null); // Lifted state
-    const [connectionStatus, setConnectionStatus] = useState('checking'); // 'cloud', 'local', 'checking'
     const containerRef = useRef(null);
 
     const slides = [
@@ -774,7 +784,7 @@ const BoardPresentation = () => {
         { component: <ContextSlide />, label: "רקע ומטרות" },
         { component: <ChartSlide />, label: "נתונים" },
         { component: <TrendsSlide />, label: "מגמות 2025" },
-        { component: <AutomationSlide />, label: "אוטומציה" }, // New Slide Added Here
+        { component: <AutomationSlide />, label: "אוטומציה" }, // Updated
         { component: <ImprovementsSlide />, label: "שיפורים שבוצעו" },
         { component: <LayersSlide />, label: "שכבות הגנה" },
         { component: <ListsSlide />, label: "מבט ל-2026" },
@@ -851,8 +861,7 @@ const BoardPresentation = () => {
                 <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16">
                     <div className="text-slate-400 text-xl font-medium flex gap-4"><span>שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}</span></div>
                     <div className="flex gap-6 items-center">
-                         {/* Status Indicator */}
-                         <div className="flex items-center gap-2 ml-4 cursor-pointer hover:opacity-80 transition" title={connectionStatus === 'cloud' ? 'מחובר לענן' : 'מצב מקומי (לחץ לניסיון חיבור)'} onClick={() => window.location.reload()}>
+                        <div className="flex items-center gap-2 ml-4 cursor-pointer hover:opacity-80 transition" title={connectionStatus === 'cloud' ? 'מחובר לענן' : 'מצב מקומי (לחץ לניסיון חיבור)'} onClick={() => window.location.reload()}>
                             {connectionStatus === 'cloud' ?
                                 <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg text-xs font-bold border border-emerald-100"><Cloud className="w-3 h-3" /> Online</div> :
                                 <div className="flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded-lg text-xs font-bold border border-orange-100"><CloudOff className="w-3 h-3" /> Local</div>
