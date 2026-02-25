@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.48";
+const APP_VERSION = "v.1.49";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -678,10 +678,10 @@ const ChartSlide = () => {
               </div>
           </div>
 
-          <div className="flex gap-6 flex-grow pb-1 min-h-0">
+          <div className="flex gap-6 flex-grow pb-1 min-h-0 items-stretch">
 
               {/* Chart Area (Left Side) */}
-              <div className="w-3/4 flex flex-col gap-3 relative">
+              <div className="w-3/4 flex flex-col relative h-full">
                   <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
                       {/* Top centered text */}
@@ -702,7 +702,7 @@ const ChartSlide = () => {
                                     <path d="M 0,0 L 8,4 L 0,8 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            <path d="M 120,20 Q 500,40 880,100" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.6"/>
+                            <path d="M 120,25 L 880,95" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.6"/>
                          </svg>
                       </div>
 
@@ -736,7 +736,7 @@ const ChartSlide = () => {
               </div>
 
               {/* Highlight Metrics (Right Side) */}
-              <div className="w-1/4 flex flex-col gap-5">
+              <div className="w-1/4 flex flex-col gap-5 h-full">
                   {/* Total Fraud Box */}
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-slate-800"></div>
