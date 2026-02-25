@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.56";
+const APP_VERSION = "v.1.57";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -680,19 +680,29 @@ const ChartSlide = () => {
 
           <div className="flex gap-8 flex-grow pb-2 min-h-0 items-stretch">
 
-              {/* Chart Area (Left Side) */}
-              <div className="w-3/4 flex flex-col relative h-full">
+              {/* Chart Area (Left Side - adjusted to 68% for better proportions) */}
+              <div className="w-[68%] flex flex-col relative h-full">
                   <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
-                      {/* SVG Arrow Overlay */}
-                      <div className="absolute top-[10px] left-[10%] right-[10%] bottom-[80px] pointer-events-none z-10">
+                      {/* Top centered text - Moved slightly up */}
+                      <div className="flex justify-center mb-2 z-20 shrink-0 relative top-0">
+                          <div className="bg-emerald-50 px-5 py-1.5 rounded-full border border-emerald-100 shadow-sm whitespace-nowrap">
+                              <span className="text-emerald-700 font-bold text-sm flex items-center gap-2">
+                                  <TrendingUp className="w-4 h-4 transform rotate-180" />
+                                  מגמת ירידה עקבית בהיקפי הונאה
+                              </span>
+                          </div>
+                      </div>
+
+                      {/* SVG Arrow Overlay - Thinner, raised higher, improved positioning */}
+                      <div className="absolute top-0 left-[8%] right-[8%] bottom-[80px] pointer-events-none z-10">
                          <svg viewBox="0 0 1000 200" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
                             <defs>
-                                <marker id="trendArrowElegant" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-                                    <path d="M 0,0 L 8,4 L 0,8 Z" fill="#10b981" />
+                                <marker id="trendArrowElegant" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                                    <path d="M 0,0 L 6,3 L 0,6 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            <path d="M 120,20 L 880,85" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.6"/>
+                            <path d="M 120,15 L 880,65" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.8"/>
                          </svg>
                       </div>
 
@@ -705,10 +715,11 @@ const ChartSlide = () => {
                                 <YAxis yAxisId="left" hide={true} domain={[0, 'dataMax + 100000']} />
                                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
 
-                                <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} isAnimationActive={false} />
-                                <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} isAnimationActive={false} />
-                                <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} isAnimationActive={false} />
-                                <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} isAnimationActive={false}>
+                                {/* Added maxBarSize to prevent bars from becoming extremely wide and disproportionate */}
+                                <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} isAnimationActive={false} maxBarSize={110} />
+                                <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} isAnimationActive={false} maxBarSize={110} />
+                                <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} isAnimationActive={false} maxBarSize={110} />
+                                <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} isAnimationActive={false} maxBarSize={110}>
                                     <LabelList dataKey="totalExposure" content={<CustomBarLabel />} />
                                 </Bar>
                             </ComposedChart>
@@ -725,15 +736,15 @@ const ChartSlide = () => {
                   </div>
               </div>
 
-              {/* Highlight Metrics (Right Side) */}
-              <div className="w-1/4 flex flex-col gap-6 h-full">
+              {/* Highlight Metrics (Right Side - adjusted to 32% for better proportions and no text wrapping) */}
+              <div className="w-[32%] flex flex-col gap-6 h-full">
                   {/* Total Fraud Box */}
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-slate-800"></div>
                       <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
                           <Target className="w-5 h-5" /> סך ההונאה (חשיפה כוללת)
                       </div>
-                      <div className="text-5xl lg:text-6xl font-black text-slate-800 mb-3">₪{totalExposureM}M</div>
+                      <div className="text-5xl font-black text-slate-800 mb-3">₪{totalExposureM}M</div>
                       <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-600 text-base leading-tight">
                           היקף דומה לשנה שעברה<br/>
                           <span className="text-sm font-medium text-slate-400">(ב-2024: ₪{prevExposureM}M)</span>
@@ -746,7 +757,7 @@ const ChartSlide = () => {
                       <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
                           <ShieldCheck className="w-5 h-5 text-sky-500" /> איכות המניעה
                       </div>
-                      <div className="text-5xl lg:text-6xl font-black text-sky-600 mb-3">{currentQuality}%</div>
+                      <div className="text-5xl font-black text-sky-600 mb-3">{currentQuality}%</div>
                       <div className="bg-sky-50 border border-sky-100 p-4 rounded-xl text-sky-800 text-base leading-tight">
                           <div className="flex items-center gap-2 font-bold mb-1">
                               <TrendingUp className="w-4 h-4" /> עליה של +{qualityDelta}%
