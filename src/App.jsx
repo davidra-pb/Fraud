@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.57";
+const APP_VERSION = "v.1.58";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -648,24 +648,24 @@ const ChartSlide = () => {
     };
 
     return (
-    <div className="h-full flex flex-col px-8 overflow-hidden">
+    <div className="h-full flex flex-col px-8 overflow-hidden pt-4 pb-2">
       <div className="w-full h-full flex flex-col">
 
-          <div className="mb-4 flex justify-between items-end shrink-0">
+          <div className="mb-2 flex justify-between items-end shrink-0">
               <div>
-                  <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
+                  <h2 className="text-4xl font-bold text-slate-800 mb-1">נתוני מניעה ונזק - 2025</h2>
                   <p className="text-xl text-slate-500">סיכום מגמות, חשיפה ומניעה כספית</p>
               </div>
           </div>
 
           {/* Full Width Top Section: Insights */}
-          <div className="bg-sky-50 border border-sky-100 p-5 rounded-2xl flex items-start gap-4 shrink-0 mb-6 shadow-sm print:border-sky-200">
-              <div className="bg-sky-500 text-white p-3 rounded-xl shrink-0 mt-1 shadow-md">
-                  <Zap className="w-6 h-6" />
+          <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-start gap-4 shrink-0 mb-4 shadow-sm print:border-sky-200">
+              <div className="bg-sky-500 text-white p-2.5 rounded-xl shrink-0 mt-0.5 shadow-md">
+                  <Zap className="w-5 h-5" />
               </div>
               <div className="flex-grow">
-                  <h4 className="font-bold text-sky-900 text-xl mb-2">תובנות מרכזיות</h4>
-                  <ul className="text-sky-800 text-lg leading-relaxed space-y-2">
+                  <h4 className="font-bold text-sky-900 text-xl mb-1">תובנות מרכזיות</h4>
+                  <ul className="text-sky-800 text-lg leading-relaxed space-y-1">
                       <li className="flex items-start gap-2">
                           <span className="text-sky-500 font-bold mt-1">•</span>
                           <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות והשקת המוצרים החדשים.</span>
@@ -678,15 +678,15 @@ const ChartSlide = () => {
               </div>
           </div>
 
-          <div className="flex gap-8 flex-grow pb-2 min-h-0 items-stretch">
+          <div className="flex gap-5 flex-grow min-h-0 items-stretch">
 
               {/* Chart Area (Left Side - adjusted to 68% for better proportions) */}
               <div className="w-[68%] flex flex-col relative h-full">
-                  <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
+                  <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
                       {/* Top centered text - Moved slightly up */}
-                      <div className="flex justify-center mb-2 z-20 shrink-0 relative top-0">
-                          <div className="bg-emerald-50 px-5 py-1.5 rounded-full border border-emerald-100 shadow-sm whitespace-nowrap">
+                      <div className="flex justify-center mb-1 z-20 shrink-0 relative top-0">
+                          <div className="bg-emerald-50 px-5 py-1 rounded-full border border-emerald-100 shadow-sm whitespace-nowrap">
                               <span className="text-emerald-700 font-bold text-sm flex items-center gap-2">
                                   <TrendingUp className="w-4 h-4 transform rotate-180" />
                                   מגמת ירידה עקבית בהיקפי הונאה
@@ -695,31 +695,31 @@ const ChartSlide = () => {
                       </div>
 
                       {/* SVG Arrow Overlay - Thinner, raised higher, improved positioning */}
-                      <div className="absolute top-0 left-[8%] right-[8%] bottom-[80px] pointer-events-none z-10">
+                      <div className="absolute top-[-5px] left-[8%] right-[8%] bottom-[80px] pointer-events-none z-10">
                          <svg viewBox="0 0 1000 200" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
                             <defs>
                                 <marker id="trendArrowElegant" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                                     <path d="M 0,0 L 6,3 L 0,6 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            <path d="M 120,15 L 880,65" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.8"/>
+                            <path d="M 120,5 L 880,45" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.8"/>
                          </svg>
                       </div>
 
                       {/* Chart */}
-                      <div className="flex-grow w-full min-h-[300px] mt-1">
+                      <div className="flex-grow w-full min-h-[150px] mt-0">
                           <ResponsiveContainer width="100%" height="100%">
-                            <ComposedChart data={chartData} margin={{top: 45, right: 10, bottom: 5, left: 0}}>
+                            <ComposedChart data={chartData} margin={{top: 35, right: 10, bottom: 0, left: 0}}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
-                                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 16, fontWeight: 600}} dy={10} />
+                                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 14, fontWeight: 600}} dy={10} />
                                 <YAxis yAxisId="left" hide={true} domain={[0, 'dataMax + 100000']} />
                                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
 
                                 {/* Added maxBarSize to prevent bars from becoming extremely wide and disproportionate */}
-                                <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} isAnimationActive={false} maxBarSize={110} />
-                                <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} isAnimationActive={false} maxBarSize={110} />
-                                <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} isAnimationActive={false} maxBarSize={110} />
-                                <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} isAnimationActive={false} maxBarSize={110}>
+                                <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} isAnimationActive={false} maxBarSize={100} />
+                                <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} isAnimationActive={false} maxBarSize={100} />
+                                <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} isAnimationActive={false} maxBarSize={100} />
+                                <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} isAnimationActive={false} maxBarSize={100}>
                                     <LabelList dataKey="totalExposure" content={<CustomBarLabel />} />
                                 </Bar>
                             </ComposedChart>
@@ -727,7 +727,7 @@ const ChartSlide = () => {
                       </div>
 
                       {/* Legend at the bottom */}
-                      <div className="flex justify-center gap-6 text-sm font-medium mt-3 mb-0 bg-slate-50 px-6 py-2 rounded-xl border border-slate-100 w-fit mx-auto shrink-0 print:border-slate-200">
+                      <div className="flex justify-center gap-5 text-sm font-medium mt-2 mb-0 bg-slate-50 px-5 py-2 rounded-xl border border-slate-100 w-fit mx-auto shrink-0 print:border-slate-200">
                           <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
                           <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
                           <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
@@ -737,29 +737,29 @@ const ChartSlide = () => {
               </div>
 
               {/* Highlight Metrics (Right Side - adjusted to 32% for better proportions and no text wrapping) */}
-              <div className="w-[32%] flex flex-col gap-6 h-full">
+              <div className="w-[32%] flex flex-col gap-5 h-full">
                   {/* Total Fraud Box */}
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
+                  <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-slate-800"></div>
-                      <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
+                      <div className="text-slate-500 font-bold text-lg mb-1 flex items-center gap-2">
                           <Target className="w-5 h-5" /> סך ההונאה (חשיפה כוללת)
                       </div>
-                      <div className="text-5xl font-black text-slate-800 mb-3">₪{totalExposureM}M</div>
-                      <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-600 text-base leading-tight">
+                      <div className="text-5xl font-black text-slate-800 mb-2">₪{totalExposureM}M</div>
+                      <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-slate-600 text-[15px] leading-tight">
                           היקף דומה לשנה שעברה<br/>
                           <span className="text-sm font-medium text-slate-400">(ב-2024: ₪{prevExposureM}M)</span>
                       </div>
                   </div>
 
                   {/* Quality Box */}
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
+                  <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-sky-500"></div>
-                      <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
+                      <div className="text-slate-500 font-bold text-lg mb-1 flex items-center gap-2">
                           <ShieldCheck className="w-5 h-5 text-sky-500" /> איכות המניעה
                       </div>
-                      <div className="text-5xl font-black text-sky-600 mb-3">{currentQuality}%</div>
-                      <div className="bg-sky-50 border border-sky-100 p-4 rounded-xl text-sky-800 text-base leading-tight">
-                          <div className="flex items-center gap-2 font-bold mb-1">
+                      <div className="text-5xl font-black text-sky-600 mb-2">{currentQuality}%</div>
+                      <div className="bg-sky-50 border border-sky-100 p-3 rounded-xl text-sky-800 text-[15px] leading-tight">
+                          <div className="flex items-center gap-2 font-bold mb-0.5">
                               <TrendingUp className="w-4 h-4" /> עליה של +{qualityDelta}%
                           </div>
                           <span className="text-sm font-medium opacity-80">שיפור משמעותי ביחס אשתקד (ב-2024: {prevQuality}%)</span>
