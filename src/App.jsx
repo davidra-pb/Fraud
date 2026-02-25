@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.54";
+const APP_VERSION = "v.1.56";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -685,14 +685,14 @@ const ChartSlide = () => {
                   <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
                       {/* SVG Arrow Overlay */}
-                      <div className="absolute top-[30px] left-[10%] right-[10%] bottom-[80px] pointer-events-none z-10">
+                      <div className="absolute top-[10px] left-[10%] right-[10%] bottom-[80px] pointer-events-none z-10">
                          <svg viewBox="0 0 1000 200" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
                             <defs>
                                 <marker id="trendArrowElegant" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
                                     <path d="M 0,0 L 8,4 L 0,8 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            <path d="M 120,25 L 880,95" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.6"/>
+                            <path d="M 120,20 L 880,85" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.6"/>
                          </svg>
                       </div>
 
@@ -705,10 +705,10 @@ const ChartSlide = () => {
                                 <YAxis yAxisId="left" hide={true} domain={[0, 'dataMax + 100000']} />
                                 <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
 
-                                <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
-                                <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
-                                <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
-                                <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]}>
+                                <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} isAnimationActive={false} />
+                                <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} isAnimationActive={false} />
+                                <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} isAnimationActive={false} />
+                                <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} isAnimationActive={false}>
                                     <LabelList dataKey="totalExposure" content={<CustomBarLabel />} />
                                 </Bar>
                             </ComposedChart>
@@ -889,7 +889,7 @@ const BoardPresentation = () => {
 
     if (isPrintMode) {
         return (
-            <div className="bg-slate-200 min-h-screen font-sans p-8 flex flex-col items-center gap-8 print:block print:p-0 print:bg-white" dir="rtl" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+            <div className="min-h-screen bg-slate-200 font-sans flex flex-col items-center gap-8 py-8 print:p-0 print:bg-white print:block" dir="rtl" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
                 <style>{`
                     @media print {
                         @page { size: A4 landscape; margin: 0; }
@@ -897,42 +897,61 @@ const BoardPresentation = () => {
                             -webkit-print-color-adjust: exact !important;
                             print-color-adjust: exact !important;
                             background: white !important;
-                            margin: 0;
-                            padding: 0;
+                            margin: 0 !important;
+                            padding: 0 !important;
                         }
                         .no-print { display: none !important; }
-                        * { box-shadow: none !important; text-shadow: none !important; filter: none !important; }
+                        * { box-shadow: none !important; text-shadow: none !important; }
                         .print-border { border: 1px solid #cbd5e1 !important; }
 
-                        /* Reset print-slide to fill perfectly the A4 paper */
-                        .print-slide {
-                            page-break-after: always;
-                            break-after: always;
-                            margin: 0 !important;
-                            border: none !important;
-                            box-shadow: none !important;
+                        .print-page-container {
                             width: 297mm !important;
                             height: 210mm !important;
+                            page-break-after: always;
+                            break-after: page;
+                            overflow: hidden !important;
+                            position: relative !important;
                             background: white !important;
-                            position: relative;
-                            overflow: hidden;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            border: none !important;
+                            box-shadow: none !important;
+                        }
+
+                        .print-scaler {
+                            width: 1536px !important;
+                            height: 864px !important;
+                            min-width: 1536px !important;
+                            min-height: 864px !important;
+                            max-width: 1536px !important;
+                            max-height: 864px !important;
+                            position: absolute !important;
+                            top: 50% !important;
+                            left: 50% !important;
+                            margin-top: -432px !important;
+                            margin-left: -768px !important;
+                            transform: scale(0.72) !important;
+                            transform-origin: center center !important;
+                            background: white !important;
                         }
                     }
                 `}</style>
+
+                {/* Print Controls */}
                 <div className="fixed top-4 right-4 z-50 flex gap-4 no-print">
                     <button onClick={() => window.print()} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all"><Printer className="w-5 h-5" />הדפס / שמור כ-PDF</button>
                     <button onClick={() => setIsPrintMode(false)} className="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-full shadow-md transition-all"><X className="w-5 h-5" />חזור למצגת</button>
                 </div>
 
+                {/* Slides Container */}
                 {slides.map((slide, index) => (
-                    <div key={index} className="print-slide w-[297mm] h-[210mm] bg-white shadow-xl border border-slate-300 relative overflow-hidden shrink-0">
-                        <div className="absolute top-4 left-6 text-slate-300 text-xs font-bold z-50 no-print">{index + 1} / {slides.length} • {APP_VERSION}</div>
-                        {/* This is the core of the fix:
-                            We force the slide to think it's on a 1536x864 (16:9) screen.
-                            Then we scale it down by 0.70 to perfectly fit the center of an A4 page.
-                            This stops ANY layout shifting, stretching, or text wrapping issues!
-                        */}
-                        <div className="absolute top-1/2 left-1/2 w-[1536px] h-[864px] bg-white -translate-x-1/2 -translate-y-1/2 scale-[0.70] origin-center">
+                    <div key={index} className="print-page-container w-[297mm] h-[210mm] relative bg-white shadow-xl border border-slate-300 shrink-0 mx-auto overflow-hidden">
+                        <div className="absolute top-4 left-6 text-slate-300 text-xs font-bold z-50 no-print">
+                            {index + 1} / {slides.length} • {APP_VERSION}
+                        </div>
+
+                        {/* The Scaler: Keeps desktop dimensions perfectly and shrinks them to A4 */}
+                        <div className="print-scaler w-[1536px] h-[864px] absolute top-1/2 left-1/2 bg-white" style={{ marginTop: '-432px', marginLeft: '-768px', transform: 'scale(0.72)' }}>
                             {slide.component}
                         </div>
                     </div>
