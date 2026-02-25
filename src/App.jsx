@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.59";
+const APP_VERSION = "v.1.60";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -648,51 +648,51 @@ const ChartSlide = () => {
     };
 
     return (
-    <div className="h-full flex flex-col px-8 pb-6 pt-4 overflow-hidden">
+    <div className="h-full flex flex-col px-8 pb-10 pt-6"> {/* Added large bottom padding so shadows/boxes are never clipped */}
       <div className="w-full h-full flex flex-col">
 
-          <div className="mb-1 flex justify-between items-end shrink-0">
+          <div className="mb-1.5 flex justify-between items-end shrink-0">
               <div>
-                  <h2 className="text-4xl font-bold text-slate-800 mb-1">נתוני מניעה ונזק - 2025</h2>
+                  <h2 className="text-4xl font-bold text-slate-800 mb-0">נתוני מניעה ונזק - 2025</h2>
                   <p className="text-xl text-slate-500">סיכום מגמות, חשיפה ומניעה כספית</p>
               </div>
           </div>
 
           {/* Full Width Top Section: Insights */}
-          <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-start gap-4 shrink-0 mb-3 shadow-sm print:border-sky-200">
-              <div className="bg-sky-500 text-white p-3 rounded-xl shrink-0 mt-1 shadow-md">
-                  <Zap className="w-6 h-6" />
+          <div className="bg-sky-50 border border-sky-100 py-3 px-5 rounded-2xl flex items-start gap-4 shrink-0 mb-4 shadow-sm print:border-sky-200">
+              <div className="bg-sky-500 text-white p-2.5 rounded-xl shrink-0 mt-0.5 shadow-md">
+                  <Zap className="w-5 h-5" />
               </div>
               <div className="flex-grow">
                   <h4 className="font-bold text-sky-900 text-xl mb-1">תובנות מרכזיות</h4>
-                  <ul className="text-sky-800 text-lg leading-relaxed space-y-1">
+                  <ul className="text-sky-800 text-lg leading-snug space-y-1">
                       <li className="flex items-start gap-2">
-                          <span className="text-sky-500 font-bold mt-1">•</span>
+                          <span className="text-sky-500 font-bold mt-0.5">•</span>
                           <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות והשקת המוצרים החדשים.</span>
                       </li>
                       <li className="flex items-start gap-2">
-                          <span className="text-sky-500 font-bold mt-1">•</span>
+                          <span className="text-sky-500 font-bold mt-0.5">•</span>
                           <span><strong>זינוק במניעה:</strong> מתוך סך החשיפה, החברה הצליחה להציל <strong>{formatCurrency(totalSaved)}</strong>. מדובר בשיפור של <strong>{qualityDelta}%</strong> באיכות המניעה ביחס לאשתקד.</span>
                       </li>
                   </ul>
               </div>
           </div>
 
-          <div className="flex gap-6 flex-grow min-h-0 items-stretch">
+          <div className="flex gap-5 flex-grow min-h-0 items-stretch">
 
-              {/* Chart Area (Left Side - adjusted to 68% for better proportions) */}
+              {/* Chart Area (Left Side - 68%) */}
               <div className="w-[68%] flex flex-col relative h-full">
-                  <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
+                  <div className="bg-white p-5 pb-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow min-h-0 flex flex-col relative print:border-slate-300">
 
-                      {/* SVG Arrow Overlay - Thinner, raised higher, text removed */}
-                      <div className="absolute top-[15px] left-[8%] right-[8%] bottom-[80px] pointer-events-none z-10">
+                      {/* SVG Arrow Overlay - Thinner, lowered slightly, text removed completely */}
+                      <div className="absolute top-[22px] left-[8%] right-[8%] bottom-[80px] pointer-events-none z-10">
                          <svg viewBox="0 0 1000 200" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
                             <defs>
                                 <marker id="trendArrowElegant" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                                     <path d="M 0,0 L 6,3 L 0,6 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            <path d="M 120,5 L 880,45" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.8"/>
+                            <path d="M 120,5 L 880,50" fill="none" stroke="#10b981" strokeWidth="2.5" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.8"/>
                          </svg>
                       </div>
 
@@ -726,30 +726,30 @@ const ChartSlide = () => {
                   </div>
               </div>
 
-              {/* Highlight Metrics (Right Side - adjusted to 32% for better proportions and no text wrapping) */}
-              <div className="w-[32%] flex flex-col gap-4 h-full">
+              {/* Highlight Metrics (Right Side - 32%) */}
+              <div className="w-[32%] flex flex-col gap-5 h-full">
                   {/* Total Fraud Box */}
-                  <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative flex-1 min-h-0 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-slate-800"></div>
-                      <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
+                      <div className="text-slate-500 font-bold text-base mb-1 flex items-center gap-2">
                           <Target className="w-5 h-5" /> סך ההונאה (חשיפה כוללת)
                       </div>
-                      <div className="text-5xl font-black text-slate-800 mb-3">₪{totalExposureM}M</div>
-                      <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-600 text-sm leading-tight">
+                      <div className="text-[42px] font-black text-slate-800 leading-none mb-2 mt-1">₪{totalExposureM}M</div>
+                      <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-slate-600 text-sm leading-snug">
                           היקף דומה לשנה שעברה<br/>
                           <span className="text-xs font-medium text-slate-400">(ב-2024: ₪{prevExposureM}M)</span>
                       </div>
                   </div>
 
                   {/* Quality Box */}
-                  <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative flex-1 min-h-0 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-sky-500"></div>
-                      <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
+                      <div className="text-slate-500 font-bold text-base mb-1 flex items-center gap-2">
                           <ShieldCheck className="w-5 h-5 text-sky-500" /> איכות המניעה
                       </div>
-                      <div className="text-5xl font-black text-sky-600 mb-3">{currentQuality}%</div>
-                      <div className="bg-sky-50 border border-sky-100 p-4 rounded-xl text-sky-800 text-sm leading-tight">
-                          <div className="flex items-center gap-2 font-bold mb-1">
+                      <div className="text-[42px] font-black text-sky-600 leading-none mb-2 mt-1">{currentQuality}%</div>
+                      <div className="bg-sky-50 border border-sky-100 p-3 rounded-xl text-sky-800 text-sm leading-snug">
+                          <div className="flex items-center gap-2 font-bold mb-0.5">
                               <TrendingUp className="w-4 h-4" /> עליה של +{qualityDelta}%
                           </div>
                           <span className="text-xs font-medium opacity-80">שיפור משמעותי ביחס אשתקד (ב-2024: {prevQuality}%)</span>
