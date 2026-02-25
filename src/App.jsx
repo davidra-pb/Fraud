@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.42";
+const APP_VERSION = "v.1.43";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -589,7 +589,7 @@ const TrendsSlide = () => (
   </div>
 );
 
-// 6. Chart (Enhanced with Insights)
+// 6. Chart (Enhanced with Insights and Trend Arrow)
 const ChartSlide = () => {
     const latestData = chartData[3];
     const prevData = chartData[2];
@@ -597,9 +597,9 @@ const ChartSlide = () => {
     // FORMATTED TO 1 DECIMAL PLACE
     const totalExposureM = (latestData.totalExposure / 1000000).toFixed(1);
     const prevExposureM = (prevData.totalExposure / 1000000).toFixed(1);
-    const currentQuality = latestData.quality;
-    const prevQuality = prevData.quality;
-    const qualityDelta = (currentQuality - prevQuality).toFixed(1);
+    const currentQuality = latestData.quality.toFixed(1);
+    const prevQuality = prevData.quality.toFixed(1);
+    const qualityDelta = (latestData.quality - prevData.quality).toFixed(1);
     const totalSaved = latestData.totalSaved;
 
     const CustomBarLabel = (props) => {
@@ -607,7 +607,7 @@ const ChartSlide = () => {
         const dataPoint = chartData[index];
         // FORMATTED TO 1 DECIMAL PLACE
         const barTotalM = (dataPoint.totalExposure / 1000000).toFixed(1);
-        const barQuality = dataPoint.quality + '%';
+        const barQuality = dataPoint.quality.toFixed(1) + '%';
 
         return (
             <g>
@@ -698,17 +698,20 @@ const ChartSlide = () => {
                   {/* Chart */}
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative pt-14 print:border-slate-300">
 
-                      {/* Trend Arrow Overlay (Positioned exactly over the bars) */}
-                      <div className="absolute top-[80px] left-[15%] right-[15%] bottom-[140px] pointer-events-none z-10">
-                         <svg width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
+                      {/* Trend Arrow Overlay (Beautiful Thick Curved Arrow) */}
+                      <div className="absolute top-[35px] left-[15%] right-[10%] bottom-[120px] pointer-events-none z-10 drop-shadow-lg">
+                         <svg viewBox="0 0 1000 300" width="100%" height="100%" style={{overflow: 'visible'}}>
                             <defs>
-                                <marker id="trendArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                                    <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+                                <marker id="trendArrowSolid" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto">
+                                    <path d="M 0,0 L 14,7 L 0,14 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            <path d="M 0,0 L 100%,45%" fill="none" stroke="#10b981" strokeWidth="4" strokeDasharray="8,8" markerEnd="url(#trendArrow)" opacity="0.85"/>
+                            {/* The curve goes from right to left in RTL visually, but SVG coordinates are LTR.
+                                We want it to start from the highest bar (2022) to the lowest damage area (2025).
+                                2022 is on the right side of the chart visually in RTL. */}
+                            <path d="M 900,10 Q 500,60 100,160" fill="none" stroke="#10b981" strokeWidth="8" strokeLinecap="round" markerEnd="url(#trendArrowSolid)" opacity="0.85"/>
                          </svg>
-                         <div className="absolute top-[18%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-white/95 px-5 py-2 rounded-full border border-emerald-100 shadow-md whitespace-nowrap">
+                         <div className="absolute top-[25%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-white/95 px-5 py-2 rounded-full border border-emerald-100 shadow-md whitespace-nowrap">
                              <span className="text-emerald-600 font-bold text-sm flex items-center gap-2">
                                  <TrendingUp className="w-4 h-4 transform rotate-180" />
                                  מגמת ירידה עקבית בהיקפי ההונאה מ-2022
@@ -750,7 +753,7 @@ const ChartSlide = () => {
                           <ul className="text-sky-800 text-lg leading-relaxed space-y-1">
                               <li className="flex items-start gap-2">
                                   <span className="text-sky-500 mt-1">•</span>
-                                  <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות.</span>
+                                  <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות והשקת המוצרים החדשים.</span>
                               </li>
                               <li className="flex items-start gap-2">
                                   <span className="text-sky-500 mt-1">•</span>
@@ -809,7 +812,7 @@ const SectionTransitionSlide = () => (
             <Compass className="w-14 h-14 text-white print:text-sky-600" />
         </div>
         <h1 className="text-7xl font-black text-white mb-6 tracking-tight drop-shadow-lg print:text-slate-800 print:drop-shadow-none">מבט קדימה</h1>
-        <h2 className="text-4xl text-sky-100 font-medium print:text-slate-500">מיקודים, תכנון ואסטרטגיה לשנת 2026</h2>
+        <h2 className="text-4xl text-sky-100 font-medium print:text-slate-500">מיקודים לשנת 2026</h2>
     </div>
 );
 
