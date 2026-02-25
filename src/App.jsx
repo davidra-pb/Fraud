@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.49";
+const APP_VERSION = "v.1.51";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -306,7 +306,7 @@ const TitleSlide = () => (
         <h2 className="text-3xl text-sky-600 font-normal">סיכום 2025 ותוכניות ל-2026</h2>
       </div>
       <div className="mt-12 px-10 py-3 bg-white rounded-full text-sky-700 text-xl font-bold shadow-xl border border-sky-100 print:shadow-none print:border-slate-300">
-        דירקטוריון פברואר 2026
+        דירקטוריון מרץ 2026
       </div>
     </div>
 );
@@ -434,7 +434,7 @@ const OperatingConceptSlide = () => {
 
                 {/* Layer 3 */}
                 <div className="w-[80%] bg-sky-600 text-white p-5 rounded-2xl text-center border-t-4 border-rose-300 shadow-lg relative z-30 flex items-center justify-between px-10">
-                    <div className="flex items-center gap-4"><div className="p-2 bg-white/20 rounded-lg"><Cpu className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 3: מנועי סיכון (Real-Time)</h3></div>
+                    <div className="flex items-center gap-4"><div className="p-2 bg-white/20 rounded-lg"><Cpu className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 3: מנגנון ניטור הונאות (זמן-אמת)</h3></div>
                     <p className="text-sky-100 font-medium text-lg">עצירת פעולות פיננסיות חשודות בזמן אמת ע"י מודל Wallet Score</p>
                 </div>
 
@@ -488,7 +488,7 @@ const FraudStrategySlide = () => (
               <ul className="space-y-4 flex-grow overflow-y-auto pr-2">
                   <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
                     <div className="w-2 h-2 rounded-full bg-sky-400 mt-1.5 shrink-0"></div>
-                    <div><strong>דיוק מנוע סיכונים (Wallet Score):</strong> פיתוח חוקים חדשים תוך שמירה על איזון עדין ומינימום פגיעה במשתמשים לגיטימיים.</div>
+                    <div><strong>דיוק מנגנון ניטור הונאות (Wallet Score):</strong> פיתוח חוקים חדשים תוך שמירה על איזון עדין ומינימום פגיעה במשתמשים לגיטימיים.</div>
                   </li>
                   <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
                     <div className="w-2 h-2 rounded-full bg-sky-400 mt-1.5 shrink-0"></div>
@@ -496,7 +496,7 @@ const FraudStrategySlide = () => (
                   </li>
                   <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
                     <div className="w-2 h-2 rounded-full bg-sky-400 mt-1.5 shrink-0"></div>
-                    <div><strong>התראות מונעות פישינג:</strong> שינוי ניסוח ה-SMS והתראה על כניסות ממכשירים לא מזוהים.</div>
+                    <div><strong>התראות מונעות פישינג:</strong> -SMS והתראה על כניסות ממכשירים לא מזוהים.</div>
                   </li>
               </ul>
           </div>
@@ -514,11 +514,11 @@ const FraudStrategySlide = () => (
                   </li>
                   <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
                     <div className="w-2 h-2 rounded-full bg-rose-400 mt-1.5 shrink-0"></div>
-                    <div><strong>חסימות והקפאות:</strong> מניעת חזרת הונאה דרך חסימה הרמטית לפי מזהה מכשיר, מספר טלפון או תעודת זהות של רשתות עוינות.</div>
+                    <div><strong>חסימות והקפאות:</strong> מניעת חזרת הונאה וניהול רשימות שחורות לפי מזהה מכשיר, מספר טלפון או תעודת זהות.</div>
                   </li>
                   <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
                     <div className="w-2 h-2 rounded-full bg-rose-400 mt-1.5 shrink-0"></div>
-                    <div><strong>זיכויים וניהול הכחשות:</strong> מענה מהיר מול חברות האשראי לביטול עסקאות משובשות והחזרת כספים.</div>
+                    <div><strong>ניהול הכחשות וביטולי עסקאות:</strong> טיפול ומענה מהיר מול חברות האשראי לביטול עסקאות והחזרת כספים ״גנובים״.</div>
                   </li>
               </ul>
           </div>
@@ -532,7 +532,7 @@ const TrendsSlide = () => (
      <div className="mb-8">
         <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-rose-300 pr-6">סוגי הונאות בולטים - מיקודי 2025 (המשך)</h2>
         <h3 className="text-2xl font-bold text-slate-700 mt-2 mb-2">2. דפוסי הונאות חדשים שהתמודדנו איתם ב-2025</h3>
-        <p className="text-slate-500 text-xl font-medium">מקרים מורכבים שעקפו את מעגלי ההגנה האוטומטיים ודרשו התערבות וניטור אנושי</p>
+        <p className="text-slate-500 text-xl font-medium">מקרים שעקפו את מעגלי ההגנה האוטומטיים ודרשו התערבות וניטור אנושי</p>
      </div>
 
      <div className="grid grid-cols-2 gap-12 flex-grow max-h-[55vh] print:max-h-none">
@@ -684,16 +684,6 @@ const ChartSlide = () => {
               <div className="w-3/4 flex flex-col relative h-full">
                   <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
-                      {/* Top centered text */}
-                      <div className="flex justify-center mb-0 z-20 shrink-0 relative">
-                          <div className="bg-emerald-50 px-5 py-1.5 rounded-full border border-emerald-100 shadow-sm whitespace-nowrap">
-                              <span className="text-emerald-700 font-bold text-sm flex items-center gap-2">
-                                  <TrendingUp className="w-4 h-4 transform rotate-180" />
-                                  מגמת ירידה עקבית בהיקפי הונאה
-                              </span>
-                          </div>
-                      </div>
-
                       {/* SVG Arrow Overlay */}
                       <div className="absolute top-[30px] left-[10%] right-[10%] bottom-[80px] pointer-events-none z-10">
                          <svg viewBox="0 0 1000 200" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
@@ -791,7 +781,7 @@ const EmbezzlementSlide = () => (
                 <div className="flex items-center gap-4 mb-5 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><ShieldAlert className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3></div>
                 <ul className="text-slate-600 text-lg leading-relaxed space-y-4 flex-grow overflow-y-auto">
                     <li>• עריכת מיפוי של תהליכי הליבה בארגון ואיתור מוקדי סיכון פוטנציאליים למעילות.</li>
-                    <li>• יישום עקרון בסיסי של הפרדת סמכויות (Segregation of Duties) במערכות המידע.</li>
+                    <li>• יישום עקרון בסיסי של הפרדת סמכויות במערכות השונות.</li>
                     <li>• כתיבה ויישום תוכנית סדורה להפחתת חשיפות קיימות והטמעת בקרות מפצות.</li>
                 </ul>
             </div>
@@ -804,17 +794,6 @@ const EmbezzlementSlide = () => (
                 </ul>
             </div>
         </div>
-    </div>
-);
-
-// 8. Transition to 2026
-const SectionTransitionSlide = () => (
-    <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-sky-600 to-indigo-800 print:h-full print:w-full print:bg-white print:border-8 print:border-sky-600 animate-fadeIn">
-        <div className="w-28 h-28 bg-white/10 rounded-full flex items-center justify-center mb-8 backdrop-blur-md print:bg-sky-100 print:border print:border-sky-200">
-            <Compass className="w-14 h-14 text-white print:text-sky-600" />
-        </div>
-        <h1 className="text-7xl font-black text-white mb-6 tracking-tight drop-shadow-lg print:text-slate-800 print:drop-shadow-none">מבט קדימה</h1>
-        <h2 className="text-4xl text-sky-100 font-medium print:text-slate-500">מיקודים לשנת 2026</h2>
     </div>
 );
 
@@ -831,15 +810,15 @@ const FutureOutlookSlide = () => (
                 <div className="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><CreditCard className="w-8 h-8 text-emerald-500" /></div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-4">מוצרים ושירותים חדשים</h3>
                 <p className="text-slate-500 text-lg leading-relaxed">
-                    שימת דגש על איתור ולמידה של מתווי הונאה חדשים בסביבת המוצרים המתרחבת. בניית מעטפת הגנה ובקרות מותאמות לשירותים החדשים, ביניהם: העברות תשלום בזמן אמת (RTP), שירותי ערבויות, וחשבונות קטינים (PayBox Young).
+                    שימת דגש על איתור ולמידה מהירה של מתווי הונאה חדשים בסביבת המוצרים המתרחבת. בניית מעטפת הגנה ובקרות מותאמות לשירותים החדשים, ביניהם: טעינה מחשבון בנק בתשתית RTP, שירותי ערבויות, וחשבונות קטינים (PayBox Young).
                 </p>
             </div>
 
             <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
                 <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Sparkles className="w-8 h-8 text-sky-500" /></div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">בינה מלאכותית (AI)</h3>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">הטמעת כלי AI לניטור הונאות</h3>
                 <p className="text-slate-500 text-lg leading-relaxed">
-                    שילוב נרחב ומשמעותי של כלים מבוססי בינה מלאכותית ולמידת מכונה (Machine Learning) כחלק אינטגרלי מתהליכי הניטור, האיתור והזיהוי המהיר של הונאות מורכבות במערכות החברה.
+                    שילוב משמעותי של כלים מבוססי בינה מלאכותית ולמידת מכונה (ML) כחלק אינטגרלי מתהליכי הניטור, האיתור והזיהוי המהיר של הונאות מורכבות במערכות החברה.
                 </p>
             </div>
 
@@ -847,7 +826,7 @@ const FutureOutlookSlide = () => (
                 <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Eye className="w-8 h-8 text-indigo-500" /></div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-4">ניהול סיכוני פנים (מעילות)</h3>
                 <p className="text-slate-500 text-lg leading-relaxed">
-                    הטמעת בקרות טכנולוגיות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts). בנוסף, בחינה מחודשת של נוהל המהימנות והגדלת תדירות חובת הפוליגרף לעובדים בתפקידים רגישים.
+                    הטמעת בקרות טכנולוגיות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות. בנוסף, בחינה מחודשת של נוהל המהימנות והגדלת תדירות חובת הפוליגרף לעובדים בתפקידים רגישים.
                 </p>
             </div>
         </div>
@@ -869,7 +848,7 @@ const BoardPresentation = () => {
     const [isPrintMode, setIsPrintMode] = useState(false);
     const [commentsVisible, setCommentsVisible] = useState(true);
     const [newCommentPos, setNewCommentPos] = useState(null);
-    const [connectionStatus, setConnectionStatus] = useState('checking'); 
+    const [connectionStatus, setConnectionStatus] = useState('checking');
     const containerRef = useRef(null);
 
     const slides = [
@@ -880,7 +859,6 @@ const BoardPresentation = () => {
         { component: <TrendsSlide />, label: "מגמות ודוגמאות הונאה" },
         { component: <ChartSlide />, label: "נתוני מניעה ונזק" },
         { component: <EmbezzlementSlide />, label: "סיכוני מעילות 2025" },
-        { component: <SectionTransitionSlide />, label: "מעבר ל-2026" },
         { component: <FutureOutlookSlide />, label: "מיקודים ל-2026" },
         { component: <ThankYouSlide />, label: "סיום" },
     ];
