@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.51";
+const APP_VERSION = "v.1.52";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -313,18 +313,18 @@ const TitleSlide = () => (
 
 // 2. Context
 const ContextSlide = () => (
-    <div className="h-full flex flex-col justify-center px-12 overflow-hidden print:h-full print:px-8">
-      <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-500 pr-6">רקע ומטרות</h2>
+    <div className="h-full flex flex-col justify-center px-12 print:px-8 overflow-hidden print:h-full">
+      <h2 className="text-4xl font-bold text-slate-800 mb-8 print:mb-4 border-r-8 border-sky-500 pr-6">רקע ומטרות</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 flex-grow max-h-[70vh] print:max-h-none">
-        <div className="bg-sky-50/60 p-8 rounded-[2rem] border border-sky-100 relative overflow-hidden flex flex-col justify-center print:border-slate-200">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="bg-white p-4 rounded-2xl shadow-sm print:border print:border-slate-200">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 print:gap-6 flex-grow max-h-[70vh] print:max-h-none">
+        <div className="bg-sky-50/60 p-8 print:p-6 rounded-[2rem] border border-sky-100 relative overflow-hidden flex flex-col justify-center print:border-slate-200 print:h-auto">
+          <div className="flex items-center gap-4 mb-6 print:mb-4">
+            <div className="bg-white p-4 print:p-3 rounded-2xl shadow-sm print:border print:border-slate-200">
                <Activity className="w-8 h-8 text-sky-600" />
             </div>
             <h3 className="text-2xl font-bold text-slate-800">האתגרים שלנו</h3>
           </div>
-          <div className="space-y-4 text-slate-600 text-xl leading-relaxed">
+          <div className="space-y-4 print:space-y-3 text-slate-600 text-xl print:text-lg leading-relaxed">
             <p>
               עולם ההונאות משתנה כל הזמן. הסביבה הפנימית והחיצונית מתפתחת בקצב מסחרר עם כניסת טכנולוגיות חדשות ומוצרים פיננסיים חדשים.
             </p>
@@ -334,14 +334,14 @@ const ContextSlide = () => (
           </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-slate-100 border border-slate-100 relative flex flex-col justify-center print:border-slate-200">
-          <div className="flex items-center gap-4 mb-6">
-             <div className="bg-sky-100 p-4 rounded-2xl shadow-sm print:border print:border-sky-200">
+        <div className="bg-white p-8 print:p-6 rounded-[2rem] shadow-lg shadow-slate-100 border border-slate-100 relative flex flex-col justify-center print:border-slate-200 print:h-auto">
+          <div className="flex items-center gap-4 mb-6 print:mb-4">
+             <div className="bg-sky-100 p-4 print:p-3 rounded-2xl shadow-sm print:border print:border-sky-200">
                 <Target className="w-8 h-8 text-sky-600" />
              </div>
             <h3 className="text-2xl font-bold text-slate-800">מה נציג היום?</h3>
           </div>
-          <ul className="space-y-6 text-slate-600 text-xl">
+          <ul className="space-y-6 print:space-y-4 text-slate-600 text-xl print:text-lg">
             <li className="flex items-start gap-4">
               <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
               <span>
@@ -393,8 +393,8 @@ const OperatingConceptSlide = () => {
                 .anim-shield { animation: pulse-shield 2s infinite; }
             `}</style>
 
-            <div className="mb-6 text-center">
-                <h2 className="text-4xl font-bold text-slate-800 mb-2">תפיסת ההפעלה: מודל הסינון</h2>
+            <div className="mb-6 print:mb-4 text-center">
+                <h2 className="text-4xl print:text-3xl font-bold text-slate-800 mb-2">תפיסת ההפעלה: מודל הסינון</h2>
             </div>
 
             <div className="flex-grow flex flex-col items-center justify-start pt-2">
@@ -410,9 +410,9 @@ const OperatingConceptSlide = () => {
                 </div>
 
                 {/* Layer 1 */}
-                <div className="w-full bg-slate-800 text-white p-5 rounded-2xl text-center border-t-4 border-rose-500 shadow-lg relative z-10 flex items-center justify-between px-10">
+                <div className="w-full bg-slate-800 text-white p-5 print:p-4 rounded-2xl text-center border-t-4 border-rose-500 shadow-lg relative z-10 flex items-center justify-between px-10 print:px-6">
                     <div className="flex items-center gap-4"><div className="p-2 bg-white/10 rounded-lg"><Server className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 1: תשתית וסייבר</h3></div>
-                    <p className="text-slate-300 font-medium text-lg">חסימת מתקפות רשת, בוטים וגישה ממדינות עוינות (Geo-Block)</p>
+                    <p className="text-slate-300 font-medium text-lg print:text-base">חסימת מתקפות רשת, בוטים וגישה ממדינות עוינות (Geo-Block)</p>
                 </div>
 
                 {/* Filter 1 */}
@@ -422,9 +422,9 @@ const OperatingConceptSlide = () => {
                 </div>
 
                 {/* Layer 2 */}
-                <div className="w-[90%] bg-sky-900 text-white p-5 rounded-2xl text-center border-t-4 border-rose-400 shadow-lg relative z-20 flex items-center justify-between px-10">
+                <div className="w-[90%] bg-sky-900 text-white p-5 print:p-4 rounded-2xl text-center border-t-4 border-rose-400 shadow-lg relative z-20 flex items-center justify-between px-10 print:px-6">
                     <div className="flex items-center gap-4"><div className="p-2 bg-white/10 rounded-lg"><Fingerprint className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 2: זיהוי ואימות לקוח</h3></div>
-                    <p className="text-sky-200 font-medium text-lg">חסימת זהויות בדויות דרך אימות אדי״ב, נב״ת 411 וזיהוי מכשיר</p>
+                    <p className="text-sky-200 font-medium text-lg print:text-base">חסימת זהויות בדויות דרך אימות אדי״ב, נב״ת 411 וזיהוי מכשיר</p>
                 </div>
 
                 {/* Filter 2 */}
@@ -433,9 +433,9 @@ const OperatingConceptSlide = () => {
                 </div>
 
                 {/* Layer 3 */}
-                <div className="w-[80%] bg-sky-600 text-white p-5 rounded-2xl text-center border-t-4 border-rose-300 shadow-lg relative z-30 flex items-center justify-between px-10">
+                <div className="w-[80%] bg-sky-600 text-white p-5 print:p-4 rounded-2xl text-center border-t-4 border-rose-300 shadow-lg relative z-30 flex items-center justify-between px-10 print:px-6">
                     <div className="flex items-center gap-4"><div className="p-2 bg-white/20 rounded-lg"><Cpu className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 3: מנגנון ניטור הונאות (זמן-אמת)</h3></div>
-                    <p className="text-sky-100 font-medium text-lg">עצירת פעולות פיננסיות חשודות בזמן אמת ע"י מודל Wallet Score</p>
+                    <p className="text-sky-100 font-medium text-lg print:text-base">עצירת פעולות פיננסיות חשודות בזמן אמת ע"י מודל Wallet Score</p>
                 </div>
 
                 {/* Filter 3 (Blocked) */}
@@ -444,9 +444,9 @@ const OperatingConceptSlide = () => {
                 </div>
 
                 {/* Layer 4 (Core) */}
-                <div className="w-[70%] bg-white text-slate-800 p-6 rounded-2xl text-center border-2 border-emerald-500 shadow-[0_10px_30px_rgba(16,185,129,0.2)] relative z-40 flex items-center justify-between px-10 anim-shield mt-2">
-                    <div className="flex items-center gap-4"><div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><ShieldCheck className="w-8 h-8" /></div><h3 className="text-2xl font-bold text-emerald-700">בקרה אנושית (הצפה וטיפול בחריגים)</h3></div>
-                    <p className="text-slate-600 font-bold text-lg">חקירות אנליסטים, רשימות שחורות וטיפול באירועים חריגים</p>
+                <div className="w-[70%] bg-white text-slate-800 p-6 print:p-4 rounded-2xl text-center border-2 border-emerald-500 shadow-[0_10px_30px_rgba(16,185,129,0.2)] relative z-40 flex items-center justify-between px-10 print:px-6 anim-shield mt-2">
+                    <div className="flex items-center gap-4"><div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><ShieldCheck className="w-8 h-8 print:w-6 print:h-6" /></div><h3 className="text-2xl print:text-xl font-bold text-emerald-700">בקרה אנושית (הצפה וטיפול בחריגים)</h3></div>
+                    <p className="text-slate-600 font-bold text-lg print:text-base">חקירות אנליסטים, רשימות שחורות וטיפול באירועים חריגים</p>
                 </div>
 
             </div>
@@ -459,42 +459,42 @@ const FraudStrategySlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
 
        {/* Header & Explanation Area */}
-       <div className="mb-6">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">סוגי הונאות בולטים - מיקודי 2025</h2>
+       <div className="mb-6 print:mb-3">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 print:mb-3 border-r-8 border-sky-400 pr-6">סוגי הונאות בולטים - מיקודי 2025</h2>
 
-            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-100 shadow-sm">
-                <h3 className="text-2xl font-bold text-slate-800 mb-3">1. שימוש בכרטיסי אשראי גנובים (האיום המרכזי)</h3>
-                <p className="text-slate-600 text-lg leading-relaxed mb-4">
+            <div className="bg-slate-50 p-5 print:p-4 rounded-2xl border border-slate-100 shadow-sm">
+                <h3 className="text-2xl font-bold text-slate-800 mb-3 print:mb-2">1. שימוש בכרטיסי אשראי גנובים (האיום המרכזי)</h3>
+                <p className="text-slate-600 text-lg print:text-[15px] leading-relaxed print:leading-normal mb-4 print:mb-2">
                     השימוש השכיח והמשמעותי ביותר בהונאות ב-PayBox הינו שימוש בפרטי כרטיסי אשראי גנובים, המהווים כיום את <strong>"אויב מספר 1"</strong> של החברה. מטרת העבריינים היא להלבין כספים גנובים דרך העברות או משיכות לחשבונות קש.
                 </p>
-                <div className="bg-sky-100/50 p-4 rounded-xl border border-sky-100">
-                    <p className="text-sky-800 text-lg font-medium leading-relaxed">
+                <div className="bg-sky-100/50 p-4 print:p-3 rounded-xl border border-sky-100">
+                    <p className="text-sky-800 text-lg print:text-[15px] font-medium leading-relaxed print:leading-normal">
                         כלל תהליכי העבודה, השגרות והכלים שלנו מכוונים כדי למנוע מקרים אלו, ובנויים במספר שכבות הגנה במקביל. הטיפול באיום מתחלק לשני צירי פעולה:
                     </p>
                 </div>
             </div>
        </div>
 
-       <h4 className="text-xl font-bold text-slate-700 mb-3 px-2">מעגלי הטיפול באיום המרכזי ב-2025:</h4>
+       <h4 className="text-xl font-bold text-slate-700 mb-3 print:mb-2 px-2">מעגלי הטיפול באיום המרכזי ב-2025:</h4>
 
        {/* Actions Grid */}
-       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 flex-grow max-h-[35vh] print:max-h-none">
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 print:gap-4 flex-grow max-h-[35vh] print:max-h-none">
           {/* Preventive */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-md border border-slate-100 flex flex-col print:border-slate-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-sky-50 rounded-2xl flex items-center justify-center print:border print:border-sky-200"><Shield className="w-6 h-6 text-sky-500" /></div>
+          <div className="bg-white p-6 print:p-5 rounded-[2rem] shadow-md border border-slate-100 flex flex-col print:border-slate-300 print:h-auto">
+              <div className="flex items-center gap-3 mb-4 print:mb-2">
+                <div className="w-12 h-12 print:w-10 print:h-10 bg-sky-50 rounded-2xl flex items-center justify-center print:border print:border-sky-200"><Shield className="w-6 h-6 text-sky-500" /></div>
                 <h3 className="text-xl font-bold text-slate-800">מענה מניעתי (לא לאפשר מראש)</h3>
               </div>
-              <ul className="space-y-4 flex-grow overflow-y-auto pr-2">
-                  <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
+              <ul className="space-y-4 print:space-y-2 flex-grow overflow-y-auto print:overflow-visible pr-2">
+                  <li className="flex items-start gap-3 text-slate-600 text-base print:text-[14px] leading-snug">
                     <div className="w-2 h-2 rounded-full bg-sky-400 mt-1.5 shrink-0"></div>
                     <div><strong>דיוק מנגנון ניטור הונאות (Wallet Score):</strong> פיתוח חוקים חדשים תוך שמירה על איזון עדין ומינימום פגיעה במשתמשים לגיטימיים.</div>
                   </li>
-                  <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
+                  <li className="flex items-start gap-3 text-slate-600 text-base print:text-[14px] leading-snug">
                     <div className="w-2 h-2 rounded-full bg-sky-400 mt-1.5 shrink-0"></div>
                     <div><strong>זיהוי מכשירים:</strong> איתור משתמשים ללא אנשי קשר במכשיר או המגיעים מאזור זמן זר.</div>
                   </li>
-                  <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
+                  <li className="flex items-start gap-3 text-slate-600 text-base print:text-[14px] leading-snug">
                     <div className="w-2 h-2 rounded-full bg-sky-400 mt-1.5 shrink-0"></div>
                     <div><strong>התראות מונעות פישינג:</strong> -SMS והתראה על כניסות ממכשירים לא מזוהים.</div>
                   </li>
@@ -502,21 +502,21 @@ const FraudStrategySlide = () => (
           </div>
 
           {/* Reactive */}
-          <div className="bg-white p-6 rounded-[2rem] shadow-md border border-slate-100 flex flex-col print:border-slate-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center print:border print:border-rose-200"><ZapOff className="w-6 h-6 text-rose-500" /></div>
+          <div className="bg-white p-6 print:p-5 rounded-[2rem] shadow-md border border-slate-100 flex flex-col print:border-slate-300 print:h-auto">
+              <div className="flex items-center gap-3 mb-4 print:mb-2">
+                <div className="w-12 h-12 print:w-10 print:h-10 bg-rose-50 rounded-2xl flex items-center justify-center print:border print:border-rose-200"><ZapOff className="w-6 h-6 text-rose-500" /></div>
                 <h3 className="text-xl font-bold text-slate-800">מענה תגובתי (למקרים שחדרו)</h3>
               </div>
-              <ul className="space-y-4 flex-grow overflow-y-auto pr-2">
-                  <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
+              <ul className="space-y-4 print:space-y-2 flex-grow overflow-y-auto print:overflow-visible pr-2">
+                  <li className="flex items-start gap-3 text-slate-600 text-base print:text-[14px] leading-snug">
                     <div className="w-2 h-2 rounded-full bg-rose-400 mt-1.5 shrink-0"></div>
                     <div><strong>ניטור והתערבות אנושית:</strong> טיפול במקרים נדירים שהצליחו לחדור את ההגנה האוטומטית, דרך בקרת אנליסטים ועצירה מיידית.</div>
                   </li>
-                  <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
+                  <li className="flex items-start gap-3 text-slate-600 text-base print:text-[14px] leading-snug">
                     <div className="w-2 h-2 rounded-full bg-rose-400 mt-1.5 shrink-0"></div>
                     <div><strong>חסימות והקפאות:</strong> מניעת חזרת הונאה וניהול רשימות שחורות לפי מזהה מכשיר, מספר טלפון או תעודת זהות.</div>
                   </li>
-                  <li className="flex items-start gap-3 text-slate-600 text-base leading-snug">
+                  <li className="flex items-start gap-3 text-slate-600 text-base print:text-[14px] leading-snug">
                     <div className="w-2 h-2 rounded-full bg-rose-400 mt-1.5 shrink-0"></div>
                     <div><strong>ניהול הכחשות וביטולי עסקאות:</strong> טיפול ומענה מהיר מול חברות האשראי לביטול עסקאות והחזרת כספים ״גנובים״.</div>
                   </li>
@@ -529,28 +529,28 @@ const FraudStrategySlide = () => (
 // 5. Trends (Part 2 - New Patterns)
 const TrendsSlide = () => (
   <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
-     <div className="mb-8">
+     <div className="mb-8 print:mb-4">
         <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-rose-300 pr-6">סוגי הונאות בולטים - מיקודי 2025 (המשך)</h2>
         <h3 className="text-2xl font-bold text-slate-700 mt-2 mb-2">2. דפוסי הונאות חדשים שהתמודדנו איתם ב-2025</h3>
-        <p className="text-slate-500 text-xl font-medium">מקרים שעקפו את מעגלי ההגנה האוטומטיים ודרשו התערבות וניטור אנושי</p>
+        <p className="text-slate-500 text-xl print:text-lg font-medium">מקרים שעקפו את מעגלי ההגנה האוטומטיים ודרשו התערבות וניטור אנושי</p>
      </div>
 
-     <div className="grid grid-cols-2 gap-12 flex-grow max-h-[55vh] print:max-h-none">
-        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
+     <div className="grid grid-cols-2 gap-12 print:gap-6 flex-grow max-h-[55vh] print:max-h-none">
+        <div className="bg-white p-8 print:p-5 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:h-auto print:border-slate-300">
             <div>
-                <div className="flex items-start justify-between mb-5">
-                    <div className="bg-rose-50 p-4 rounded-2xl print:border print:border-rose-100">
-                        <Phone className="w-8 h-8 text-rose-400" />
+                <div className="flex items-start justify-between mb-5 print:mb-3">
+                    <div className="bg-rose-50 p-4 print:p-3 rounded-2xl print:border print:border-rose-100">
+                        <Phone className="w-8 h-8 print:w-6 print:h-6 text-rose-400" />
                     </div>
                     <div className="bg-slate-50 px-4 py-1.5 rounded-full text-sm font-bold text-slate-600 border border-slate-200 print:border-slate-300">
                         הנדסה חברתית
                     </div>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">2.1 הונאות "בזק" / שירות לקוחות</h3>
-                <div className="text-slate-600 text-lg leading-relaxed space-y-3">
+                <h3 className="text-2xl font-bold text-slate-800 mb-4 print:mb-2">2.1 הונאות "בזק" / שירות לקוחות</h3>
+                <div className="text-slate-600 text-lg print:text-[15px] leading-relaxed print:leading-normal space-y-3 print:space-y-1.5">
                     <p><strong>כיצד זה מבוצע?</strong> עבריינים יוצרים קשר טלפוני עם הלקוח, מתחזים לנציג שירות וטוענים לחוב דחוף. בדרך זו הם מוציאים במרמה את פרטי האשראי וקוד האימות.</p>
                     <p><strong>התוצאה:</strong> פתיחת חשבון PayBox חדש על שם הלקוח התמים וביצוע חיובים מיידיים.</p>
-                    <div className="mt-2 inline-block font-semibold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl text-base print:border print:border-rose-200">פגיעה ממוקדת באוכלוסייה מבוגרת</div>
+                    <div className="mt-2 inline-block font-semibold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl text-base print:text-[14px] print:border print:border-rose-200">פגיעה ממוקדת באוכלוסייה מבוגרת</div>
                 </div>
             </div>
             <div className="flex items-center gap-6 mt-4 pt-4 border-t border-slate-100">
@@ -560,19 +560,19 @@ const TrendsSlide = () => (
             </div>
         </div>
 
-        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
+        <div className="bg-white p-8 print:p-5 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:h-auto print:border-slate-300">
              <div>
-                <div className="flex items-start justify-between mb-5">
-                    <div className="bg-rose-50 p-4 rounded-2xl print:border print:border-rose-100">
-                        <Utensils className="w-8 h-8 text-rose-400" />
+                <div className="flex items-start justify-between mb-5 print:mb-3">
+                    <div className="bg-rose-50 p-4 print:p-3 rounded-2xl print:border print:border-rose-100">
+                        <Utensils className="w-8 h-8 print:w-6 print:h-6 text-rose-400" />
                     </div>
                     <div className="bg-slate-50 px-4 py-1.5 rounded-full text-sm font-bold text-slate-600 border border-slate-200 print:border-slate-300">פישינג ממוקד</div>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">2.2 הונאת "מסעדות"</h3>
-                <div className="text-slate-600 text-lg leading-relaxed space-y-3">
+                <h3 className="text-2xl font-bold text-slate-800 mb-4 print:mb-2">2.2 הונאת "מסעדות"</h3>
+                <div className="text-slate-600 text-lg print:text-[15px] leading-relaxed print:leading-normal space-y-3 print:space-y-1.5">
                     <p><strong>כיצד זה מבוצע?</strong> הלקוח מקבל שיחה ממתחזה ל"מסעדה" דקה לאחר ביצוע הזמנה לגיטימית. נטען כי "התשלום לא עבר" ומבוקש קוד האימות לסיום העסקה.</p>
                     <p><strong>התוצאה:</strong> השתלטות מלאה על החשבון הקיים של הלקוח וביצוע עסקאות בלתי מורשות.</p>
-                    <div className="mt-2 inline-block font-semibold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl text-base print:border print:border-rose-200">ניצול ציני של הלחץ וחוסר תשומת הלב</div>
+                    <div className="mt-2 inline-block font-semibold text-rose-600 bg-rose-50 px-3 py-1.5 rounded-xl text-base print:text-[14px] print:border print:border-rose-200">ניצול ציני של הלחץ וחוסר תשומת הלב</div>
                 </div>
             </div>
             <div className="flex items-center gap-6 mt-4 pt-4 border-t border-slate-100">
@@ -682,7 +682,7 @@ const ChartSlide = () => {
 
               {/* Chart Area (Left Side) */}
               <div className="w-3/4 flex flex-col relative h-full">
-                  <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
+                  <div className="bg-white p-4 print:p-3 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
                       {/* SVG Arrow Overlay */}
                       <div className="absolute top-[30px] left-[10%] right-[10%] bottom-[80px] pointer-events-none z-10">
@@ -697,7 +697,7 @@ const ChartSlide = () => {
                       </div>
 
                       {/* Chart */}
-                      <div className="flex-grow w-full min-h-[300px] mt-1">
+                      <div className="flex-grow w-full min-h-[300px] print:min-h-[250px] mt-1">
                           <ResponsiveContainer width="100%" height="100%">
                             <ComposedChart data={chartData} margin={{top: 45, right: 10, bottom: 5, left: 0}}>
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
@@ -728,7 +728,7 @@ const ChartSlide = () => {
               {/* Highlight Metrics (Right Side) */}
               <div className="w-1/4 flex flex-col gap-5 h-full">
                   {/* Total Fraud Box */}
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
+                  <div className="bg-white p-6 print:p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-slate-800"></div>
                       <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
                           <Target className="w-5 h-5" /> סך ההונאה (חשיפה כוללת)
@@ -741,7 +741,7 @@ const ChartSlide = () => {
                   </div>
 
                   {/* Quality Box */}
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
+                  <div className="bg-white p-6 print:p-4 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-sky-500"></div>
                       <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
                           <ShieldCheck className="w-5 h-5 text-sky-500" /> איכות המניעה
@@ -764,30 +764,30 @@ const ChartSlide = () => {
 // 7. Embezzlement 2025
 const EmbezzlementSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
-        <div className="mb-10 text-center shrink-0">
+        <div className="mb-10 print:mb-4 text-center shrink-0">
             <h2 className="text-4xl font-bold text-slate-800 mb-2 border-b-4 border-indigo-500 inline-block pb-2">ניהול סיכוני מעילות פנים - סיכום 2025</h2>
-            <p className="text-slate-500 text-2xl">חיזוק מעטפת ההגנה מבית ומניעת אי-סדרים</p>
+            <p className="text-slate-500 text-2xl print:text-xl">חיזוק מעטפת ההגנה מבית ומניעת אי-סדרים</p>
         </div>
-        <div className="grid grid-cols-3 gap-8 flex-grow max-h-[50vh] min-h-0">
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
-                <div className="flex items-center gap-4 mb-5 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><Scale className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3></div>
-                <ul className="text-slate-600 text-lg leading-relaxed space-y-4 flex-grow overflow-y-auto">
+        <div className="grid grid-cols-3 gap-8 print:gap-4 flex-grow max-h-[50vh] min-h-0 print:max-h-none">
+            <div className="bg-white p-8 print:p-5 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:h-auto print:overflow-visible print:border-slate-300 print:shadow-none">
+                <div className="flex items-center gap-4 mb-5 print:mb-3 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><Scale className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3></div>
+                <ul className="text-slate-600 text-lg print:text-[15px] leading-relaxed print:leading-normal space-y-4 print:space-y-2 flex-grow overflow-y-auto print:overflow-visible">
                     <li>• ביצוע עדכון מקיף ויסודי לנוהל מהימנות עובדים בארגון.</li>
                     <li>• החמרת הקריטריונים הנדרשים לסיווג עובדים לתפקידים רגישים ("רמה א׳").</li>
                     <li>• שילוב מערך של בדיקות נאותות מוגברות ומבחני מהימנות טרם כניסה לתפקיד.</li>
                 </ul>
             </div>
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
-                <div className="flex items-center gap-4 mb-5 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><ShieldAlert className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3></div>
-                <ul className="text-slate-600 text-lg leading-relaxed space-y-4 flex-grow overflow-y-auto">
+            <div className="bg-white p-8 print:p-5 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:h-auto print:overflow-visible print:border-slate-300 print:shadow-none">
+                <div className="flex items-center gap-4 mb-5 print:mb-3 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><ShieldAlert className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3></div>
+                <ul className="text-slate-600 text-lg print:text-[15px] leading-relaxed print:leading-normal space-y-4 print:space-y-2 flex-grow overflow-y-auto print:overflow-visible">
                     <li>• עריכת מיפוי של תהליכי הליבה בארגון ואיתור מוקדי סיכון פוטנציאליים למעילות.</li>
                     <li>• יישום עקרון בסיסי של הפרדת סמכויות במערכות השונות.</li>
                     <li>• כתיבה ויישום תוכנית סדורה להפחתת חשיפות קיימות והטמעת בקרות מפצות.</li>
                 </ul>
             </div>
-            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
-                <div className="flex items-center gap-4 mb-5 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><GraduationCap className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">תרבות ומודעות</h3></div>
-                <ul className="text-slate-600 text-lg leading-relaxed space-y-4 flex-grow overflow-y-auto">
+            <div className="bg-white p-8 print:p-5 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:h-auto print:overflow-visible print:border-slate-300 print:shadow-none">
+                <div className="flex items-center gap-4 mb-5 print:mb-3 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><GraduationCap className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">תרבות ומודעות</h3></div>
+                <ul className="text-slate-600 text-lg print:text-[15px] leading-relaxed print:leading-normal space-y-4 print:space-y-2 flex-grow overflow-y-auto print:overflow-visible">
                     <li>• העברת הדרכות ייעודיות לצוותים אופרטיביים הנמצאים במוקדי סיכון גבוה.</li>
                     <li>• חיזוק מערך האתיקה הארגונית והטמעת מנגנוני דיווח אנונימיים ובטוחים.</li>
                     <li>• פעילות אקטיבית להטמעת תרבות של "אפס סובלנות" בנושאי מעילות ואי-סדרים.</li>
@@ -800,32 +800,32 @@ const EmbezzlementSlide = () => (
 // 9. Outlook 2026
 const FutureOutlookSlide = () => (
     <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
-        <div className="mb-10">
-            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">מיקודים לשנת 2026</h2>
-            <p className="text-slate-500 text-2xl">התאמת תפיסת ההפעלה לאיומים ולסביבה הטכנולוגית המשתנה</p>
+        <div className="mb-10 print:mb-5">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 print:mb-2 border-r-8 border-sky-400 pr-6">מיקודים לשנת 2026</h2>
+            <p className="text-slate-500 text-2xl print:text-xl">התאמת תפיסת ההפעלה לאיומים ולסביבה הטכנולוגית המשתנה</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 print:gap-5 flex-grow max-h-[65vh] print:max-h-none">
 
-            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
-                <div className="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><CreditCard className="w-8 h-8 text-emerald-500" /></div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">מוצרים ושירותים חדשים</h3>
-                <p className="text-slate-500 text-lg leading-relaxed">
+            <div className="bg-white border border-slate-100 p-8 print:p-5 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none print:h-auto">
+                <div className="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 print:mb-4"><CreditCard className="w-8 h-8 text-emerald-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4 print:mb-2">מוצרים ושירותים חדשים</h3>
+                <p className="text-slate-500 text-lg print:text-[15px] leading-relaxed print:leading-normal">
                     שימת דגש על איתור ולמידה מהירה של מתווי הונאה חדשים בסביבת המוצרים המתרחבת. בניית מעטפת הגנה ובקרות מותאמות לשירותים החדשים, ביניהם: טעינה מחשבון בנק בתשתית RTP, שירותי ערבויות, וחשבונות קטינים (PayBox Young).
                 </p>
             </div>
 
-            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
-                <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Sparkles className="w-8 h-8 text-sky-500" /></div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">הטמעת כלי AI לניטור הונאות</h3>
-                <p className="text-slate-500 text-lg leading-relaxed">
+            <div className="bg-white border border-slate-100 p-8 print:p-5 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none print:h-auto">
+                <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 print:mb-4"><Sparkles className="w-8 h-8 text-sky-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4 print:mb-2">הטמעת כלי AI לניטור הונאות</h3>
+                <p className="text-slate-500 text-lg print:text-[15px] leading-relaxed print:leading-normal">
                     שילוב משמעותי של כלים מבוססי בינה מלאכותית ולמידת מכונה (ML) כחלק אינטגרלי מתהליכי הניטור, האיתור והזיהוי המהיר של הונאות מורכבות במערכות החברה.
                 </p>
             </div>
 
-            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
-                <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Eye className="w-8 h-8 text-indigo-500" /></div>
-                <h3 className="text-2xl font-bold text-slate-800 mb-4">ניהול סיכוני פנים (מעילות)</h3>
-                <p className="text-slate-500 text-lg leading-relaxed">
+            <div className="bg-white border border-slate-100 p-8 print:p-5 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none print:h-auto">
+                <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 print:mb-4"><Eye className="w-8 h-8 text-indigo-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4 print:mb-2">ניהול סיכוני פנים (מעילות)</h3>
+                <p className="text-slate-500 text-lg print:text-[15px] leading-relaxed print:leading-normal">
                     הטמעת בקרות טכנולוגיות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות. בנוסף, בחינה מחודשת של נוהל המהימנות והגדלת תדירות חובת הפוליגרף לעובדים בתפקידים רגישים.
                 </p>
             </div>
