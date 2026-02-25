@@ -373,35 +373,61 @@ const ContextSlide = () => (
 );
 
 // 3. Operating Concept (Formerly Layers)
-const OperatingConceptSlide = () => {
-    const layers = [
-        { title: "תשתית וסייבר (בסיס)", icon: <Server className="w-8 h-8" />, desc: "חוסמים גישה לא מורשית עוד לפני שנכנסים לאפליקציה.", items: ["חומת אש (Firewall)", "חסימת מדינות (Geo-Block)", "הגנה ממתקפות"], color: "bg-slate-700", widthClass: "w-full" },
-        { title: "זיהוי לקוח (בכניסה)", icon: <Fingerprint className="w-8 h-8" />, desc: "בודקים שמי שנרשם הוא באמת מי שהוא טוען.", items: ["איסוף נב״ת 411: ת.ז, כתובת, טלפון, מגדר, אופי שימוש", "אימות ח-ן מול אדי״ב", "פרופיל ראשוני"], color: "bg-sky-600", widthClass: "w-[92%]" },
-        { title: "מנועי סיכון (בזמן אמת)", icon: <Cpu className="w-8 h-8" />, desc: "בודקים כל פעולה ופעולה ברגע שהיא קורית.", items: ["ציון סיכון (Wallet Score)", "חוקי וספי מערכת", "אימות מסמכים"], color: "bg-sky-500", widthClass: "w-[84%]" },
-        { title: "בקרה אנושית (טיפול בחריגים)", icon: <Search className="w-8 h-8" />, desc: "האנליסטים שלנו בודקים מקרים חשודים לעומק.", items: ["ניטור יומי", "רשימות שחורות", "תחקור הונאות", "בדיקות הלבנת הון", "ניתוח התנהגות", "אימות מסמכים"], color: "bg-sky-400", widthClass: "w-[76%]" }
-    ];
-
+const OperatingConceptSlideOption1 = () => {
     return (
         <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
-            <div className="mb-8 text-center">
-                <h2 className="text-4xl font-bold text-slate-800 mb-4">תפיסת ההפעלה</h2>
-                <p className="text-slate-500 text-xl max-w-4xl mx-auto">מערכת של מספר שכבות סינון, מהגנה תשתיתית כללית ועד בדיקה אנושית פרטנית</p>
+            <div className="mb-6 text-center">
+                <h2 className="text-4xl font-bold text-slate-800 mb-2">תפיסת ההפעלה: הגנה רב-שכבתית (Defense in Depth)</h2>
+                <p className="text-slate-500 text-xl">מעטפת הגנה שלמה - עבריין צריך לעקוף את כל השכבות כדי לבצע הונאה</p>
             </div>
 
-            <div className="flex flex-col items-center gap-4 w-full flex-grow justify-center">
-                {layers.map((layer, idx) => (
-                    <div key={idx} className={`${layer.widthClass} ${layer.color} text-white rounded-2xl shadow-xl flex items-center p-5 transition-all hover:scale-[1.01] print:shadow-none print:border print:border-slate-400`}>
-                        <div className="p-3 bg-white/20 rounded-xl mr-4 ml-6 backdrop-blur-md shadow-inner">{layer.icon}</div>
-                        <div className="flex-grow">
-                            <div className="flex justify-between items-end mb-1"><h3 className="text-2xl font-bold">{layer.title}</h3><span className="text-sky-100 text-base font-light italic">{layer.desc}</span></div>
-                            <div className="flex gap-3 mt-3 flex-wrap">
-                                {layer.items.map((item, i) => (
-                                    <span key={i} className="text-base bg-black/20 px-4 py-1.5 rounded-xl border border-white/10 shadow-sm print:border print:border-white/30">{item}</span>
-                                ))}
+            <div className="flex-grow flex items-center justify-center">
+                {/* Layer 1 - Outer */}
+                <div className="bg-slate-800 w-full p-6 pb-8 rounded-[2.5rem] shadow-2xl border border-slate-700 text-white relative">
+                    <div className="flex items-center gap-4 mb-4 px-4">
+                        <div className="p-3 bg-white/10 rounded-xl"><Server className="w-8 h-8 text-slate-200" /></div>
+                        <div>
+                            <h3 className="text-2xl font-bold">שכבה 1: תשתית וסייבר</h3>
+                            <p className="text-slate-400 text-sm">חסימת גישה לא מורשית עוד בשערי המערכת (חומת אש, חסימת אזורים גיאוגרפים).</p>
+                        </div>
+                    </div>
+
+                    {/* Layer 2 */}
+                    <div className="bg-sky-900 w-full p-6 pb-8 rounded-[2rem] shadow-inner border border-sky-800 relative mt-2">
+                        <div className="flex items-center gap-4 mb-4 px-4">
+                            <div className="p-3 bg-white/10 rounded-xl"><Fingerprint className="w-8 h-8 text-sky-200" /></div>
+                            <div>
+                                <h3 className="text-2xl font-bold">שכבה 2: זיהוי לקוח (Onboarding)</h3>
+                                <p className="text-sky-300 text-sm">אימות זהות מול נב״ת 411 ואדי״ב ביצירת הפרופיל הראשוני.</p>
+                            </div>
+                        </div>
+
+                        {/* Layer 3 */}
+                        <div className="bg-sky-600 w-full p-6 pb-8 rounded-[1.5rem] shadow-inner border border-sky-500 relative mt-2">
+                            <div className="flex items-center gap-4 mb-4 px-4">
+                                <div className="p-3 bg-white/20 rounded-xl"><Cpu className="w-8 h-8 text-white" /></div>
+                                <div>
+                                    <h3 className="text-2xl font-bold">שכבה 3: מנועי סיכון (Real-Time)</h3>
+                                    <p className="text-sky-100 text-sm">בדיקת כל פעולה ופעולה באמצעות Wallet Score וחוקים אוטומטיים.</p>
+                                </div>
+                            </div>
+
+                            {/* Layer 4 - Core */}
+                            <div className="bg-sky-400 w-full p-6 rounded-2xl shadow-xl border border-sky-300 relative mt-2 flex items-center justify-between">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-white/20 rounded-xl shadow-inner"><Search className="w-8 h-8 text-white" /></div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-white">שכבה 4: ליבת הבקרה - אנליסטים וצוות הונאות</h3>
+                                        <p className="text-sky-50 text-sm font-medium">ניטור יומי, חקירות עומק וטיפול במקרי קצה מורכבים (חריגים).</p>
+                                    </div>
+                                </div>
+                                <div className="bg-white text-sky-600 px-4 py-2 rounded-full font-bold text-sm shadow-md">
+                                    המחסום האחרון
+                                </div>
                             </div>
                         </div>
                     </div>
-                ))}
+                </div>
             </div>
         </div>
     );
