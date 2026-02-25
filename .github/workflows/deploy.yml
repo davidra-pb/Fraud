@@ -1,33 +1,31 @@
+name: Deploy React App
 
-    name: Deploy React App
+on:
+  push:
+    branches: ["main", "master"]
 
-    on:
-      push:
-        branches: ["main", "master"]
+permissions:
+  contents: write
 
-    permissions:
-      contents: write
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    jobs:
-      build-and-deploy:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout
-            uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-          - name: Set up Node
-            uses: actions/setup-node@v4
-            with:
-              node-version: 20
+      - name: Install Dependencies
+        run: npm install
 
-          - name: Install Dependencies
-            run: npm install
+      - name: Build Project
+        run: npm run build
 
-          - name: Build Project
-            run: npm run build
-
-          - name: Deploy to GitHub Pages
-            uses: JamesIves/github-pages-deploy-action@v4
-            with:
-              folder: dist
-    
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: dist
