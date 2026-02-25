@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.46";
+const APP_VERSION = "v.1.47";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -827,14 +827,15 @@ const FutureOutlookSlide = () => (
             <p className="text-slate-500 text-2xl">התאמת תפיסת ההפעלה לאיומים ולסביבה הטכנולוגית המשתנה</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
-            <div className="bg-slate-700 text-white p-8 rounded-[2rem] shadow-xl transform hover:scale-105 transition duration-300 flex flex-col print:shadow-none print:border print:border-slate-600">
-                <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md shadow-inner"><Smartphone className="w-8 h-8 text-white" /></div>
-                <h3 className="text-2xl font-bold mb-4">מוצרים ושירותים חדשים</h3>
-                <p className="text-slate-300 text-lg leading-relaxed">
+
+            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
+                <div className="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><CreditCard className="w-8 h-8 text-emerald-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">מוצרים ושירותים חדשים</h3>
+                <p className="text-slate-500 text-lg leading-relaxed">
                     שימת דגש על איתור ולמידה של מתווי הונאה חדשים בסביבת המוצרים המתרחבת. בניית מעטפת הגנה ובקרות מותאמות לשירותים החדשים, ביניהם: העברות תשלום בזמן אמת (RTP), שירותי ערבויות, וחשבונות קטינים (PayBox Young).
                 </p>
             </div>
-            
+
             <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
                 <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Sparkles className="w-8 h-8 text-sky-500" /></div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-4">בינה מלאכותית (AI)</h3>
@@ -844,7 +845,7 @@ const FutureOutlookSlide = () => (
             </div>
 
             <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
-                <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Archive className="w-8 h-8 text-indigo-500" /></div>
+                <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Eye className="w-8 h-8 text-indigo-500" /></div>
                 <h3 className="text-2xl font-bold text-slate-800 mb-4">ניהול סיכוני פנים (מעילות)</h3>
                 <p className="text-slate-500 text-lg leading-relaxed">
                     הטמעת בקרות טכנולוגיות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts). בנוסף, בחינה מחודשת של נוהל המהימנות והגדלת תדירות חובת הפוליגרף לעובדים בתפקידים רגישים.
