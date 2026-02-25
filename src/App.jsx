@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.40";
+const APP_VERSION = "v.1.41";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -589,7 +589,7 @@ const TrendsSlide = () => (
   </div>
 );
 
-// 6. Chart (Enhanced with built-in labels and combined stats)
+// 6. Chart (Enhanced with Insights)
 const ChartSlide = () => {
     const latestData = chartData[3];
     const prevData = chartData[2];
@@ -599,10 +599,10 @@ const ChartSlide = () => {
     const currentQuality = latestData.quality;
     const prevQuality = prevData.quality;
     const qualityDelta = (currentQuality - prevQuality).toFixed(1);
+    const totalSaved = latestData.totalSaved;
 
-    // Custom Label component for rendering Total and Quality inside/above the bar
     const CustomBarLabel = (props) => {
-        const { x, y, width, height, index } = props;
+        const { x, y, width, index } = props;
         const dataPoint = chartData[index];
         const barTotalM = (dataPoint.totalExposure / 1000000).toFixed(2);
         const barQuality = dataPoint.quality + '%';
@@ -652,7 +652,7 @@ const ChartSlide = () => {
     return (
     <div className="h-full flex flex-col px-8 overflow-hidden print:h-full print:px-6">
       <div className="w-full h-full flex flex-col origin-top transform scale-90 print:scale-100" style={{ transformOrigin: 'top center' }}>
-          <div className="mb-4">
+          <div className="mb-3">
               <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
               <p className="text-xl text-slate-500">סיכום מגמות, חשיפה ומניעה כספית</p>
           </div>
@@ -690,7 +690,7 @@ const ChartSlide = () => {
                   </div>
               </div>
 
-              {/* Chart Area (Left Side) */}
+              {/* Chart & Insights Area (Left Side) */}
               <div className="w-2/3 flex flex-col gap-3 relative">
 
                   {/* Trend Arrow Overlay */}
@@ -703,14 +703,9 @@ const ChartSlide = () => {
                         </defs>
                         <path d="M 0,0 Q 50%,20 100%,70%" fill="none" stroke="#f43f5e" strokeWidth="4" strokeDasharray="8,8" markerEnd="url(#trendArrow)" opacity="0.6"/>
                      </svg>
-                     <div className="absolute top-[10%] left-[50%] transform -translate-x-1/2 bg-white/95 px-5 py-2 rounded-full border border-rose-100 shadow-md">
-                         <span className="text-rose-600 font-bold text-sm flex items-center gap-2">
-                             <TrendingUp className="w-5 h-5 transform rotate-180" />
-                             מגמת ירידה עקבית בהיקף ניסיונות ההונאה מ-2022
-                         </span>
-                     </div>
                   </div>
 
+                  {/* Chart */}
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative pt-14 print:border-slate-300">
                       <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-20 print:border print:border-slate-200">
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
@@ -723,7 +718,7 @@ const ChartSlide = () => {
                         <ComposedChart data={chartData} margin={{top: 30, right: 10, bottom: 5, left: 0}}>
                             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
                             <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 16, fontWeight: 600}} dy={10} />
-                            <YAxis yAxisId="left" hide={true} /> {/* Hide Y axis to make it cleaner, numbers are on bars */}
+                            <YAxis yAxisId="left" hide={true} />
                             <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
 
                             <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
@@ -734,6 +729,26 @@ const ChartSlide = () => {
                             </Bar>
                         </ComposedChart>
                       </ResponsiveContainer>
+                  </div>
+
+                  {/* Insights Box */}
+                  <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-start gap-4 shrink-0 print:border-sky-200">
+                      <div className="bg-sky-500 text-white p-2.5 rounded-xl shrink-0 mt-1">
+                          <Zap className="w-6 h-6" />
+                      </div>
+                      <div>
+                          <h4 className="font-bold text-sky-900 text-xl mb-2">תובנות מרכזיות</h4>
+                          <ul className="text-sky-800 text-lg leading-relaxed space-y-1">
+                              <li className="flex items-start gap-2">
+                                  <span className="text-sky-500 mt-1">•</span>
+                                  <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות.</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                  <span className="text-sky-500 mt-1">•</span>
+                                  <span><strong>זינוק במניעה:</strong> מתוך סך החשיפה, החברה הצליחה להציל <strong>{formatCurrency(totalSaved)}</strong>. מדובר בשיפור של <strong>{qualityDelta}%</strong> באיכות המניעה ביחס לאשתקד.</span>
+                              </li>
+                          </ul>
+                      </div>
                   </div>
               </div>
           </div>
