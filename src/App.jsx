@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.41";
+const APP_VERSION = "v.1.42";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -594,8 +594,9 @@ const ChartSlide = () => {
     const latestData = chartData[3];
     const prevData = chartData[2];
 
-    const totalExposureM = (latestData.totalExposure / 1000000).toFixed(2);
-    const prevExposureM = (prevData.totalExposure / 1000000).toFixed(2);
+    // FORMATTED TO 1 DECIMAL PLACE
+    const totalExposureM = (latestData.totalExposure / 1000000).toFixed(1);
+    const prevExposureM = (prevData.totalExposure / 1000000).toFixed(1);
     const currentQuality = latestData.quality;
     const prevQuality = prevData.quality;
     const qualityDelta = (currentQuality - prevQuality).toFixed(1);
@@ -604,7 +605,8 @@ const ChartSlide = () => {
     const CustomBarLabel = (props) => {
         const { x, y, width, index } = props;
         const dataPoint = chartData[index];
-        const barTotalM = (dataPoint.totalExposure / 1000000).toFixed(2);
+        // FORMATTED TO 1 DECIMAL PLACE
+        const barTotalM = (dataPoint.totalExposure / 1000000).toFixed(1);
         const barQuality = dataPoint.quality + '%';
 
         return (
@@ -693,20 +695,27 @@ const ChartSlide = () => {
               {/* Chart & Insights Area (Left Side) */}
               <div className="w-2/3 flex flex-col gap-3 relative">
 
-                  {/* Trend Arrow Overlay */}
-                  <div className="absolute inset-0 pointer-events-none z-10" style={{ padding: '70px 10% 30% 10%' }}>
-                     <svg width="100%" height="100%" preserveAspectRatio="none">
-                        <defs>
-                            <marker id="trendArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-                                <polygon points="0 0, 10 3.5, 0 7" fill="#f43f5e" />
-                            </marker>
-                        </defs>
-                        <path d="M 0,0 Q 50%,20 100%,70%" fill="none" stroke="#f43f5e" strokeWidth="4" strokeDasharray="8,8" markerEnd="url(#trendArrow)" opacity="0.6"/>
-                     </svg>
-                  </div>
-
                   {/* Chart */}
                   <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative pt-14 print:border-slate-300">
+
+                      {/* Trend Arrow Overlay (Positioned exactly over the bars) */}
+                      <div className="absolute top-[80px] left-[15%] right-[15%] bottom-[140px] pointer-events-none z-10">
+                         <svg width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
+                            <defs>
+                                <marker id="trendArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#10b981" />
+                                </marker>
+                            </defs>
+                            <path d="M 0,0 L 100%,45%" fill="none" stroke="#10b981" strokeWidth="4" strokeDasharray="8,8" markerEnd="url(#trendArrow)" opacity="0.85"/>
+                         </svg>
+                         <div className="absolute top-[18%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-white/95 px-5 py-2 rounded-full border border-emerald-100 shadow-md whitespace-nowrap">
+                             <span className="text-emerald-600 font-bold text-sm flex items-center gap-2">
+                                 <TrendingUp className="w-4 h-4 transform rotate-180" />
+                                 מגמת ירידה עקבית בהיקפי ההונאה מ-2022
+                             </span>
+                         </div>
+                      </div>
+
                       <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-20 print:border print:border-slate-200">
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
