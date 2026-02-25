@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.60";
+const APP_VERSION = "v.1.61";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -648,44 +648,44 @@ const ChartSlide = () => {
     };
 
     return (
-    <div className="h-full flex flex-col px-8 pb-10 pt-6"> {/* Added large bottom padding so shadows/boxes are never clipped */}
+    <div className="h-full flex flex-col px-8 pt-8 pb-10 overflow-hidden">
       <div className="w-full h-full flex flex-col">
 
-          <div className="mb-1.5 flex justify-between items-end shrink-0">
+          <div className="mb-4 flex justify-between items-end shrink-0">
               <div>
-                  <h2 className="text-4xl font-bold text-slate-800 mb-0">נתוני מניעה ונזק - 2025</h2>
+                  <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
                   <p className="text-xl text-slate-500">סיכום מגמות, חשיפה ומניעה כספית</p>
               </div>
           </div>
 
           {/* Full Width Top Section: Insights */}
-          <div className="bg-sky-50 border border-sky-100 py-3 px-5 rounded-2xl flex items-start gap-4 shrink-0 mb-4 shadow-sm print:border-sky-200">
-              <div className="bg-sky-500 text-white p-2.5 rounded-xl shrink-0 mt-0.5 shadow-md">
-                  <Zap className="w-5 h-5" />
+          <div className="bg-sky-50 border border-sky-100 p-5 rounded-2xl flex items-start gap-4 shrink-0 mb-6 shadow-sm print:border-sky-200">
+              <div className="bg-sky-500 text-white p-3 rounded-xl shrink-0 mt-1 shadow-md">
+                  <Zap className="w-6 h-6" />
               </div>
               <div className="flex-grow">
-                  <h4 className="font-bold text-sky-900 text-xl mb-1">תובנות מרכזיות</h4>
-                  <ul className="text-sky-800 text-lg leading-snug space-y-1">
+                  <h4 className="font-bold text-sky-900 text-xl mb-2">תובנות מרכזיות</h4>
+                  <ul className="text-sky-800 text-lg leading-relaxed space-y-2">
                       <li className="flex items-start gap-2">
-                          <span className="text-sky-500 font-bold mt-0.5">•</span>
+                          <span className="text-sky-500 font-bold mt-1">•</span>
                           <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות והשקת המוצרים החדשים.</span>
                       </li>
                       <li className="flex items-start gap-2">
-                          <span className="text-sky-500 font-bold mt-0.5">•</span>
+                          <span className="text-sky-500 font-bold mt-1">•</span>
                           <span><strong>זינוק במניעה:</strong> מתוך סך החשיפה, החברה הצליחה להציל <strong>{formatCurrency(totalSaved)}</strong>. מדובר בשיפור של <strong>{qualityDelta}%</strong> באיכות המניעה ביחס לאשתקד.</span>
                       </li>
                   </ul>
               </div>
           </div>
 
-          <div className="flex gap-5 flex-grow min-h-0 items-stretch">
+          <div className="flex gap-8 flex-grow pb-4 min-h-0 items-stretch">
 
-              {/* Chart Area (Left Side - 68%) */}
+              {/* Chart Area (Left Side - adjusted to 68% for better proportions) */}
               <div className="w-[68%] flex flex-col relative h-full">
-                  <div className="bg-white p-5 pb-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow min-h-0 flex flex-col relative print:border-slate-300">
+                  <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
                       {/* SVG Arrow Overlay - Thinner, lowered slightly, text removed completely */}
-                      <div className="absolute top-[22px] left-[8%] right-[8%] bottom-[80px] pointer-events-none z-10">
+                      <div className="absolute top-[35px] left-[8%] right-[8%] bottom-[80px] pointer-events-none z-10">
                          <svg viewBox="0 0 1000 200" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
                             <defs>
                                 <marker id="trendArrowElegant" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
@@ -717,7 +717,7 @@ const ChartSlide = () => {
                       </div>
 
                       {/* Legend at the bottom */}
-                      <div className="flex justify-center gap-6 text-sm font-medium mt-1 mb-0 bg-slate-50 px-6 py-2 rounded-xl border border-slate-100 w-fit mx-auto shrink-0 print:border-slate-200">
+                      <div className="flex justify-center gap-6 text-sm font-medium mt-3 mb-0 bg-slate-50 px-6 py-2 rounded-xl border border-slate-100 w-fit mx-auto shrink-0 print:border-slate-200">
                           <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
                           <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
                           <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
@@ -726,33 +726,33 @@ const ChartSlide = () => {
                   </div>
               </div>
 
-              {/* Highlight Metrics (Right Side - 32%) */}
-              <div className="w-[32%] flex flex-col gap-5 h-full">
+              {/* Highlight Metrics (Right Side - adjusted to 32% for better proportions and no text wrapping) */}
+              <div className="w-[32%] flex flex-col gap-6 h-full">
                   {/* Total Fraud Box */}
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative flex-1 min-h-0 print:border-slate-300">
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-slate-800"></div>
-                      <div className="text-slate-500 font-bold text-base mb-1 flex items-center gap-2">
+                      <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
                           <Target className="w-5 h-5" /> סך ההונאה (חשיפה כוללת)
                       </div>
-                      <div className="text-[42px] font-black text-slate-800 leading-none mb-2 mt-1">₪{totalExposureM}M</div>
-                      <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-slate-600 text-sm leading-snug">
+                      <div className="text-5xl lg:text-6xl font-black text-slate-800 mb-3">₪{totalExposureM}M</div>
+                      <div className="bg-slate-50 border border-slate-200 p-4 rounded-xl text-slate-600 text-base leading-tight">
                           היקף דומה לשנה שעברה<br/>
-                          <span className="text-xs font-medium text-slate-400">(ב-2024: ₪{prevExposureM}M)</span>
+                          <span className="text-sm font-medium text-slate-400">(ב-2024: ₪{prevExposureM}M)</span>
                       </div>
                   </div>
 
                   {/* Quality Box */}
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative flex-1 min-h-0 print:border-slate-300">
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex flex-col justify-center relative overflow-hidden flex-1 print:border-slate-300">
                       <div className="absolute top-0 right-0 w-2 h-full bg-sky-500"></div>
-                      <div className="text-slate-500 font-bold text-base mb-1 flex items-center gap-2">
+                      <div className="text-slate-500 font-bold text-lg mb-2 flex items-center gap-2">
                           <ShieldCheck className="w-5 h-5 text-sky-500" /> איכות המניעה
                       </div>
-                      <div className="text-[42px] font-black text-sky-600 leading-none mb-2 mt-1">{currentQuality}%</div>
-                      <div className="bg-sky-50 border border-sky-100 p-3 rounded-xl text-sky-800 text-sm leading-snug">
-                          <div className="flex items-center gap-2 font-bold mb-0.5">
+                      <div className="text-5xl lg:text-6xl font-black text-sky-600 mb-3">{currentQuality}%</div>
+                      <div className="bg-sky-50 border border-sky-100 p-4 rounded-xl text-sky-800 text-base leading-tight">
+                          <div className="flex items-center gap-2 font-bold mb-1">
                               <TrendingUp className="w-4 h-4" /> עליה של +{qualityDelta}%
                           </div>
-                          <span className="text-xs font-medium opacity-80">שיפור משמעותי ביחס אשתקד (ב-2024: {prevQuality}%)</span>
+                          <span className="text-sm font-medium opacity-80">שיפור משמעותי ביחס אשתקד (ב-2024: {prevQuality}%)</span>
                       </div>
                   </div>
               </div>
@@ -893,7 +893,10 @@ const BoardPresentation = () => {
             <div className="min-h-screen bg-slate-200 font-sans flex flex-col items-center gap-8 py-8 print:p-0 print:bg-white print:block" dir="rtl" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
                 <style>{`
                     @media print {
-                        @page { size: A4 landscape; margin: 0; }
+                        @page {
+                            size: 1536px 864px; /* Exact 16:9 slide size */
+                            margin: 0;
+                        }
                         body {
                             -webkit-print-color-adjust: exact !important;
                             print-color-adjust: exact !important;
@@ -906,8 +909,8 @@ const BoardPresentation = () => {
                         .print-border { border: 1px solid #cbd5e1 !important; }
 
                         .print-page-container {
-                            width: 297mm !important;
-                            height: 210mm !important;
+                            width: 1536px !important;
+                            height: 864px !important;
                             page-break-after: always;
                             break-after: page;
                             overflow: hidden !important;
@@ -917,23 +920,7 @@ const BoardPresentation = () => {
                             padding: 0 !important;
                             border: none !important;
                             box-shadow: none !important;
-                        }
-
-                        .print-scaler {
-                            width: 1536px !important;
-                            height: 864px !important;
-                            min-width: 1536px !important;
-                            min-height: 864px !important;
-                            max-width: 1536px !important;
-                            max-height: 864px !important;
-                            position: absolute !important;
-                            top: 50% !important;
-                            left: 50% !important;
-                            margin-top: -432px !important;
-                            margin-left: -768px !important;
-                            transform: scale(0.72) !important;
-                            transform-origin: center center !important;
-                            background: white !important;
+                            transform: none !important;
                         }
                     }
                 `}</style>
@@ -946,15 +933,11 @@ const BoardPresentation = () => {
 
                 {/* Slides Container */}
                 {slides.map((slide, index) => (
-                    <div key={index} className="print-page-container w-[297mm] h-[210mm] relative bg-white shadow-xl border border-slate-300 shrink-0 mx-auto overflow-hidden">
-                        <div className="absolute top-4 left-6 text-slate-300 text-xs font-bold z-50 no-print">
+                    <div key={index} className="print-page-container w-[1536px] h-[864px] relative bg-white shadow-xl border border-slate-300 shrink-0 mx-auto overflow-hidden no-print-transform" style={{"@media screen": {transform: "scale(0.7)", transformOrigin: "top center", marginBottom: "-200px"}}}>
+                        <div className="absolute top-6 left-8 text-slate-300 text-sm font-bold z-50 no-print">
                             {index + 1} / {slides.length} • {APP_VERSION}
                         </div>
-
-                        {/* The Scaler: Keeps desktop dimensions perfectly and shrinks them to A4 */}
-                        <div className="print-scaler w-[1536px] h-[864px] absolute top-1/2 left-1/2 bg-white" style={{ marginTop: '-432px', marginLeft: '-768px', transform: 'scale(0.72)' }}>
-                            {slide.component}
-                        </div>
+                        {slide.component}
                     </div>
                 ))}
             </div>
