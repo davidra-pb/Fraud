@@ -1,287 +1,926 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Defense in Depth - Vectors</title>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;800;900&display=swap');
-        
-        body { 
-            font-family: 'Heebo', sans-serif; 
-            background-color: #f1f5f9; 
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 60px;
-            padding: 60px 0;
-            margin: 0;
-        }
+import React, { useState, useEffect, useRef } from 'react';
+import {
+  ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+} from 'recharts';
+import { 
+  Shield, TrendingUp, Activity, Server, Target, Lock, Eye, FileText, 
+  ChevronLeft, ChevronRight, Fingerprint, Cpu, Search, Phone, Utensils, 
+  Sliders, MessageSquare, CreditCard, ShieldCheck, CheckCircle, Zap, 
+  AlertCircle, Microscope, BrainCircuit, FileBadge, Map, GraduationCap, Archive, Scale, ShieldAlert, Printer, X, MessageCircle, MousePointer2, Cloud, CloudOff, RefreshCw, ZapOff, Sparkles, Smartphone, Compass, ArrowDownToLine, ArrowDown
+} from 'lucide-react';
 
-        .slide {
-            width: 1280px;
-            height: 720px;
-            background-color: #ffffff;
-            border-radius: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            padding: 50px 80px;
-        }
+// Firebase Imports
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
-        .slide-header {
-            margin-bottom: 30px;
-            text-align: center;
-        }
+// --- CONFIG ---
+const APP_VERSION = "v.1.38";
 
-        .slide-title {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 0.5rem;
-        }
+// --- FIREBASE SETUP (Safe Initialization) ---
+let app, auth, db;
+let isFirebaseAvailable = false;
+let appId = 'fraud-prevention-deck';
 
-        .slide-subtitle {
-            font-size: 1.25rem;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        /* Animations */
-        @keyframes arrow-strike {
-            0% { transform: translateY(-15px); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(15px); opacity: 0; }
-        }
-        .anim-strike { animation: arrow-strike 1.5s infinite; }
-        .anim-strike-delay { animation: arrow-strike 1.5s infinite; animation-delay: 0.75s; }
-
-        @keyframes pulse-shield {
-            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-            70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-        }
-        .anim-shield { animation: pulse-shield 2s infinite; }
-
-        @keyframes radar-ping {
-            0% { transform: scale(0.8); opacity: 0.8; border-color: rgba(244, 63, 94, 0.8); }
-            100% { transform: scale(1.2); opacity: 0; border-color: rgba(244, 63, 94, 0); }
-        }
-        .anim-radar { animation: radar-ping 2s infinite cubic-bezier(0, 0, 0.2, 1); }
-    </style>
-</head>
-<body>
-
-    <!-- OPTION 1: THE FUNNEL (משפך הסינון) -->
-    <div class="slide">
-        <div class="slide-header">
-            <h2 class="slide-title">אופציה 1: מודל "משפך הסינון" (The Funnel)</h2>
-            <p class="slide-subtitle">ממחיש חזותית כיצד כל שכבת הגנה מסננת את נפח ההתקפות עד להגנה מוחלטת בליבה</p>
-        </div>
-        
-        <div class="flex-grow flex flex-col items-center justify-start pt-4">
+try {
+    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+        const configObj = JSON.parse(__firebase_config);
+        if (Object.keys(configObj).length > 0) {
+            app = initializeApp(configObj);
+            auth = getAuth(app);
+            db = getFirestore(app);
             
-            <!-- Attack Vector Top -->
-            <div class="flex flex-col items-center mb-2">
-                <div class="bg-rose-500 text-white px-6 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest shadow-md mb-2 border border-rose-600">וקטור תקיפה נכנס (איומי סייבר והונאה)</div>
-                <div class="flex gap-6 text-rose-500 anim-strike">
-                    <i data-lucide="arrow-down-to-line" class="w-8 h-8 opacity-70"></i>
-                    <i data-lucide="arrow-down-to-line" class="w-10 h-10"></i>
-                    <i data-lucide="arrow-down-to-line" class="w-8 h-8 opacity-70"></i>
-                </div>
-            </div>
-
-            <!-- Layer 1 -->
-            <div class="w-full bg-slate-800 text-white p-5 rounded-2xl text-center border-t-4 border-rose-500 shadow-lg relative z-10 flex items-center justify-between px-10">
-                <div class="flex items-center gap-4"><div class="p-2 bg-white/10 rounded-lg"><i data-lucide="server" class="w-6 h-6"></i></div><h3 class="text-xl font-bold">שכבה 1: תשתית וסייבר</h3></div>
-                <p class="text-slate-300 font-medium">חסימת מתקפות רשת, בוטים וגישה ממדינות עוינות (Geo-Block)</p>
-            </div>
+            const rawAppId = typeof __app_id !== 'undefined' ? __app_id : 'fraud-prevention-deck';
+            appId = rawAppId.replace(/[^a-zA-Z0-9_-]/g, '_');
             
-            <!-- Filter 1 -->
-            <div class="flex gap-8 text-rose-400 my-2 anim-strike anim-strike-delay">
-                <i data-lucide="arrow-down" class="w-6 h-6"></i>
-                <i data-lucide="arrow-down" class="w-6 h-6"></i>
-            </div>
+            isFirebaseAvailable = true;
+        }
+    }
+} catch (e) {
+    console.warn("Firebase init failed (running in offline mode):", e);
+}
 
-            <!-- Layer 2 -->
-            <div class="w-[90%] bg-sky-900 text-white p-5 rounded-2xl text-center border-t-4 border-rose-400 shadow-lg relative z-20 flex items-center justify-between px-10">
-                <div class="flex items-center gap-4"><div class="p-2 bg-white/10 rounded-lg"><i data-lucide="fingerprint" class="w-6 h-6"></i></div><h3 class="text-xl font-bold">שכבה 2: זיהוי ואימות לקוח</h3></div>
-                <p class="text-sky-200 font-medium">חסימת זהויות בדויות דרך אימות אדי״ב, נב״ת 411 וזיהוי מכשיר</p>
-            </div>
+// --- DATA ---
+const chartData = [
+  { year: '2022', savedNear: 741053.20, savedRetro: 338370.34, savedCollection: 265140.60, damage: 779212.67, quality: 63.3, totalSaved: 1344564, totalExposure: 2123776 },
+  { year: '2023', savedNear: 289707, savedRetro: 269037.13, savedCollection: 221925.26, damage: 659347.02, quality: 54.2, totalSaved: 780669, totalExposure: 1440016 },
+  { year: '2024', savedNear: 270150, savedRetro: 119560, savedCollection: 368974.10, damage: 395792.65, quality: 65.7, totalSaved: 758684, totalExposure: 1154477 },
+  { year: '2025', savedNear: 590387.37, savedRetro: 85356, savedCollection: 263511.59, damage: 254250.00, quality: 78.7, totalSaved: 939255, totalExposure: 1193505 },
+];
 
-            <!-- Filter 2 -->
-            <div class="flex gap-4 text-rose-300 my-2 anim-strike">
-                <i data-lucide="arrow-down" class="w-6 h-6"></i>
-            </div>
+const formatCurrency = (val) => val >= 1000 ? `₪${(val/1000).toFixed(0)}k` : val;
+const formatMillions = (val) => `₪${(val/1000000).toFixed(1)}M`;
 
-            <!-- Layer 3 -->
-            <div class="w-[80%] bg-sky-600 text-white p-5 rounded-2xl text-center border-t-4 border-rose-300 shadow-lg relative z-30 flex items-center justify-between px-10">
-                <div class="flex items-center gap-4"><div class="p-2 bg-white/20 rounded-lg"><i data-lucide="cpu" class="w-6 h-6"></i></div><h3 class="text-xl font-bold">שכבה 3: מנועי סיכון (Real-Time)</h3></div>
-                <p class="text-sky-100 font-medium">עצירת פעולות פיננסיות חשודות בזמן אמת ע"י מודל Wallet Score</p>
-            </div>
+const colors = {
+    chart: {
+        savedNear: "#0ea5e9", // Sky 500
+        savedRetro: "#38bdf8", // Sky 400
+        savedCollection: "#bae6fd", // Sky 200
+        damage: "#f43f5e", // Rose 500
+        line: "#0c4a6e" // Sky 900
+    }
+};
 
-            <!-- Filter 3 (Blocked) -->
-            <div class="h-6 w-1 border-l-2 border-dashed border-rose-300 my-1 relative">
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-rose-400"><i data-lucide="x" class="w-5 h-5"></i></div>
-            </div>
+// --- COMPONENTS ---
 
-            <!-- Layer 4 (Core) -->
-            <div class="w-[70%] bg-white text-slate-800 p-6 rounded-2xl text-center border-2 border-emerald-500 shadow-[0_10px_30px_rgba(16,185,129,0.2)] relative z-40 flex items-center justify-between px-10 anim-shield mt-2">
-                <div class="flex items-center gap-4"><div class="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><i data-lucide="shield-check" class="w-8 h-8"></i></div><h3 class="text-2xl font-bold text-emerald-700">שכבה 4: ליבת הבקרה</h3></div>
-                <p class="text-slate-600 font-bold">חקירות אנליסטים, רשימות שחורות וטיפול בחריגים</p>
-            </div>
+// Login Screen
+const LoginScreen = ({ onLogin }) => {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(false);
 
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (password === 'Pb@2026') { 
+      onLogin();
+    } else {
+      setError(true);
+    }
+  };
+
+  return (
+    <div className="w-screen h-screen flex items-center justify-center bg-slate-100 font-sans p-4" dir="rtl">
+      <div className="bg-white p-10 rounded-[2rem] shadow-2xl w-full max-w-md text-center border border-slate-200">
+        <div className="w-20 h-20 bg-sky-50 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Lock className="w-10 h-10 text-sky-600" />
         </div>
+        <h2 className="text-2xl font-bold text-slate-800 mb-2">המצגת מוגנת</h2>
+        <p className="text-slate-500 mb-8 text-base">אנא הזן סיסמת צפייה כדי להמשיך</p>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <input 
+              type="password" 
+              value={password}
+              onChange={(e) => { setPassword(e.target.value); setError(false); }}
+              placeholder="סיסמה..." 
+              className={`w-full px-5 py-3 text-lg border rounded-xl text-right focus:outline-none focus:ring-4 focus:ring-sky-100 transition-all text-slate-700 placeholder-slate-400 ${error ? 'border-red-300 ring-red-50' : 'border-slate-300'}`}
+            />
+          </div>
+          
+          {error && <p className="text-red-500 text-sm text-right font-medium">סיסמה שגויה, נסה שוב</p>}
+          
+          <button 
+            type="submit" 
+            className="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 text-lg rounded-xl transition-all shadow-lg hover:shadow-sky-200 mt-2"
+          >
+            כניסה למצגת
+          </button>
+        </form>
+        
+        <div className="mt-6 text-slate-400 text-xs font-medium">
+            {APP_VERSION}
+        </div>
+      </div>
     </div>
+  );
+};
 
+// --- COMMENTS SYSTEM ---
+const CommentsLayer = ({ slideIndex, isVisible, containerRef, newCommentPos, setNewCommentPos, onStatusChange }) => {
+    const [comments, setComments] = useState([]);
+    const [user, setUser] = useState(null);
+    const [newCommentText, setNewCommentText] = useState("");
+    const [useLocalMode, setUseLocalMode] = useState(!isFirebaseAvailable);
+    const [isSaving, setIsSaving] = useState(false);
+    
+    const LOCAL_STORAGE_KEY = `fraud-deck-comments-${appId}`;
 
-    <!-- OPTION 2: THE DEEP CORE (שכבות עוטפות עם ציר חדירה) -->
-    <div class="slide">
-        <div class="slide-header">
-            <h2 class="slide-title">אופציה 2: "מעטפת הליבה" (Nested Penetration)</h2>
-            <p class="slide-subtitle">ממחיש באופן פיזי את ציר התקיפה המנסה לחדור את השכבות, וכיצד הוא נבלם</p>
+    useEffect(() => {
+        if (onStatusChange) {
+            onStatusChange(useLocalMode ? 'local' : 'cloud');
+        }
+    }, [useLocalMode, onStatusChange]);
+
+    useEffect(() => {
+        if (!isFirebaseAvailable) {
+            setUseLocalMode(true);
+            return;
+        }
+
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Auth failed, switching to local mode:", err);
+                setUseLocalMode(true);
+            }
+        };
+        initAuth();
+        const unsubscribeAuth = onAuthStateChanged(auth, (u) => {
+            if (u) {
+                setUser(u);
+                setUseLocalMode(false);
+            } else {
+                setUseLocalMode(true);
+            }
+        });
+        return () => unsubscribeAuth();
+    }, []);
+
+    useEffect(() => {
+        if (useLocalMode) {
+            try {
+                const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (saved) setComments(JSON.parse(saved));
+            } catch(e) {}
+            return;
+        }
+
+        if (!user) return; 
+
+        try {
+            const commentsRef = collection(db, 'artifacts', appId, 'public', 'data', 'comments');
+            const unsubscribe = onSnapshot(commentsRef, (snapshot) => {
+                const loadedComments = [];
+                snapshot.forEach(doc => {
+                    loadedComments.push({ id: doc.id, ...doc.data() });
+                });
+                setComments(loadedComments);
+            }, (error) => {
+                setUseLocalMode(true);
+            });
+
+            return () => unsubscribe();
+        } catch (err) {
+            setUseLocalMode(true);
+        }
+    }, [user, useLocalMode]);
+
+    const handleSaveComment = async () => {
+        if (!newCommentText.trim()) return;
+        setIsSaving(true);
+
+        const newComment = {
+            slideIndex,
+            x: newCommentPos.x,
+            y: newCommentPos.y,
+            text: newCommentText,
+            createdAt: new Date().toISOString(),
+            authorId: user ? user.uid : 'local-user',
+        };
+
+        if (useLocalMode) {
+            const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
+            setComments(updatedComments);
+            try { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments)); } catch (e) {}
+            setNewCommentPos(null);
+            setNewCommentText("");
+            setIsSaving(false);
+        } else {
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'comments'), newComment);
+                setNewCommentPos(null);
+                setNewCommentText("");
+            } catch (err) {
+                setUseLocalMode(true);
+                const updatedComments = [...comments, { ...newComment, id: Date.now().toString() }];
+                setComments(updatedComments);
+                try { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments)); } catch (e) {}
+                setNewCommentPos(null);
+                setNewCommentText("");
+            } finally {
+                setIsSaving(false);
+            }
+        }
+    };
+
+    const handleDeleteComment = async (id) => {
+        if (useLocalMode) {
+            const updatedComments = comments.filter(c => c.id !== id);
+            setComments(updatedComments);
+            try { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedComments)); } catch (e) {}
+        } else {
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'comments', id));
+            } catch (err) {
+                 const updatedComments = comments.filter(c => c.id !== id);
+                 setComments(updatedComments);
+            }
+        }
+    };
+
+    if (!isVisible) return null;
+
+    const currentSlideComments = comments.filter(c => c.slideIndex === slideIndex);
+
+    return (
+        <div className="absolute inset-0 pointer-events-none z-[100] overflow-hidden no-print">
+            {!newCommentPos && currentSlideComments.length === 0 && (
+                <div className="absolute top-6 left-1/2 transform -translate-x-1/2 bg-slate-800/90 text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm animate-fadeIn pointer-events-none z-50">
+                    <MousePointer2 className="w-4 h-4" />
+                    <span>קליק ימני להוספת הערה {useLocalMode ? '(מצב מקומי)' : ''}</span>
+                </div>
+            )}
+            {currentSlideComments.map(comment => (
+                <div 
+                    key={comment.id}
+                    className="absolute pointer-events-auto bg-amber-100 border border-amber-300 shadow-xl rounded-lg rounded-br-none p-3 w-48 text-sm text-slate-900 animate-fadeIn z-[101] transform -translate-y-full origin-bottom-left"
+                    style={{ left: `${comment.x}%`, top: `${comment.y}%` }}
+                >
+                    <div className="flex justify-between items-start mb-1 border-b border-amber-200 pb-1">
+                        <span className="text-[10px] text-amber-700 font-bold">הערה</span>
+                        <button onClick={() => handleDeleteComment(comment.id)} className="text-slate-400 hover:text-red-600 transition-colors p-1"><X className="w-3 h-3" /></button>
+                    </div>
+                    <p className="font-medium leading-snug break-words whitespace-pre-wrap">{String(comment.text || '')}</p>
+                    <div className="absolute bottom-[-5px] right-0 w-3 h-3 bg-amber-100 border-b border-r border-amber-300 transform rotate-45"></div>
+                </div>
+            ))}
+            {newCommentPos && (
+                <div className="absolute pointer-events-auto bg-white border border-sky-500 shadow-2xl rounded-xl p-3 w-64 animate-fadeIn z-[102]" style={{ left: `${newCommentPos.x}%`, top: `${newCommentPos.y}%` }}>
+                    <div className="flex justify-between items-center mb-2">
+                        <p className="text-xs font-bold text-sky-600">הוספת הערה</p>
+                        <button onClick={() => setNewCommentPos(null)} className="text-slate-400 hover:text-slate-600"><X className="w-4 h-4"/></button>
+                    </div>
+                    <textarea 
+                        className="w-full text-sm border border-slate-200 rounded-lg p-2 mb-2 focus:outline-none focus:ring-2 focus:ring-sky-500 min-h-[80px] bg-slate-50 resize-none text-right"
+                        placeholder="כתוב הערה כאן..."
+                        value={newCommentText}
+                        onChange={(e) => setNewCommentText(e.target.value)}
+                        autoFocus
+                    />
+                    <div className="flex gap-2">
+                        <button onClick={handleSaveComment} disabled={isSaving} className={`flex-1 bg-sky-600 text-white text-xs py-2 rounded-lg transition font-medium shadow-sm flex items-center justify-center ${isSaving ? 'opacity-70 cursor-wait' : 'hover:bg-sky-700'}`}>
+                            {isSaving ? <RefreshCw className="w-3 h-3 animate-spin" /> : 'שמור'}
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
-        
-        <div class="flex-grow flex items-center justify-center relative w-full px-12">
-            
-            <!-- ATTACK VECTOR SIDEBAR -->
-            <div class="absolute right-12 top-0 bottom-0 w-32 flex flex-col items-center z-50 pt-6">
-                <div class="bg-rose-500 text-white text-sm font-bold py-2 px-4 rounded-xl shadow-[0_0_20px_rgba(244,63,94,0.5)] border border-rose-400 whitespace-nowrap z-10 text-center leading-tight">
-                    וקטור<br/>תקיפה
-                </div>
-                <!-- Animated penetrating line -->
-                <div class="w-2 flex-grow bg-gradient-to-b from-rose-500 via-rose-300 to-transparent relative rounded-full -mt-2">
-                    <div class="absolute top-[20%] left-1/2 -translate-x-1/2 text-rose-500 bg-slate-900 rounded-full anim-strike"><i data-lucide="chevron-down" class="w-6 h-6"></i></div>
-                    <div class="absolute top-[45%] left-1/2 -translate-x-1/2 text-rose-400 bg-sky-900 rounded-full anim-strike"><i data-lucide="chevron-down" class="w-6 h-6"></i></div>
-                    <div class="absolute top-[70%] left-1/2 -translate-x-1/2 text-rose-300 bg-sky-600 rounded-full anim-strike"><i data-lucide="chevron-down" class="w-6 h-6"></i></div>
-                    
-                    <!-- Blocking Shield -->
-                    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 text-emerald-500 bg-white p-1 rounded-full shadow-lg border border-emerald-200">
-                        <i data-lucide="shield-alert" class="w-8 h-8"></i>
-                    </div>
-                </div>
-            </div>
+    );
+};
 
-            <!-- LAYERS (Padded to make room for vector on the right) -->
-            <div class="bg-slate-900 w-full rounded-[3rem] p-8 pr-32 shadow-2xl relative border border-slate-800">
-                <div class="flex items-center gap-4 mb-4">
-                    <h3 class="text-xl font-bold text-white uppercase tracking-wider">שכבה 1: תשתית וסייבר</h3>
-                    <p class="text-slate-400 text-sm">חסימת גישה היקפית, Geo-Block, חומת אש</p>
-                </div>
+// --- SLIDE COMPONENTS ---
 
-                <div class="bg-sky-900 w-full rounded-[2.5rem] p-8 shadow-[inset_0_10px_30px_rgba(0,0,0,0.5)] border border-sky-800/50 mt-2">
-                    <div class="flex items-center gap-4 mb-4">
-                        <h3 class="text-xl font-bold text-white uppercase tracking-wider">שכבה 2: זיהוי לקוח (KYC)</h3>
-                        <p class="text-sky-200/80 text-sm">אימות אדי״ב ונב״ת 411 בתהליך ההצטרפות</p>
-                    </div>
-
-                    <div class="bg-sky-600 w-full rounded-[2rem] p-8 shadow-[inset_0_10px_20px_rgba(0,0,0,0.3)] border border-sky-500 mt-2">
-                        <div class="flex items-center gap-4 mb-4">
-                            <h3 class="text-xl font-bold text-white uppercase tracking-wider">שכבה 3: מנועי סיכון (Real-Time)</h3>
-                            <p class="text-sky-100 text-sm">חוקיות ו-Wallet Score לבדיקת עסקאות</p>
-                        </div>
-
-                        <!-- Core -->
-                        <div class="bg-white w-full rounded-[1.5rem] p-8 shadow-[0_0_40px_rgba(255,255,255,0.2)] flex items-center justify-between border-4 border-emerald-500/30 mt-2 anim-shield">
-                            <div>
-                                <h3 class="text-2xl font-bold text-emerald-700 mb-1">שכבה 4: ליבת הבקרה האנושית</h3>
-                                <p class="text-slate-500 text-lg font-medium">חקירות עומק, ניטור יומי ע"י אנליסטים וניהול רשימות שחורות לחריגים.</p>
-                            </div>
-                            <div class="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-200">
-                                <i data-lucide="shield-check" class="w-10 h-10 text-emerald-600"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
+// 1. Title Slide
+const TitleSlide = () => (
+    <div className="flex flex-col items-center justify-center h-full text-center space-y-8 bg-gradient-to-br from-sky-50 to-white print:h-full print:w-full">
+      <div className="w-32 h-32 bg-sky-500 rounded-[2.5rem] flex items-center justify-center shadow-2xl shadow-sky-200 print:shadow-none print:border print:border-slate-200">
+        <Shield className="w-16 h-16 text-white" />
+      </div>
+      <div>
+        <h1 className="text-6xl font-black text-slate-800 mb-4 tracking-tight">סקירה שנתית: מעילות והונאות</h1>
+        <h2 className="text-3xl text-sky-600 font-normal">סיכום 2025 ותוכניות ל-2026</h2>
+      </div>
+      <div className="mt-12 px-10 py-3 bg-white rounded-full text-sky-700 text-xl font-bold shadow-xl border border-sky-100 print:shadow-none print:border-slate-300">
+        דירקטוריון פברואר 2026
+      </div>
     </div>
-
-
-    <!-- OPTION 3: THE RADAR (מעגלי אבטחה קונצנטריים) -->
-    <div class="slide">
-        <div class="slide-header">
-            <h2 class="slide-title">אופציה 3: "הרדאר" (Concentric Rings)</h2>
-            <p class="slide-subtitle">הפרדה ברורה בין הייצוג הויזואלי של שכבות ההגנה לבין הפירוט הטקסטואלי</p>
+);
+  
+// 2. Context
+const ContextSlide = () => (
+    <div className="h-full flex flex-col justify-center px-12 overflow-hidden print:h-full print:px-8">
+      <h2 className="text-4xl font-bold text-slate-800 mb-8 border-r-8 border-sky-500 pr-6">רקע ומטרות</h2>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 flex-grow max-h-[70vh] print:max-h-none">
+        <div className="bg-sky-50/60 p-8 rounded-[2rem] border border-sky-100 relative overflow-hidden flex flex-col justify-center print:border-slate-200">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="bg-white p-4 rounded-2xl shadow-sm print:border print:border-slate-200">
+               <Activity className="w-8 h-8 text-sky-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-slate-800">האתגרים שלנו</h3>
+          </div>
+          <div className="space-y-4 text-slate-600 text-xl leading-relaxed">
+            <p>
+              עולם ההונאות משתנה כל הזמן. הסביבה הפנימית והחיצונית מתפתחת בקצב מסחרר עם כניסת טכנולוגיות חדשות ומוצרים פיננסיים חדשים.
+            </p>
+            <p>
+              מול כל אלה, האתגר המרכזי שלנו הוא למנוע ולסכל את הנזק תוך שמירה על חוויית משתמש חלקה ומינימום הפרעה ללקוחות לגיטימיים.
+            </p>
+          </div>
         </div>
-        
-        <div class="flex-grow flex items-center justify-between gap-12 px-6">
+  
+        <div className="bg-white p-8 rounded-[2rem] shadow-lg shadow-slate-100 border border-slate-100 relative flex flex-col justify-center print:border-slate-200">
+          <div className="flex items-center gap-4 mb-6">
+             <div className="bg-sky-100 p-4 rounded-2xl shadow-sm print:border print:border-sky-200">
+                <Target className="w-8 h-8 text-sky-600" />
+             </div>
+            <h3 className="text-2xl font-bold text-slate-800">מה נציג היום?</h3>
+          </div>
+          <ul className="space-y-6 text-slate-600 text-xl">
+            <li className="flex items-start gap-4">
+              <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
+              <span>
+                <strong>תפיסת הפעלה:</strong> סקירה של מעגלי ההגנה הקיימים והניהול המערכתי המפחית סיכונים.
+              </span>
+            </li>
+            <li className="flex items-start gap-4">
+              <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
+              <span>
+                <strong>מיקודים במניעה:</strong> כיצד פעלנו למול מתווי התקיפה הבולטים ביותר בשנה החולפת.
+              </span>
+            </li>
+            <li className="flex items-start gap-4">
+              <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
+              <span>
+                <strong>נתונים מרכזיים מניהול ההונאות משנת 2025.</strong>
+              </span>
+            </li>
+            <li className="flex items-start gap-4">
+              <span className="mt-2 w-2.5 h-2.5 bg-sky-500 rounded-full flex-shrink-0 print-no-shadow"></span>
+              <span>
+                <strong>מבט קדימה:</strong> מיקודים ל-2026.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+);
+
+// 3. Operating Concept (The Funnel - Option 1)
+const OperatingConceptSlide = () => {
+    return (
+        <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
+            <style>{`
+                @keyframes arrow-strike {
+                    0% { transform: translateY(-15px); opacity: 0; }
+                    50% { opacity: 1; }
+                    100% { transform: translateY(15px); opacity: 0; }
+                }
+                .anim-strike { animation: arrow-strike 1.5s infinite; }
+                .anim-strike-delay { animation: arrow-strike 1.5s infinite; animation-delay: 0.75s; }
+
+                @keyframes pulse-shield {
+                    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+                    70% { box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+                    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+                }
+                .anim-shield { animation: pulse-shield 2s infinite; }
+            `}</style>
+
+            <div className="mb-8 text-center">
+                <h2 className="text-4xl font-bold text-slate-800 mb-2">תפיסת ההפעלה: מודל משפך הסינון</h2>
+                <p className="text-slate-500 text-xl font-medium">המחשה חזותית של שכבות ההגנה וסינון האיומים עד לליבה</p>
+            </div>
             
-            <!-- Graphic Right Side (Radar) -->
-            <div class="relative w-[480px] h-[480px] flex items-center justify-center shrink-0">
+            <div className="flex-grow flex flex-col items-center justify-start pt-4">
                 
-                <!-- Attack Vector Lightning -->
-                <div class="absolute top-0 right-0 z-50 transform -translate-x-4 translate-y-4">
-                    <div class="relative">
-                        <div class="absolute inset-0 rounded-full border-2 anim-radar"></div>
-                        <div class="bg-rose-500 text-white text-xs font-bold py-1 px-3 rounded-full shadow-lg border border-rose-400 mb-2 whitespace-nowrap">איום חיצוני</div>
-                        <i data-lucide="zap" class="w-10 h-10 text-rose-500 fill-rose-500 anim-strike transform rotate-12"></i>
+                {/* Attack Vector Top */}
+                <div className="flex flex-col items-center mb-2">
+                    <div className="bg-rose-500 text-white px-6 py-1.5 rounded-full text-sm font-bold uppercase tracking-widest shadow-md mb-2 border border-rose-600">וקטור תקיפה נכנס (איומי סייבר והונאה)</div>
+                    <div className="flex gap-6 text-rose-500 anim-strike">
+                        <ArrowDownToLine className="w-8 h-8 opacity-70" />
+                        <ArrowDownToLine className="w-10 h-10" />
+                        <ArrowDownToLine className="w-8 h-8 opacity-70" />
                     </div>
                 </div>
 
-                <!-- Rings -->
-                <div class="absolute w-full h-full rounded-full border-[24px] border-slate-200 shadow-inner flex items-center justify-center">
-                    <div class="absolute top-4 text-slate-400 font-bold text-sm">תשתית</div>
-                </div>
-                <div class="absolute w-[360px] h-[360px] rounded-full border-[24px] border-sky-100 shadow-[inset_0_4px_15px_rgba(0,0,0,0.05)] flex items-center justify-center">
-                    <div class="absolute top-4 text-sky-400 font-bold text-sm">KYC</div>
-                </div>
-                <div class="absolute w-[240px] h-[240px] rounded-full border-[24px] border-sky-300 shadow-[inset_0_4px_15px_rgba(0,0,0,0.1)] flex items-center justify-center">
-                    <div class="absolute top-4 text-sky-600 font-bold text-sm">Risk Engine</div>
+                {/* Layer 1 */}
+                <div className="w-full bg-slate-800 text-white p-5 rounded-2xl text-center border-t-4 border-rose-500 shadow-lg relative z-10 flex items-center justify-between px-10">
+                    <div className="flex items-center gap-4"><div className="p-2 bg-white/10 rounded-lg"><Server className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 1: תשתית וסייבר</h3></div>
+                    <p className="text-slate-300 font-medium text-lg">חסימת מתקפות רשת, בוטים וגישה ממדינות עוינות (Geo-Block)</p>
                 </div>
                 
-                <!-- Core -->
-                <div class="absolute w-[120px] h-[120px] rounded-full bg-emerald-500 flex items-center justify-center text-white shadow-[0_0_30px_rgba(16,185,129,0.5)] z-10 border-4 border-white anim-shield">
-                    <i data-lucide="shield-check" class="w-12 h-12"></i>
+                {/* Filter 1 */}
+                <div className="flex gap-8 text-rose-400 my-2 anim-strike anim-strike-delay">
+                    <ArrowDown className="w-6 h-6" />
+                    <ArrowDown className="w-6 h-6" />
+                </div>
+
+                {/* Layer 2 */}
+                <div className="w-[90%] bg-sky-900 text-white p-5 rounded-2xl text-center border-t-4 border-rose-400 shadow-lg relative z-20 flex items-center justify-between px-10">
+                    <div className="flex items-center gap-4"><div className="p-2 bg-white/10 rounded-lg"><Fingerprint className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 2: זיהוי ואימות לקוח</h3></div>
+                    <p className="text-sky-200 font-medium text-lg">חסימת זהויות בדויות דרך אימות אדי״ב, נב״ת 411 וזיהוי מכשיר</p>
+                </div>
+
+                {/* Filter 2 */}
+                <div className="flex gap-4 text-rose-300 my-2 anim-strike">
+                    <ArrowDown className="w-6 h-6" />
+                </div>
+
+                {/* Layer 3 */}
+                <div className="w-[80%] bg-sky-600 text-white p-5 rounded-2xl text-center border-t-4 border-rose-300 shadow-lg relative z-30 flex items-center justify-between px-10">
+                    <div className="flex items-center gap-4"><div className="p-2 bg-white/20 rounded-lg"><Cpu className="w-6 h-6" /></div><h3 className="text-xl font-bold">שכבה 3: מנועי סיכון (Real-Time)</h3></div>
+                    <p className="text-sky-100 font-medium text-lg">עצירת פעולות פיננסיות חשודות בזמן אמת ע"י מודל Wallet Score</p>
+                </div>
+
+                {/* Filter 3 (Blocked) */}
+                <div className="h-6 w-1 border-l-2 border-dashed border-rose-300 my-1 relative">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-rose-400"><X className="w-5 h-5" /></div>
+                </div>
+
+                {/* Layer 4 (Core) */}
+                <div className="w-[70%] bg-white text-slate-800 p-6 rounded-2xl text-center border-2 border-emerald-500 shadow-[0_10px_30px_rgba(16,185,129,0.2)] relative z-40 flex items-center justify-between px-10 anim-shield mt-2">
+                    <div className="flex items-center gap-4"><div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg"><ShieldCheck className="w-8 h-8" /></div><h3 className="text-2xl font-bold text-emerald-700">שכבה 4: ליבת הבקרה</h3></div>
+                    <p className="text-slate-600 font-bold text-lg">חקירות אנליסטים, רשימות שחורות וטיפול בחריגים</p>
+                </div>
+
+            </div>
+        </div>
+    );
+};
+
+// 4. Fraud Strategy Part 1
+const FraudStrategySlide = () => (
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
+       <div className="mb-8">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">סוגי הונאות בולטים - מיקודי 2025</h2>
+            <p className="text-slate-600 text-xl max-w-5xl leading-relaxed bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                לרוב, ההונאות ב-PayBox נובעות משימוש בפרטי כרטיסי אשראי גנובים והזנתם לאפליקציה על ידי גורמים עוינים (ATO / Carding). מטרת העבריינים היא להלבין כספים גנובים דרך העברות P2P לאנשי קשר או משיכות לחשבונות בנק (חשבונות קש).
+            </p>
+       </div>
+  
+       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 flex-grow max-h-[60vh] print:max-h-none">
+          {/* Preventive */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-md border border-slate-100 flex flex-col print:border-slate-300">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-14 h-14 bg-sky-50 rounded-2xl flex items-center justify-center print:border print:border-sky-200"><Shield className="w-7 h-7 text-sky-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800">טיפול מניעתי (Proactive)</h3>
+              </div>
+              <ul className="space-y-5 flex-grow">
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
+                    <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0"></div>
+                    <div><strong>שדרוג מנוע סיכונים (Wallet Score):</strong> פיתוח חוקים חדשים תוך שמירה על איזון עדין ומינימום פגיעה במשתמשים לגיטימיים (צמצום False Positives).</div>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
+                    <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0"></div>
+                    <div><strong>זיהוי מכשירים:</strong> הוספת יכולת לאתר משתמשים ללא אנשי קשר במכשיר או המגיעים מאזור זמן שאינו ישראל.</div>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
+                    <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0"></div>
+                    <div><strong>צמצום חשיפה:</strong> הגבלת סכומים בכרטיסים זרים (ל-1,000 ₪) וחסימת משיכות לחשבונות בנק שטרם אומתו.</div>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
+                    <div className="w-2 h-2 rounded-full bg-sky-400 mt-2 shrink-0"></div>
+                    <div><strong>התראות מונעות פישינג:</strong> שינוי ניסוח ה-SMS והתראה על כניסות ממכשירים לא מזוהים.</div>
+                  </li>
+              </ul>
+          </div>
+
+          {/* Reactive */}
+          <div className="bg-white p-8 rounded-[2rem] shadow-md border border-slate-100 flex flex-col print:border-slate-300">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center print:border print:border-rose-200"><ZapOff className="w-7 h-7 text-rose-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800">טיפול תגובתי (Reactive)</h3>
+              </div>
+              <ul className="space-y-5 flex-grow">
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
+                    <div className="w-2 h-2 rounded-full bg-rose-400 mt-2 shrink-0"></div>
+                    <div><strong>ניטור והתערבות אנושית:</strong> תהליך יומי בו צוות אנליסטים מנתח עסקאות חשודות שהוצפו במערכת (על בסיס חוקיות מצטברת) ומבצע עצירה מיידית.</div>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
+                    <div className="w-2 h-2 rounded-full bg-rose-400 mt-2 shrink-0"></div>
+                    <div><strong>חסימות והקפאות (Blacklist & Banned):</strong> מניעת חזרת הונאה דרך חסימה הרמטית לפי מזהה מכשיר, מספר טלפון או תעודת זהות של רשתות עוינות.</div>
+                  </li>
+                  <li className="flex items-start gap-3 text-slate-600 text-lg leading-snug">
+                    <div className="w-2 h-2 rounded-full bg-rose-400 mt-2 shrink-0"></div>
+                    <div><strong>זיכויים וניהול הכחשות:</strong> ניהול תהליכי תגובה מול חברות האשראי, ביטול עסקאות משובשות והחזרת כספים כדי למנוע ספיגת הנזק.</div>
+                  </li>
+              </ul>
+          </div>
+       </div>
+    </div>
+);
+
+// 5. Trends (Part 2)
+const TrendsSlide = () => (
+  <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
+     <div className="mb-10">
+        <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-rose-300 pr-6">סוגי הונאות בולטים - מיקודי 2025 (המשך)</h2>
+        <p className="text-slate-500 text-2xl font-medium">מקרים מורכבים שעקפו את מעגלי ההגנה האוטומטיים ודרשו התערבות וניטור אנושי</p>
+     </div>
+
+     <div className="grid grid-cols-2 gap-12 flex-grow max-h-[60vh] print:max-h-none">
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
+            <div>
+                <div className="flex items-start justify-between mb-6">
+                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100">
+                        <Phone className="w-10 h-10 text-rose-400" />
+                    </div>
+                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print:border-slate-300">
+                        הנדסה חברתית
+                    </div>
+                </div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">הונאת "בזק" / שירות לקוחות</h3>
+                <div className="text-slate-600 text-xl leading-relaxed space-y-4">
+                    <p><strong>כיצד זה מבוצע?</strong> עבריינים יוצרים קשר טלפוני עם הלקוח, מתחזים לנציג שירות וטוענים לחוב דחוף. בדרך זו הם מוציאים במרמה את פרטי האשראי וקוד האימות.</p>
+                    <p><strong>התוצאה:</strong> פתיחת חשבון PayBox חדש על שם הלקוח התמים וביצוע חיובים מיידיים.</p>
+                    <div className="mt-4 inline-block font-semibold text-rose-600 bg-rose-50 px-4 py-2 rounded-xl text-lg print:border print:border-rose-200">פגיעה ממוקדת באוכלוסייה מבוגרת</div>
                 </div>
             </div>
+            <div className="flex items-center gap-8 mt-6 pt-6 border-t border-slate-100">
+                <div><span className="block text-sm text-slate-400 uppercase font-bold tracking-wider">כמות מקרים מנוטרת</span><span className="text-3xl font-black text-slate-700">~24</span></div>
+                 <div className="w-px h-12 bg-slate-200"></div>
+                <div><span className="block text-sm text-slate-400 uppercase font-bold tracking-wider">נזק כספי מטופל</span><span className="text-3xl font-black text-rose-500">₪64k</span></div>
+            </div>
+        </div>
 
-            <!-- Text Left Side -->
-            <div class="flex flex-col gap-5 flex-grow">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 border-r-4 border-r-slate-300">
-                    <div class="p-3 bg-slate-50 rounded-xl"><i data-lucide="server" class="w-6 h-6 text-slate-500"></i></div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800">1. תשתית וסייבר</h3>
-                        <p class="text-slate-500 text-sm">חומת אש (Firewall), חסימות אזוריות והגנה ממתקפות רשת.</p>
+        <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all relative overflow-hidden flex flex-col justify-between h-full print:border-slate-300">
+             <div>
+                <div className="flex items-start justify-between mb-6">
+                    <div className="bg-rose-50 p-5 rounded-2xl print:border print:border-rose-100">
+                        <Utensils className="w-10 h-10 text-rose-400" />
                     </div>
+                    <div className="bg-slate-50 px-5 py-2 rounded-full text-base font-bold text-slate-600 border border-slate-200 print:border-slate-300">פישינג ממוקד</div>
                 </div>
-
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 border-r-4 border-r-sky-200">
-                    <div class="p-3 bg-sky-50 rounded-xl"><i data-lucide="fingerprint" class="w-6 h-6 text-sky-500"></i></div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800">2. זיהוי לקוח (KYC)</h3>
-                        <p class="text-slate-500 text-sm">בדיקות רגולציה (נב״ת 411), אימות אדי״ב ובניית פרופיל סיכון.</p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4 border-r-4 border-r-sky-400">
-                    <div class="p-3 bg-sky-100 rounded-xl"><i data-lucide="cpu" class="w-6 h-6 text-sky-600"></i></div>
-                    <div>
-                        <h3 class="text-xl font-bold text-slate-800">3. מנועי סיכון אוטומטיים</h3>
-                        <p class="text-slate-500 text-sm">ניתוח עסקאות בזמן אמת ע"י חוקים חכמים ומודל Wallet Score.</p>
-                    </div>
-                </div>
-
-                <div class="bg-emerald-50 p-5 rounded-2xl shadow-md border border-emerald-100 flex items-center gap-4 border-r-4 border-r-emerald-500">
-                    <div class="p-3 bg-emerald-500 rounded-xl shadow-inner"><i data-lucide="users" class="w-6 h-6 text-white"></i></div>
-                    <div>
-                        <h3 class="text-xl font-bold text-emerald-800">4. בקרה אנושית (ליבת ההגנה)</h3>
-                        <p class="text-emerald-600 text-sm font-medium">צוות אנליסטים לניטור חריגים, חקירות עומק ורשימות שחורות.</p>
-                    </div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">הונאת "מסעדות"</h3>
+                <div className="text-slate-600 text-xl leading-relaxed space-y-4">
+                    <p><strong>כיצד זה מבוצע?</strong> הלקוח מקבל שיחה ממתחזה ל"מסעדה" דקה לאחר ביצוע הזמנה לגיטימית. נטען כי "התשלום לא עבר" ומבוקש קוד האימות לסיום העסקה.</p>
+                    <p><strong>התוצאה:</strong> השתלטות מלאה על החשבון הקיים של הלקוח וביצוע עסקאות בלתי מורשות.</p>
+                    <div className="mt-4 inline-block font-semibold text-rose-600 bg-rose-50 px-4 py-2 rounded-xl text-lg print:border print:border-rose-200">ניצול ציני של הלחץ וחוסר תשומת הלב</div>
                 </div>
             </div>
+            <div className="flex items-center gap-8 mt-6 pt-6 border-t border-slate-100">
+                <div><span className="block text-sm text-slate-400 uppercase font-bold tracking-wider">כמות מקרים מנוטרת</span><span className="text-3xl font-black text-slate-700">~35</span></div>
+                 <div className="w-px h-12 bg-slate-200"></div>
+                <div><span className="block text-sm text-slate-400 uppercase font-bold tracking-wider">נזק כספי מטופל</span><span className="text-3xl font-black text-rose-500">₪180k</span></div>
+            </div>
+        </div>
+     </div>
+  </div>
+);
 
+// 6. Chart
+const ChartSlide = () => {
+    const latestData = chartData[3]; 
+    const prevData = chartData[2];
+    
+    const totalExposure = latestData.totalExposure;
+    const totalSaved = latestData.totalSaved;
+    const savedPercentage = latestData.quality;
+    const improvement = ((latestData.quality - prevData.quality) / prevData.quality) * 100;
+    const damageReduced = prevData.damage - latestData.damage;
+  
+    const CustomTooltip = ({ active, payload, label }) => {
+      if (active && payload && payload.length) {
+        const getVal = (key) => payload.find(p => p.dataKey === key)?.value || 0;
+        
+        return (
+          <div className="bg-white p-4 border border-slate-100 shadow-2xl rounded-xl font-sans text-right min-w-[240px]" dir="rtl">
+            <p className="font-bold text-slate-800 text-lg mb-2 border-b pb-2">{label}</p>
+            <div className="space-y-2 text-base">
+               <div className="flex justify-between items-center"><span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: colors.chart.savedNear}}></span>מניעה אקטיבית:</span><span className="font-medium text-slate-700">{formatCurrency(getVal('savedNear'))}</span></div>
+               <div className="flex justify-between items-center"><span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: colors.chart.savedRetro}}></span>ניכוי יתרה:</span><span className="font-medium text-slate-700">{formatCurrency(getVal('savedRetro'))}</span></div>
+               <div className="flex justify-between items-center"><span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: colors.chart.savedCollection}}></span>גבייה:</span><span className="font-medium text-slate-700">{formatCurrency(getVal('savedCollection'))}</span></div>
+               <div className="my-2 pt-2 border-t border-dashed border-slate-200 flex justify-between items-center bg-sky-50 -mx-4 px-4 py-1">
+                  <span className="font-bold text-sky-700">סה״כ נחסך:</span>
+                  <span className="font-bold text-sky-700">{formatCurrency(getVal('savedCollection') + getVal('savedRetro') + getVal('savedNear'))}</span>
+               </div>
+               <div className="flex justify-between items-center pt-1"><span className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full" style={{backgroundColor: colors.chart.damage}}></span>נזק בפועל:</span><span className="font-bold text-rose-500">{formatCurrency(getVal('damage'))}</span></div>
+               <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between items-center">
+                  <span className="font-bold text-slate-800">איכות מניעה:</span>
+                  <span className="font-black text-sky-600 text-lg">{getVal('quality')}%</span>
+               </div>
+            </div>
+          </div>
+        );
+      }
+      return null;
+    };
+  
+    return (
+    <div className="h-full flex flex-col px-8 overflow-hidden print:h-full print:px-6">
+      <div className="w-full h-full flex flex-col origin-top transform scale-90 print:scale-100" style={{ transformOrigin: 'top center' }}>
+          <div className="mb-4">
+              <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
+              <p className="text-xl text-slate-500">סיכום מגמות, חשיפה ומניעה כספית</p>
+          </div>
+
+          <div className="flex gap-8 h-full pb-4">
+              
+              <div className="w-1/4 flex flex-col gap-4">
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
+                      <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-500"></div>
+                      <div>
+                          <div className="text-slate-500 font-medium text-base mb-1">איכות מניעה (%)</div>
+                          <div className="text-5xl font-black text-slate-800">{savedPercentage}%</div>
+                      </div>
+                      <div className="flex flex-col gap-1 mt-2 text-slate-500 text-sm">
+                          <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full w-fit print:border print:border-emerald-200">
+                            <TrendingUp className="w-4 h-4" />
+                            <span className="font-bold text-base">+{improvement.toFixed(1)}%</span>
+                          </div>
+                          <p>שיפור משמעותי לעומת 2024 המעיד על ייעול הבקרות.</p>
+                      </div>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
+                      <div className="absolute top-0 right-0 w-1.5 h-full bg-sky-300"></div>
+                      <div>
+                          <div className="text-slate-500 font-medium text-base mb-1">כסף שהוצל (סה"כ)</div>
+                          <div className="text-4xl font-black text-sky-600">{formatCurrency(totalSaved)}</div>
+                      </div>
+                      <div className="mt-2 text-slate-500 text-sm leading-snug">
+                          <p className="mb-1">מתוך חשיפה של <strong>{formatCurrency(totalExposure)}</strong></p>
+                          <p>על כל שקל נזק, המערך חסך לחברה כ-4 שקלים.</p>
+                      </div>
+                  </div>
+
+                  <div className="bg-white p-4 rounded-[1.5rem] shadow-sm border border-slate-100 flex flex-col justify-between flex-1 relative overflow-hidden print:border-slate-300">
+                      <div className="absolute top-0 right-0 w-1.5 h-full bg-rose-400"></div>
+                      <div>
+                          <div className="text-slate-500 font-medium text-base mb-1">נזק בפועל</div>
+                          <div className="text-4xl font-black text-rose-500">{formatCurrency(latestData.damage)}</div>
+                      </div>
+                      <div className="mt-2 text-slate-500 text-sm flex flex-col gap-1">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-sky-500" />
+                            <span>ירידה של <strong>{formatCurrency(damageReduced)}</strong></span>
+                          </div>
+                          <p>רמת הנזק הנמוכה ביותר שנרשמה ב-3 השנים האחרונות.</p>
+                      </div>
+                  </div>
+
+                  <div className="bg-amber-50 p-4 rounded-[1.5rem] shadow-sm border border-amber-200 flex flex-col justify-center relative overflow-hidden print:border-amber-300">
+                      <div className="flex items-center gap-2 mb-1">
+                          <AlertCircle className="w-5 h-5 text-amber-600" />
+                          <div className="text-amber-800 font-bold text-base">עדכון נתונים שוטף</div>
+                      </div>
+                      <p className="text-amber-900 text-sm leading-tight font-medium">
+                          התקבלו הכחשות נוספות (2025) בסך <strong>330k ₪</strong> הממתינות כעת לסיווג.
+                      </p>
+                      <div className="mt-2 text-amber-700/70 text-xs border-t border-amber-200 pt-1">
+                          * הכחשות מתקבלות בהשהיה של עד חצי שנה ממועד העסקה.
+                      </div>
+                  </div>
+              </div>
+
+              <div className="w-3/4 flex flex-col gap-3">
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative print:border-slate-300">
+                      <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-10 print:border print:border-slate-200">
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
+                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
+                      </div>
+
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={chartData} margin={{top: 50, right: 10, bottom: 5, left: 0}}>
+                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
+                            <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 16, fontWeight: 600}} dy={10} />
+                            <YAxis yAxisId="left" tickFormatter={formatMillions} axisLine={false} tickLine={false} tick={{fill: '#94a3b8', fontSize: 14}} />
+                            <YAxis yAxisId="right" orientation="right" tickFormatter={(v)=>`${v}%`} axisLine={false} tickLine={false} tick={{fill: '#0ea5e9', fontSize: 14, fontWeight: 700}} />
+                            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+                            
+                            <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
+                            <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
+                            <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
+                            <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]} />
+                            
+                            <Line yAxisId="right" type="monotone" dataKey="quality" name="איכות מניעה" stroke={colors.chart.line} strokeWidth={5} dot={{r:6, fill: colors.chart.line, strokeWidth: 0}} />
+                        </ComposedChart>
+                      </ResponsiveContainer>
+                  </div>
+
+                  <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-center gap-4 print:border-sky-200">
+                      <div className="bg-sky-500 text-white p-2 rounded-lg">
+                          <Zap className="w-5 h-5" />
+                      </div>
+                      <div>
+                          <h4 className="font-bold text-sky-900 text-lg mb-0.5">מגמה חיובית עקבית</h4>
+                          <p className="text-sky-800 text-base leading-snug">
+                              הנתונים מצביעים בבירור על העלייה באפקטיביות ההגנה: אנו עוצרים כספים רבים יותר בזמן אמת, תוך הקטנה דרסטית של הנזק הנספג.
+                          </p>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+    );
+};
+
+// 7. Embezzlement 2025
+const EmbezzlementSlide = () => (
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
+        <div className="mb-10 text-center shrink-0">
+            <h2 className="text-4xl font-bold text-slate-800 mb-2 border-b-4 border-indigo-500 inline-block pb-2">ניהול סיכוני מעילות פנים - סיכום 2025</h2>
+            <p className="text-slate-500 text-2xl">חיזוק מעטפת ההגנה מבית ומניעת אי-סדרים</p>
+        </div>
+        <div className="grid grid-cols-3 gap-8 flex-grow max-h-[50vh] min-h-0">
+            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
+                <div className="flex items-center gap-4 mb-5 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><Scale className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מדיניות ונהלים</h3></div>
+                <ul className="text-slate-600 text-lg leading-relaxed space-y-4 flex-grow overflow-y-auto">
+                    <li>• ביצוע עדכון מקיף ויסודי לנוהל מהימנות עובדים בארגון.</li>
+                    <li>• החמרת הקריטריונים הנדרשים לסיווג עובדים לתפקידים רגישים ("רמה א׳").</li>
+                    <li>• שילוב מערך של בדיקות נאותות מוגברות ומבחני מהימנות טרם כניסה לתפקיד.</li>
+                </ul>
+            </div>
+            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
+                <div className="flex items-center gap-4 mb-5 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><ShieldAlert className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">מיפוי ובקרה</h3></div>
+                <ul className="text-slate-600 text-lg leading-relaxed space-y-4 flex-grow overflow-y-auto">
+                    <li>• עריכת מיפוי של תהליכי הליבה בארגון ואיתור מוקדי סיכון פוטנציאליים למעילות.</li>
+                    <li>• יישום עקרון בסיסי של הפרדת סמכויות (Segregation of Duties) במערכות המידע.</li>
+                    <li>• כתיבה ויישום תוכנית סדורה להפחתת חשיפות קיימות והטמעת בקרות מפצות.</li>
+                </ul>
+            </div>
+            <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-slate-100 hover:shadow-xl transition-all group flex flex-col h-full overflow-hidden print:border-slate-300 print:shadow-none">
+                <div className="flex items-center gap-4 mb-5 shrink-0"><div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center group-hover:bg-indigo-100 transition-colors print:border print:border-indigo-200"><GraduationCap className="w-7 h-7 text-indigo-600" /></div><h3 className="text-xl font-bold text-slate-800">תרבות ומודעות</h3></div>
+                <ul className="text-slate-600 text-lg leading-relaxed space-y-4 flex-grow overflow-y-auto">
+                    <li>• העברת הדרכות ייעודיות לצוותים אופרטיביים הנמצאים במוקדי סיכון גבוה.</li>
+                    <li>• חיזוק מערך האתיקה הארגונית והטמעת מנגנוני דיווח אנונימיים ובטוחים.</li>
+                    <li>• פעילות אקטיבית להטמעת תרבות של "אפס סובלנות" בנושאי מעילות ואי-סדרים.</li>
+                </ul>
+            </div>
         </div>
     </div>
+);
 
-    <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+// 8. Transition to 2026
+const SectionTransitionSlide = () => (
+    <div className="flex flex-col items-center justify-center h-full text-center bg-gradient-to-br from-sky-600 to-indigo-800 print:h-full print:w-full print:bg-white print:border-8 print:border-sky-600 animate-fadeIn">
+        <div className="w-28 h-28 bg-white/10 rounded-full flex items-center justify-center mb-8 backdrop-blur-md print:bg-sky-100 print:border print:border-sky-200">
+            <Compass className="w-14 h-14 text-white print:text-sky-600" />
+        </div>
+        <h1 className="text-7xl font-black text-white mb-6 tracking-tight drop-shadow-lg print:text-slate-800 print:drop-shadow-none">מבט קדימה</h1>
+        <h2 className="text-4xl text-sky-100 font-medium print:text-slate-500">מיקודים, תכנון ואסטרטגיה לשנת 2026</h2>
+    </div>
+);
+
+// 9. Outlook 2026
+const FutureOutlookSlide = () => (
+    <div className="h-full flex flex-col justify-center px-16 animate-fadeIn overflow-hidden print:h-full print:px-8">
+        <div className="mb-10">
+            <h2 className="text-4xl font-bold text-slate-800 mb-4 border-r-8 border-sky-400 pr-6">מיקודים לשנת 2026</h2>
+            <p className="text-slate-500 text-2xl">התאמת תפיסת ההפעלה לאיומים ולסביבה הטכנולוגית המשתנה</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 flex-grow max-h-[65vh] print:max-h-none">
+            <div className="bg-slate-700 text-white p-8 rounded-[2rem] shadow-xl transform hover:scale-105 transition duration-300 flex flex-col print:shadow-none print:border print:border-slate-600">
+                <div className="bg-white/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-6 backdrop-blur-md shadow-inner"><Smartphone className="w-8 h-8 text-white" /></div>
+                <h3 className="text-2xl font-bold mb-4">מוצרים ושירותים חדשים</h3>
+                <p className="text-slate-300 text-lg leading-relaxed">
+                    שימת דגש על איתור ולמידה של מתווי הונאה חדשים בסביבת המוצרים המתרחבת. בניית מעטפת הגנה ובקרות מותאמות לשירותים החדשים, ביניהם: העברות תשלום בזמן אמת (RTP), שירותי ערבויות, וחשבונות קטינים (PayBox Young).
+                </p>
+            </div>
+            
+            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
+                <div className="bg-sky-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Sparkles className="w-8 h-8 text-sky-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">בינה מלאכותית (AI)</h3>
+                <p className="text-slate-500 text-lg leading-relaxed">
+                    שילוב נרחב ומשמעותי של כלים מבוססי בינה מלאכותית ולמידת מכונה (Machine Learning) כחלק אינטגרלי מתהליכי הניטור, האיתור והזיהוי המהיר של הונאות מורכבות במערכות החברה.
+                </p>
+            </div>
+
+            <div className="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-lg transform hover:scale-105 transition duration-300 flex flex-col print:border-slate-300 print:shadow-none">
+                <div className="bg-indigo-50 w-16 h-16 rounded-2xl flex items-center justify-center mb-6"><Archive className="w-8 h-8 text-indigo-500" /></div>
+                <h3 className="text-2xl font-bold text-slate-800 mb-4">ניהול סיכוני פנים (מעילות)</h3>
+                <p className="text-slate-500 text-lg leading-relaxed">
+                    הטמעת בקרות טכנולוגיות אוטומטיות לזיהוי "התעוררות" חשודה של חשבונות ללא פעילות (Dormant Accounts). בנוסף, בחינה מחודשת של נוהל המהימנות והגדלת תדירות חובת הפוליגרף לעובדים בתפקידים רגישים.
+                </p>
+            </div>
+        </div>
+    </div>
+);
+
+// 10. Thank You
+const ThankYouSlide = () => (
+    <div className="flex flex-col items-center justify-center h-full text-center space-y-10 animate-fadeIn bg-gradient-to-tl from-sky-50 to-white print:h-full print:w-full">
+        <div className="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center mb-4 shadow-sm print:shadow-none print:border print:border-slate-300"><ShieldCheck className="w-16 h-16 text-sky-500" /></div>
+        <div><h1 className="text-8xl font-extrabold text-slate-800 mb-4 tracking-tight">תודה רבה</h1></div>
+    </div>
+);
+
+// --- MAIN APP ---
+const BoardPresentation = () => {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [currentSlide, setCurrentSlide] = useState(0);
+    const [isPrintMode, setIsPrintMode] = useState(false);
+    const [commentsVisible, setCommentsVisible] = useState(true);
+    const [newCommentPos, setNewCommentPos] = useState(null);
+    const [connectionStatus, setConnectionStatus] = useState('checking'); 
+    const containerRef = useRef(null);
+
+    const slides = [
+        { component: <TitleSlide />, label: "פתיחה" },
+        { component: <ContextSlide />, label: "רקע ומטרות" },
+        { component: <OperatingConceptSlide />, label: "תפיסת ההפעלה" },
+        { component: <FraudStrategySlide />, label: "סוגי הונאות 2025" },
+        { component: <TrendsSlide />, label: "מגמות ודוגמאות הונאה" },
+        { component: <ChartSlide />, label: "נתוני מניעה ונזק" },
+        { component: <EmbezzlementSlide />, label: "סיכוני מעילות 2025" },
+        { component: <SectionTransitionSlide />, label: "מעבר ל-2026" },
+        { component: <FutureOutlookSlide />, label: "מיקודים ל-2026" },
+        { component: <ThankYouSlide />, label: "סיום" },
+    ];
+
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!isAuthenticated || isPrintMode) return;
+            if (e.key === 'ArrowLeft') setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
+            else if (e.key === 'ArrowRight') setCurrentSlide(prev => Math.max(prev - 1, 0));
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isAuthenticated, isPrintMode, slides.length]);
+
+    const nextSlide = () => setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
+    const prevSlide = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
+
+    const handleContainerContextMenu = (e) => {
+        if (!commentsVisible || isPrintMode) return;
+        e.preventDefault();
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        setNewCommentPos({ x, y });
+    };
+
+    if (!isAuthenticated) return <LoginScreen onLogin={() => setIsAuthenticated(true)} />;
+
+    if (isPrintMode) {
+        return (
+            <div className="bg-white min-h-screen font-sans p-0 m-0" dir="rtl" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+                <style>{`
+                    @media print {
+                        @page { size: landscape; margin: 0; }
+                        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: white; margin: 0; padding: 0; }
+                        .no-print { display: none !important; }
+                        * { box-shadow: none !important; text-shadow: none !important; filter: none !important; }
+                        .print-slide { break-after: always; page-break-after: always; width: 297mm; height: 210mm; overflow: hidden; display: flex; flex-direction: column; }
+                        .print-scale-90 { transform: scale(0.9); transform-origin: center; width: 100%; height: 100%; }
+                        .print-border { border: 1px solid #cbd5e1 !important; }
+                        .print-no-shadow { box-shadow: none !important; }
+                    }
+                `}</style>
+                <div className="fixed top-4 right-4 z-50 flex gap-4 no-print">
+                    <button onClick={() => window.print()} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-full shadow-lg transition-all"><Printer className="w-5 h-5" />הדפס / שמור כ-PDF</button>
+                    <button onClick={() => setIsPrintMode(false)} className="flex items-center gap-2 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-full shadow-md transition-all"><X className="w-5 h-5" />חזור למצגת</button>
+                </div>
+                <div className="flex flex-col">
+                    {slides.map((slide, index) => (
+                        <div key={index} className="print-slide relative w-screen h-screen overflow-hidden bg-white border-b-2 border-slate-100 print:border-none">
+                            <div className="absolute top-4 left-6 text-slate-300 text-sm font-bold z-10">{index + 1} / {slides.length} • {APP_VERSION}</div>
+                            <div className="w-full h-full print-scale-90">{slide.component}</div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="w-screen h-screen flex flex-col items-center justify-center bg-slate-100 p-8 overflow-hidden font-sans" style={{fontFamily: 'system-ui, -apple-system, sans-serif'}}>
+            <div className="bg-white w-[98vw] h-[92vh] rounded-[3.5rem] shadow-2xl border border-white/60 relative overflow-hidden flex flex-col">
+                <div className="w-full h-3 bg-sky-50"><div className="h-full bg-sky-500 transition-all duration-700 ease-in-out" style={{ width: `${((currentSlide + 1) / slides.length) * 100}%` }}></div></div>
+                <div className="flex-grow relative overflow-hidden" ref={containerRef} onContextMenu={handleContainerContextMenu}>
+                    <CommentsLayer slideIndex={currentSlide} isVisible={commentsVisible} containerRef={containerRef} newCommentPos={newCommentPos} setNewCommentPos={setNewCommentPos} onStatusChange={setConnectionStatus} />
+                    {slides[currentSlide].component}
+                </div>
+                <div className="h-28 bg-white border-t border-slate-50 flex items-center justify-between px-16 shrink-0">
+                    <div className="text-slate-400 text-xl font-medium flex gap-4"><span>שקף {currentSlide + 1} מתוך {slides.length} | {slides[currentSlide].label}</span></div>
+                    <div className="flex gap-6 items-center">
+                        <div className="flex items-center gap-2 ml-4 cursor-pointer hover:opacity-80 transition" title={connectionStatus === 'cloud' ? 'מחובר לענן' : 'מצב מקומי (לחץ לניסיון חיבור)'} onClick={() => window.location.reload()}>
+                            {connectionStatus === 'cloud' ? 
+                                <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg text-xs font-bold border border-emerald-100"><Cloud className="w-3 h-3" /> Online</div> : 
+                                <div className="flex items-center gap-1 text-orange-600 bg-orange-50 px-2 py-1 rounded-lg text-xs font-bold border border-orange-100"><CloudOff className="w-3 h-3" /> Local</div>
+                            }
+                        </div>
+                        <button onClick={() => setCommentsVisible(!commentsVisible)} className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all font-semibold mr-2 ${commentsVisible ? 'text-sky-600 bg-sky-50' : 'text-slate-400 bg-slate-50'}`} title="הערות"><MessageCircle className="w-5 h-5" /></button>
+                        <button onClick={() => setIsPrintMode(true)} className="flex items-center gap-2 text-sky-600 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-4 py-2 rounded-xl transition-all font-semibold mr-4" title="הכן להדפסה"><Printer className="w-5 h-5" /><span className="hidden md:inline">הכן להדפסה / PDF</span></button>
+                        <div className="h-8 w-px bg-slate-200 mx-2"></div>
+                        <button onClick={prevSlide} disabled={currentSlide === 0} className={`p-5 rounded-full ${currentSlide === 0 ? 'text-slate-300 bg-slate-50' : 'bg-white shadow-lg border border-slate-100 text-slate-600 hover:bg-sky-50 hover:text-sky-600'} transition-all`}><ChevronRight className="w-8 h-8" /></button>
+                        <button onClick={nextSlide} disabled={currentSlide === slides.length - 1} className={`p-5 rounded-full ${currentSlide === slides.length - 1 ? 'text-slate-300 bg-slate-50' : 'bg-sky-500 shadow-xl shadow-sky-200 text-white hover:bg-sky-600 hover:shadow-sky-300'} transition-all`}><ChevronLeft className="w-8 h-8" /></button>
+                    </div>
+                </div>
+            </div>
+            <div className="text-center mt-6 text-slate-400 text-lg font-medium">Fraud Prevention Operations • Board Meeting Q1 2026 • {APP_VERSION}</div>
+        </div>
+    );
+};
+
+export default BoardPresentation;
