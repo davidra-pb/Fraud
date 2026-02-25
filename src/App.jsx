@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.43";
+const APP_VERSION = "v.1.44";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -693,25 +693,42 @@ const ChartSlide = () => {
               </div>
 
               {/* Chart & Insights Area (Left Side) */}
-              <div className="w-2/3 flex flex-col gap-3 relative">
+              <div className="w-2/3 flex flex-col gap-4 relative">
 
-                  {/* Chart */}
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative pt-14 print:border-slate-300">
+                  {/* Insights Box (Top) */}
+                  <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-start gap-4 shrink-0 print:border-sky-200">
+                      <div className="bg-sky-500 text-white p-2.5 rounded-xl shrink-0 mt-1">
+                          <Zap className="w-6 h-6" />
+                      </div>
+                      <div>
+                          <h4 className="font-bold text-sky-900 text-xl mb-2">תובנות מרכזיות</h4>
+                          <ul className="text-sky-800 text-lg leading-relaxed space-y-1">
+                              <li className="flex items-start gap-2">
+                                  <span className="text-sky-500 mt-1">•</span>
+                                  <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות והשקת המוצרים החדשים.</span>
+                              </li>
+                              <li className="flex items-start gap-2">
+                                  <span className="text-sky-500 mt-1">•</span>
+                                  <span><strong>זינוק במניעה:</strong> מתוך סך החשיפה, החברה הצליחה להציל <strong>{formatCurrency(totalSaved)}</strong>. מדובר בשיפור של <strong>{qualityDelta}%</strong> באיכות המניעה ביחס לאשתקד.</span>
+                              </li>
+                          </ul>
+                      </div>
+                  </div>
 
-                      {/* Trend Arrow Overlay (Beautiful Thick Curved Arrow) */}
-                      <div className="absolute top-[35px] left-[15%] right-[10%] bottom-[120px] pointer-events-none z-10 drop-shadow-lg">
-                         <svg viewBox="0 0 1000 300" width="100%" height="100%" style={{overflow: 'visible'}}>
+                  {/* Chart (Bottom) */}
+                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative pt-16 print:border-slate-300">
+
+                      {/* Trend Arrow Overlay (Moved inside chart for relative positioning) */}
+                      <div className="absolute top-[80px] left-[10%] right-[10%] bottom-[60px] pointer-events-none z-10 drop-shadow-lg">
+                         <svg viewBox="0 0 1000 300" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
                             <defs>
                                 <marker id="trendArrowSolid" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto">
                                     <path d="M 0,0 L 14,7 L 0,14 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            {/* The curve goes from right to left in RTL visually, but SVG coordinates are LTR.
-                                We want it to start from the highest bar (2022) to the lowest damage area (2025).
-                                2022 is on the right side of the chart visually in RTL. */}
-                            <path d="M 900,10 Q 500,60 100,160" fill="none" stroke="#10b981" strokeWidth="8" strokeLinecap="round" markerEnd="url(#trendArrowSolid)" opacity="0.85"/>
+                            <path d="M 900,10 Q 500,60 100,180" fill="none" stroke="#10b981" strokeWidth="8" strokeLinecap="round" markerEnd="url(#trendArrowSolid)" opacity="0.85"/>
                          </svg>
-                         <div className="absolute top-[25%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-white/95 px-5 py-2 rounded-full border border-emerald-100 shadow-md whitespace-nowrap">
+                         <div className="absolute top-[30%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-white/95 px-5 py-2 rounded-full border border-emerald-100 shadow-md whitespace-nowrap">
                              <span className="text-emerald-600 font-bold text-sm flex items-center gap-2">
                                  <TrendingUp className="w-4 h-4 transform rotate-180" />
                                  מגמת ירידה עקבית בהיקפי ההונאה מ-2022
@@ -719,7 +736,7 @@ const ChartSlide = () => {
                          </div>
                       </div>
 
-                      <div className="flex gap-6 text-sm font-medium absolute top-4 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-20 print:border print:border-slate-200">
+                      <div className="flex gap-6 text-sm font-medium absolute top-5 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-20 print:border print:border-slate-200">
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
                         <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
@@ -741,26 +758,6 @@ const ChartSlide = () => {
                             </Bar>
                         </ComposedChart>
                       </ResponsiveContainer>
-                  </div>
-
-                  {/* Insights Box */}
-                  <div className="bg-sky-50 border border-sky-100 p-4 rounded-2xl flex items-start gap-4 shrink-0 print:border-sky-200">
-                      <div className="bg-sky-500 text-white p-2.5 rounded-xl shrink-0 mt-1">
-                          <Zap className="w-6 h-6" />
-                      </div>
-                      <div>
-                          <h4 className="font-bold text-sky-900 text-xl mb-2">תובנות מרכזיות</h4>
-                          <ul className="text-sky-800 text-lg leading-relaxed space-y-1">
-                              <li className="flex items-start gap-2">
-                                  <span className="text-sky-500 mt-1">•</span>
-                                  <span><strong>יציבות בחשיפה:</strong> היקף ההונאות הכללי נותר יציב ביחס לשנה שעברה, על אף המשך הגידול המשמעותי בהיקף הפעילות והשקת המוצרים החדשים.</span>
-                              </li>
-                              <li className="flex items-start gap-2">
-                                  <span className="text-sky-500 mt-1">•</span>
-                                  <span><strong>זינוק במניעה:</strong> מתוך סך החשיפה, החברה הצליחה להציל <strong>{formatCurrency(totalSaved)}</strong>. מדובר בשיפור של <strong>{qualityDelta}%</strong> באיכות המניעה ביחס לאשתקד.</span>
-                              </li>
-                          </ul>
-                      </div>
                   </div>
               </div>
           </div>
