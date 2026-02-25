@@ -15,7 +15,7 @@ import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged }
 import { getFirestore, collection, addDoc, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 // --- CONFIG ---
-const APP_VERSION = "v.1.45";
+const APP_VERSION = "v.1.46";
 
 // --- FIREBASE SETUP (Safe Initialization) ---
 let app, auth, db;
@@ -585,7 +585,7 @@ const TrendsSlide = () => (
   </div>
 );
 
-// 6. Chart (Layout Optimized & Correct Arrow)
+// 6. Chart (Enhanced with Insights and Refined Trend Arrow)
 const ChartSlide = () => {
     const latestData = chartData[3];
     const prevData = chartData[2];
@@ -651,7 +651,7 @@ const ChartSlide = () => {
     <div className="h-full flex flex-col px-8 overflow-hidden print:h-full print:px-6">
       <div className="w-full h-full flex flex-col origin-top transform scale-90 print:scale-100" style={{ transformOrigin: 'top center' }}>
 
-          <div className="mb-4 flex justify-between items-end">
+          <div className="mb-4 flex justify-between items-end shrink-0">
               <div>
                   <h2 className="text-4xl font-bold text-slate-800 mb-2">נתוני מניעה ונזק - 2025</h2>
                   <p className="text-xl text-slate-500">סיכום מגמות, חשיפה ומניעה כספית</p>
@@ -678,53 +678,61 @@ const ChartSlide = () => {
               </div>
           </div>
 
-          <div className="flex gap-8 flex-grow pb-4 min-h-[400px]">
+          <div className="flex gap-8 flex-grow pb-2 min-h-0">
 
               {/* Chart Area (Left Side - Takes more space now) */}
               <div className="w-3/4 flex flex-col gap-3 relative">
-                  <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 flex-grow relative pt-16 print:border-slate-300">
+                  <div className="bg-white p-5 rounded-[2rem] shadow-sm border border-slate-100 flex-grow flex flex-col relative print:border-slate-300">
 
-                      {/* CORRECTED Trend Arrow Overlay (Left to Right downward trend) */}
-                      <div className="absolute top-[80px] left-[10%] right-[10%] bottom-[60px] pointer-events-none z-10 drop-shadow-lg">
-                         <svg viewBox="0 0 1000 300" width="100%" height="100%" style={{overflow: 'visible'}}>
+                      {/* NEW: Top centered text */}
+                      <div className="flex justify-center mb-0 z-20 shrink-0 relative top-2">
+                          <div className="bg-emerald-50 px-5 py-1.5 rounded-full border border-emerald-100 shadow-sm whitespace-nowrap">
+                              <span className="text-emerald-700 font-bold text-sm flex items-center gap-2">
+                                  <TrendingUp className="w-4 h-4 transform rotate-180" />
+                                  מגמת ירידה עקבית בהיקפי הונאה
+                              </span>
+                          </div>
+                      </div>
+
+                      {/* SVG Arrow Overlay - Moved up and thinned */}
+                      <div className="absolute top-[40px] left-[10%] right-[10%] bottom-[100px] pointer-events-none z-10">
+                         <svg viewBox="0 0 1000 300" width="100%" height="100%" preserveAspectRatio="none" style={{overflow: 'visible'}}>
                             <defs>
-                                <marker id="trendArrowSolid" markerWidth="14" markerHeight="14" refX="10" refY="7" orient="auto">
-                                    <path d="M 0,0 L 14,7 L 0,14 Z" fill="#10b981" />
+                                <marker id="trendArrowElegant" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+                                    <path d="M 0,0 L 8,4 L 0,8 Z" fill="#10b981" />
                                 </marker>
                             </defs>
-                            {/* Arrow path from Left (2022) to Right (2025) going downwards */}
-                            <path d="M 100,10 Q 500,60 900,160" fill="none" stroke="#10b981" strokeWidth="8" strokeLinecap="round" markerEnd="url(#trendArrowSolid)" opacity="0.85"/>
+                            {/* Corrected path: Starts left (2022) at y=20, curves to right (2025) at y=90 */}
+                            <path d="M 120,20 Q 500,40 880,90" fill="none" stroke="#10b981" strokeWidth="4" strokeLinecap="round" markerEnd="url(#trendArrowElegant)" opacity="0.6"/>
                          </svg>
-                         <div className="absolute top-[35%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 bg-white/95 px-5 py-2 rounded-full border border-emerald-100 shadow-md whitespace-nowrap">
-                             <span className="text-emerald-600 font-bold text-sm flex items-center gap-2">
-                                 <TrendingUp className="w-4 h-4 transform rotate-180" />
-                                 מגמת ירידה עקבית בהיקפי ההונאה מ-2022
-                             </span>
-                         </div>
                       </div>
 
-                      <div className="flex gap-6 text-sm font-medium absolute top-5 left-6 bg-slate-50 px-3 py-1.5 rounded-lg z-20 print:border print:border-slate-200">
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
-                        <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
+                      {/* Chart */}
+                      <div className="flex-grow w-full min-h-[250px] -mt-4">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={chartData} margin={{top: 70, right: 10, bottom: 5, left: 0}}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
+                                <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 16, fontWeight: 600}} dy={10} />
+                                <YAxis yAxisId="left" hide={true} />
+                                <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
+
+                                <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
+                                <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
+                                <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
+                                <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]}>
+                                    <LabelList dataKey="totalExposure" content={<CustomBarLabel />} />
+                                </Bar>
+                            </ComposedChart>
+                          </ResponsiveContainer>
                       </div>
 
-                      <ResponsiveContainer width="100%" height="100%">
-                        <ComposedChart data={chartData} margin={{top: 30, right: 10, bottom: 5, left: 0}}>
-                            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9"/>
-                            <XAxis dataKey="year" axisLine={false} tickLine={false} tick={{fill: '#64748b', fontSize: 16, fontWeight: 600}} dy={10} />
-                            <YAxis yAxisId="left" hide={true} />
-                            <Tooltip content={<CustomTooltip />} cursor={{ fill: '#f8fafc' }} />
-
-                            <Bar yAxisId="left" dataKey="damage" name="נזק בפועל" stackId="a" fill={colors.chart.damage} radius={[0,0,6,6]} />
-                            <Bar yAxisId="left" dataKey="savedCollection" name="גבייה" stackId="a" fill={colors.chart.savedCollection} />
-                            <Bar yAxisId="left" dataKey="savedRetro" name="ניכוי יתרה" stackId="a" fill={colors.chart.savedRetro} />
-                            <Bar yAxisId="left" dataKey="savedNear" name="מניעה אקטיבית" stackId="a" fill={colors.chart.savedNear} radius={[6,6,0,0]}>
-                                <LabelList dataKey="totalExposure" content={<CustomBarLabel />} />
-                            </Bar>
-                        </ComposedChart>
-                      </ResponsiveContainer>
+                      {/* NEW: Legend at the bottom */}
+                      <div className="flex justify-center gap-6 text-sm font-medium mt-2 mb-1 bg-slate-50 px-6 py-2.5 rounded-xl border border-slate-100 w-fit mx-auto shrink-0 print:border-slate-200">
+                          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.damage}}></div>נזק בפועל</div>
+                          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedCollection}}></div>גבייה</div>
+                          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedRetro}}></div>ניכוי יתרה</div>
+                          <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full print:border print:border-slate-400" style={{backgroundColor: colors.chart.savedNear}}></div>מניעה אקטיבית</div>
+                      </div>
                   </div>
               </div>
 
